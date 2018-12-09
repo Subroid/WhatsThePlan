@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="colorPrimary">#10E7DC</color>
+    <color name="colorPrimaryDark">#1B9CE5</color>
+    <color name="colorAccent">#239CCA</color>
+
+    <color name="tealRedA44A4A">#A44A4A</color>
+    <color name="OrangeDD8968">#DD8968</color>
+    <color name="Olive">#708238</color>
+    <color name="CreamEEE0B7">#EEE0B7</color>
+
+
+    <color name="Blue10E7DC">#10E7DC</color>
+    <color name="Blue0074E1">#0074E1</color>
+    <color name="Blue1B9CE5">#1B9CE5</color>
+    <color name="Blue6CDAEE">#6CDAEE</color>
+    <color name="Blue112D32">#112D32</color>
+    <color name="Blue254E58">#254E58</color>
+    <color name="Blue25274D">#25274D</color>
+    <color name="Blue2E9CCA">#2E9CCA</color>
+    <!-- ^blue color shades -->
+
+    <color name="WhiteFFFFFF">#FFFFFF</color>
+
+
+</resources>
