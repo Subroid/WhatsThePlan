@@ -2,7 +2,7 @@
 <resources>
     <color name="colorPrimary">#10E7DC</color>
     <color name="colorPrimaryDark">#1B9CE5</color>
-    <color name="colorAccent">#239CCA</color>
+    <color name="colorAccent">#3da720</color>
 
     <color name="tealRedA44A4A">#A44A4A</color>
     <color name="OrangeDD8968">#DD8968</color>
@@ -21,6 +21,19 @@
     <!-- ^blue color shades -->
 
     <color name="WhiteFFFFFF">#FFFFFF</color>
+    <color name="Black000000">#000000</color>
+    <color name="GreyCDCDCD">#CDCDCD</color>
+
+    <color name="IndianRed">#CD5C5C</color>
+    <color name="PersianPink">#F77FBE</color>
+    <color name="ButterscotchOrange">#E09540</color>
+    <color name="TealGreen">#008080</color>
+    <color name="UnmellowYellow">#FFFF66</color>
+    <color name="InternationalOrange">#FF4F00</color>
+    // ^colors used in circular backgrounds
+
+
+
 
 
 </resources>

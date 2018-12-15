@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item
+        android:id="@+id/ic_home"
+        android:title="Home"
+        android:icon="@drawable/ic_home" />
+
+    <item
+        android:id="@+id/ic_events"
+        android:title="Events"
+        android:icon="@drawable/ic_calendar"/>
+    <item
+        android:id="@+id/ic_add"
+        android:title="Add"
+        android:icon="@drawable/ic_add" />
+
+    <item
+        android:id="@+id/ic_chat"
+        android:title="Chat"
+        android:icon="@drawable/ic_chat"/>
+
+    <item
+        android:id="@+id/ic_map"
+        android:title="Map"
+        android:icon="@drawable/ic_pin"/>
+
+
+</menu>
