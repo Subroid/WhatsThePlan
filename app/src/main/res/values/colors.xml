@@ -4,6 +4,8 @@
     <color name="colorPrimaryDark">#1B9CE5</color>
     <color name="colorAccent">#3da720</color>
 
+    <color name="transparent">#0000</color>
+
     <color name="tealRedA44A4A">#A44A4A</color>
     <color name="OrangeDD8968">#DD8968</color>
     <color name="Olive">#708238</color>

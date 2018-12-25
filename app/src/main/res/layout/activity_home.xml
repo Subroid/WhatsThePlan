@@ -4,6 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@drawable/gradient_blue"
     tools:context=".activities.HomeActivity">
 
     <android.support.v7.widget.Toolbar
@@ -15,12 +16,11 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:fontFamily="@font/grinchedregular"
+            android:fontFamily="cursive"
             android:gravity="center"
             android:text="What's The Plan"
             android:textColor="@color/WhiteFFFFFF"
-            android:textScaleX="1.3"
-            android:textSize="@dimen/_24ssp" />
+            android:textSize="@dimen/_20ssp"/>
 
     </android.support.v7.widget.Toolbar>
 

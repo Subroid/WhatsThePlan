@@ -22,12 +22,10 @@ dependencies {
 
     def android_latest_version = "28.0.0"
     // ^variable for the latest version of android support libraries
-
     implementation "com.android.support:support-v4:$android_latest_version"
     implementation "com.android.support:appcompat-v7:$android_latest_version"
     implementation "com.android.support:support-core-utils:$android_latest_version"
     // ^^^android support libraries for the backward compatibility
-
     implementation "com.android.support:cardview-v7:$android_latest_version"
     // ^cardview library by google
     implementation "com.android.support:recyclerview-v7:$android_latest_version"
@@ -63,6 +61,22 @@ dependencies {
     implementation 'com.google.firebase:firebase-auth:16.1.0' // ^Authentication
     implementation 'com.google.firebase:firebase-storage:16.0.5' // ^Storage
     // ^^Firebase libraries by Google
+
+    def firebaseui_latest_version = "4.3.0"
+    // FirebaseUI for Firebase Realtime Database
+    implementation "com.firebaseui:firebase-ui-database:$firebaseui_latest_version"
+    // FirebaseUI for Cloud Firestore
+    implementation "com.firebaseui:firebase-ui-firestore:$firebaseui_latest_version"
+    // FirebaseUI for Firebase Auth
+    implementation "com.firebaseui:firebase-ui-auth:$firebaseui_latest_version"
+    // FirebaseUI for Firebase Auth (GitHub provider)
+    implementation "com.firebaseui:firebase-ui-auth-github:$firebaseui_latest_version"
+    // FirebaseUI for Cloud Storage
+    implementation "com.firebaseui:firebase-ui-storage:$firebaseui_latest_version"
+
+    // Fancy-Toast by Shashank02051997
+    implementation 'com.github.Shashank02051997:FancyToast-Android:0.1.3'
+
 
 
     implementation fileTree(dir: 'libs', include: ['*.jar'])

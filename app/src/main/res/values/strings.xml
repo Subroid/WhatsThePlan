@@ -1,4 +1,7 @@
 <resources>
     <string name="app_name">WhatsThePlan</string>
     <string name="title_activity_open_events">Map</string>
+    <string name="api_key_googlejson">AIzaSyCU2WPwcmUm4kivx5ldetU2FGNsN7mu4w4</string>
+    <string name="client_id_googlejson">986222016224-td05bv3bh9r2p863jnubtsgf3j8of0dg.apps.googleusercontent.com</string>
+    <string name="title_activity_restaurants">Map</string>
 </resources>

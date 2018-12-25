@@ -16,33 +16,14 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:fontFamily="@font/grinchedregular"
+            android:fontFamily="@font/ostrichssansbold"
             android:gravity="center"
             android:text="Map"
             android:textColor="@color/WhiteFFFFFF"
-            android:textScaleX="1.3"
+            android:textScaleX="1.5"
             android:textSize="@dimen/_24ssp" />
 
     </android.support.v7.widget.Toolbar>
-
-    <Switch
-        android:id="@+id/oa_currentLocationSWCH"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:elevation="@dimen/_1sdp"
-        android:text="Your Live Location"
-        android:textColor="@color/WhiteFFFFFF"
-        android:textStyle="bold"
-        android:background="@color/colorPrimaryDark"
-        android:switchPadding="@dimen/_5sdp"
-        android:padding="@dimen/_2sdp"
-        android:paddingStart="@dimen/_5sdp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.95"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.100000024" />
 
 
     <fragment xmlns:android="http://schemas.android.com/apk/res/android"

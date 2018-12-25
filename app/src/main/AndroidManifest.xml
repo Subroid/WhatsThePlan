@@ -2,11 +2,13 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="platinum.whatstheplan">
 
+    <uses-feature android:name="android.hardware.location.gps" />
+
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
-
     <!-- ^^runtime permissions for internet and gps -->
+
     <application
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
@@ -30,21 +32,23 @@
         <activity android:name=".activities.ChatActivity" />
         <activity android:name=".activities.MapActivity" />
         <activity android:name=".activities.SportsActivity" />
-        <!--
-             The API key for Google Maps-based APIs is defined as a string resource.
-             (See the file "res/values/google_maps_api.xml").
-             Note that the API key is linked to the encryption key used to sign the APK.
-             You need a different API key for each encryption key, including the release key that is used to
-             sign the APK for publishing.
-             You can define the keys for the debug and release targets in src/debug/ and src/release/. 
-        -->
-        <meta-data
-            android:name="com.google.android.maps.v2.API_KEY"
-            android:value="@string/google_maps_key" />
 
         <activity
             android:name=".activities.OpenEventsActivity"
-            android:label="@string/title_activity_open_events"></activity>
+            android:label="@string/title_activity_open_events" />
+        <activity android:name=".activities.authentications.SignUpActivity" />
+        <activity android:name=".activities.authentications.SignInActivity" />
+        <activity android:name=".activities.authentications.NameSubmitActivity" />
+
+        <activity
+            android:name=".activities.RestaurantsActivity"
+            android:label="@string/title_activity_restaurants"></activity>
+
+
+        <meta-data
+            android:name="com.google.android.geo.API_KEY"
+            android:value="@string/google_maps_key" />
+
     </application>
 
 </manifest>

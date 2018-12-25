@@ -9,5 +9,31 @@
         android:font="@font/grinchedregular"
         app:font="@font/grinchedregular"/>
 
+    <font android:font="@font/ostrichsansinlineregular"
+        app:font="@font/dinerskinny"/>
+
+    <font android:font="@font/ostrichssansbold"
+        app:font="@font/dinerskinny"/>
+
+    <font android:font="@font/monoidregular"
+        app:font="@font/dinerskinny"/>
+
+    <font
+        android:font="@font/dinerregular"
+        app:font="@font/dinerregular"/>
+
+    <font
+        android:font="@font/dinerfatt"
+        app:font="@font/dinerfatt"/>
+
+    <font
+        android:font="@font/frscript"
+        app:font="@font/frscript"/>
+
+
+    <font
+        android:font="@font/navibase"
+        app:font="@font/navibase"/>
+
 
 </font-family>
