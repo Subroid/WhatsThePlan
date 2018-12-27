@@ -74,6 +74,9 @@ dependencies {
     // FirebaseUI for Cloud Storage
     implementation "com.firebaseui:firebase-ui-storage:$firebaseui_latest_version"
 
+    implementation 'com.github.imperiumlabs:GeoFirestore-Android:v1.1.1'
+    // GeoFirestore library by imperiumlabs
+
     // Fancy-Toast by Shashank02051997
     implementation 'com.github.Shashank02051997:FancyToast-Android:0.1.3'
 

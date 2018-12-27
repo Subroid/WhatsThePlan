@@ -16,9 +16,6 @@ import android.support.v4.content.ContextCompat;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
-import android.view.ViewGroup;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.gms.location.FusedLocationProviderClient;
@@ -30,14 +27,13 @@ import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
-import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 
 import platinum.whatstheplan.R;
 
 /**
- * Right now, an activity that displays a map showing the place at the device's current location.
+ * Right now, an activity that displays a mapFragment showing the place at the device's current location.
  */
 
 public class OpenEventsActivity extends FragmentActivity implements OnMapReadyCallback {
@@ -75,7 +71,7 @@ public class OpenEventsActivity extends FragmentActivity implements OnMapReadyCa
         // ^Retrieving location and camera position from saved instance state.
 
         setContentView(R.layout.activity_open_events);
-        // Obtain the SupportMapFragment and get notified when the map is ready to be used.
+        // Obtain the SupportMapFragment and get notified when the mapFragment is ready to be used.
 
         initViewsAndVariables ();
 
@@ -113,15 +109,15 @@ public class OpenEventsActivity extends FragmentActivity implements OnMapReadyCa
             mFusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this);
 
             mMapFragment = (SupportMapFragment) getSupportFragmentManager()
-                    .findFragmentById(R.id.map);
+                    .findFragmentById(R.id.mapFragment);
             mMapFragment.getMapAsync(this);
 
         }
 
 
     /**
-     * Manipulates the map once available.
-     * This callback is triggered when the map is ready to be used.
+     * Manipulates the mapFragment once available.
+     * This callback is triggered when the mapFragment is ready to be used.
      * This is where we can add markers or lines, add listeners or move the camera. In this case,
      * we just add a marker near Sydney, Australia.
      * If Google Play services is not installed on the device, the user will be prompted to install
@@ -257,7 +253,7 @@ public class OpenEventsActivity extends FragmentActivity implements OnMapReadyCa
     }
 
     /**
-     * Updates the map's UI settings based on whether the user has granted location permission.
+     * Updates the mapFragment's UI settings based on whether the user has granted location permission.
      */
     private void updateLocationUI() {
         if (mMap == null) {
@@ -294,7 +290,7 @@ public class OpenEventsActivity extends FragmentActivity implements OnMapReadyCa
                           if (task.isSuccessful() && task.getResult() != null) {
                               mLastKnownLocation = task.getResult();
                               Log.d(TAG, "onComplete: mLastKnownLocation = " + mLastKnownLocation);
-                              // Set the map's camera position to the current location of the device.
+                              // Set the mapFragment's camera position to the current location of the device.
                               mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(
                                       mLastKnownLocation.getLatitude(), mLastKnownLocation.getLongitude()
                               ), DEFAULT_ZOOM));

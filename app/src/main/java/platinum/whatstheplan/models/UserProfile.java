@@ -1,6 +1,6 @@
 package platinum.whatstheplan.models;
 
-public class User {
+public class UserProfile {
 
     String email;
     String password;
@@ -8,16 +8,10 @@ public class User {
     String name;
     String uid;
 
-    public User() {
+    public UserProfile() {
     }
 
-    public User(String email, String password, boolean isAdmin) {
-        this.email = email;
-        this.password = password;
-        this.isAdmin = isAdmin;
-    }
-
-    public User(String email, String password, boolean isAdmin, String name, String uid) {
+    public UserProfile(String email, String password, boolean isAdmin, String name, String uid) {
         this.email = email;
         this.password = password;
         this.isAdmin = isAdmin;

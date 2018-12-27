@@ -6,7 +6,6 @@
 
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
-    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
     <!-- ^^runtime permissions for internet and gps -->
 
     <application
@@ -42,6 +41,10 @@
 
         <activity
             android:name=".activities.RestaurantsActivity"
+            android:label="@string/title_activity_restaurants"></activity>
+
+        <activity
+            android:name=".activities.RestaurantsActivity2"
             android:label="@string/title_activity_restaurants"></activity>
 
 

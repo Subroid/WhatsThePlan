@@ -1,26 +1,45 @@
 package platinum.whatstheplan.activities;
 
+import android.Manifest;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.location.Location;
+import android.provider.Settings;
+import android.support.annotation.NonNull;
 import android.support.constraint.ConstraintLayout;
 import android.support.design.bottomnavigation.LabelVisibilityMode;
+import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
-import com.google.firebase.auth.FirebaseUser;
+import com.google.android.gms.location.FusedLocationProviderClient;
+import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.location.LocationSettingsRequest;
+import com.google.android.gms.location.LocationSettingsResponse;
+import com.google.android.gms.location.SettingsClient;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.GeoPoint;
 import com.ittianyu.bottomnavigationviewex.BottomNavigationViewEx;
 
 import platinum.whatstheplan.R;
 import platinum.whatstheplan.activities.authentications.SignInActivity;
+import platinum.whatstheplan.models.UserLocation;
 import platinum.whatstheplan.utils.BottomNavigationViewHelper;
+
+import static platinum.whatstheplan.utils.Constants.REQUEST_LOCATION_PERMISSIONS_CODE_52;
 
 public class HomeActivity extends AppCompatActivity {
 
-    private static final String TAG = "HomeActivity";
+    private static final String TAG = "HomeActivityTag";
     private BottomNavigationViewEx bottomNavigationViewEx;
     private Context mContext;
     private ConstraintLayout restaurantsCL;
@@ -33,18 +52,24 @@ public class HomeActivity extends AppCompatActivity {
     private ImageView featuredBgIV;
     private ImageView exclusiveBgIV;
     private com.google.firebase.auth.FirebaseUser mCurrentUser;
+    private boolean mIsGpsEnabled;
+    private Location mCurrentLocation;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_home);
 
-        getCurrentUser ();
-        initViewsAndVariables ();
-        performActions ();
+        Log.d(TAG, "onCreate: mIsGpsEnabled = " + mIsGpsEnabled);
+
+        getCurrentUser();
+        initViewsAndVariables();
+        performActions();
+
     }
 
         private void getCurrentUser() {
+        Log.d(TAG, "getCurrentUser: mIsGpsEnabled = " + mIsGpsEnabled);
             mCurrentUser = com.google.firebase.auth.FirebaseAuth.getInstance().getCurrentUser();
             if (mCurrentUser == null) {
                 android.content.Intent signInIntent = new android.content.Intent(HomeActivity.this,

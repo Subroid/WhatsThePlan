@@ -14,12 +14,14 @@ import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.GeoPoint;
 import com.shashank.sony.fancytoastlib.FancyToast;
 
 import platinum.whatstheplan.R;
-import platinum.whatstheplan.models.User;
+import platinum.whatstheplan.models.UserInformation;
+import platinum.whatstheplan.models.UserLocation;
+import platinum.whatstheplan.models.UserProfile;
 
 public class SignUpActivity extends AppCompatActivity {
 
@@ -61,23 +63,21 @@ public class SignUpActivity extends AppCompatActivity {
                                             final FirebaseFirestore firestore = FirebaseFirestore.getInstance();
                                             final FirebaseUser current_user = FirebaseAuth.getInstance().getCurrentUser();
                                         Log.d(TAG, "onComplete: current_user.getUid() = " + current_user.getUid());
-                                            User user = new User(mEmailString, mPasswordString, false);
-                                        firestore.collection("Users").add(user).addOnCompleteListener(
-                                                new OnCompleteListener<DocumentReference>() {
+                                            UserProfile userProfile = new UserProfile(mEmailString, mPasswordString, false, null, current_user.getUid());
+                                            UserLocation userLocation = new UserLocation();
+                                            UserInformation userInformation = new UserInformation(userProfile, userLocation);
+                                        firestore.collection("Users").document(current_user.getUid()).set(userInformation)
+                                                .addOnCompleteListener(new OnCompleteListener<Void>() {
                                                     @Override
-                                                    public void onComplete(@NonNull Task<DocumentReference> task) {
-                                                       String documentId = task.getResult().getId();
-                                                        Log.d(TAG, "onComplete: documentId = " + documentId);
-                                                        firestore.collection("Users")
-                                                                .document(documentId).update("uid", current_user.getUid());
-                                                        Intent nameSubmitIntent = new Intent(
-                                                                SignUpActivity.this, NameSubmitActivity.class);
-                                                        nameSubmitIntent.putExtra("documentId", documentId);
-                                                        startActivity(nameSubmitIntent);
-                                                        finish();
+                                                    public void onComplete(@NonNull Task<Void> task) {
+                                                        if (task.isSuccessful()) {
+                                                            Intent nameSubmitIntent = new Intent(
+                                                                    SignUpActivity.this, NameSubmitActivity.class);
+                                                            startActivity(nameSubmitIntent);
+                                                            finish();
+                                                        }
                                                     }
-                                                }
-                                        );
+                                                });
                                     } else {
                                         Log.w(TAG, "createUserWithEmail:failure", task.getException());
                                         FancyToast.makeText(getApplicationContext(),
