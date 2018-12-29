@@ -7,14 +7,16 @@ public class Restaurant {
     private String name;
     private String address;
     private GeoPoint geoLocation;
+    private String image;
 
     public Restaurant() {
     }
 
-    public Restaurant(String name, String address, GeoPoint geoLocation) {
+    public Restaurant(String name, String address, GeoPoint geoLocation, String image) {
         this.name = name;
         this.address = address;
         this.geoLocation = geoLocation;
+        this.image = image;
     }
 
     public String getName() {
@@ -39,5 +41,13 @@ public class Restaurant {
 
     public void setGeoLocation(GeoPoint geoLocation) {
         this.geoLocation = geoLocation;
+    }
+
+    public String getImage() {
+        return image;
+    }
+
+    public void setImage(String image) {
+        this.image = image;
     }
 }

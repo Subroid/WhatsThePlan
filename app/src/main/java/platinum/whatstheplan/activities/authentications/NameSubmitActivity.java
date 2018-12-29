@@ -62,7 +62,7 @@ public class NameSubmitActivity extends AppCompatActivity implements View.OnClic
                             .document(current_user.getUid()).get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
                         @Override
                         public void onComplete(@NonNull Task<DocumentSnapshot> task) {
-                            if (task.isSuccessful() && task.getResult() != null) {
+                            /*if (task.isSuccessful() && task.getResult() != null) {
                                 UserInformation userInformationResult = task.getResult().toObject(UserInformation.class);
                                 UserProfile userProfile = new UserProfile();
                                 userProfile.setName(userInformationResult.getUserProfile().getName());
@@ -72,12 +72,14 @@ public class NameSubmitActivity extends AppCompatActivity implements View.OnClic
                                 userProfile.setUid(userInformationResult.getUserProfile().getUid());
                                 UserLocation userLocation = new UserLocation();
                                 userLocation.setGeoPoint(userInformationResult.getUserLocation().getGeoPoint());
-                                userLocation.setTimeStamp(userInformationResult.getUserLocation().getTimeStamp());
+                                userLocation.setTimeStamp(userInformationResult.getUserLocation().getTimeStamp());*/
 
-                                UserInformation userInformation = new UserInformation(userProfile, userLocation);
+//                                UserInformation userInformation = new UserInformation(userProfile, userLocation);
                                 FirebaseFirestore.getInstance().collection("Users")
-                                        .document(current_user.getUid()).set(userInformation);
-                            }
+                                        .document(current_user.getUid()).update(
+                                                "userProfile.name",
+                                                mFirstNameString + " " + mLastNameString);
+//                            }
                         }
                     });
                         Intent homeIntent = new Intent(NameSubmitActivity.this, HomeActivity.class);
