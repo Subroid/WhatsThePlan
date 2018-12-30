@@ -7,6 +7,9 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.graphics.Bitmap;
+import android.graphics.Canvas;
+import android.graphics.drawable.Drawable;
 import android.location.Location;
 import android.location.LocationManager;
 import android.provider.Settings;
@@ -32,9 +35,15 @@ import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.BitmapDescriptor;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.CircleOptions;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.MapStyleOptions;
+import com.google.android.gms.maps.model.Marker;
+import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.gms.maps.model.PolylineOptions;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
@@ -50,6 +59,7 @@ import java.util.Map;
 
 import platinum.whatstheplan.R;
 import platinum.whatstheplan.adapters.RestaurantsAdapter;
+import platinum.whatstheplan.interfaces.TapListener;
 import platinum.whatstheplan.models.Restaurant;
 import platinum.whatstheplan.models.UserInformation;
 import platinum.whatstheplan.models.UserLocation;
@@ -59,7 +69,8 @@ import static platinum.whatstheplan.utils.Constants.REQUEST_ERROR_DIALOG_CODE_61
 import static platinum.whatstheplan.utils.Constants.REQUEST_LOCATION_PERMISSIONS_CODE_52;
 import static platinum.whatstheplan.utils.Constants.REQUEST_LOCATION_SETTINGS_CODE_51;
 
-public class RestaurantsActivity extends FragmentActivity implements OnMapReadyCallback {
+public class RestaurantsActivity extends FragmentActivity implements OnMapReadyCallback,
+                                                                        TapListener {
 
     //todo all the methods which returns or accepts parameter of Context or Activity
 
@@ -76,6 +87,10 @@ public class RestaurantsActivity extends FragmentActivity implements OnMapReadyC
     private RecyclerView mRestaurantsRV;
     private UserInformation mUserInformation;
     private FirebaseUser mUser;
+    private Marker mMarker;
+    private Marker mUserMarker;
+    private LatLng mUserLatLng;
+    private LatLng mTargetLatLng;
 
 
     @Override
@@ -262,11 +277,7 @@ public class RestaurantsActivity extends FragmentActivity implements OnMapReadyC
     }
 
     private void requestLocationPermission() {
-        /*
-         * Request location permission, so that we can get the location of the
-         * device. The result of the permission request is handled by a callback,
-         * onRequestPermissionsResult.
-         */
+
         Log.d(TAG, "requestLocationPermission: called");
         if (ContextCompat.checkSelfPermission(this.getApplicationContext(),
                 android.Manifest.permission.ACCESS_FINE_LOCATION)
@@ -279,6 +290,7 @@ public class RestaurantsActivity extends FragmentActivity implements OnMapReadyC
                     REQUEST_LOCATION_PERMISSIONS_CODE_52);
             ActivityCompat.shouldShowRequestPermissionRationale(RestaurantsActivity.this,
                                                 android.Manifest.permission.ACCESS_FINE_LOCATION);
+
         }
     }
 
@@ -301,34 +313,16 @@ public class RestaurantsActivity extends FragmentActivity implements OnMapReadyC
         }
     }
 
-    /*private Task<LocationSettingsResponse> getLocationSettingsTask() {
-        LocationSettingsRequest.Builder location_settings_request_builder = new LocationSettingsRequest.Builder();
-        location_settings_request_builder.setAlwaysShow(true);
-        SettingsClient settingsClient = LocationServices.getSettingsClient(RestaurantsActivity.this);
-
-        return settingsClient.checkLocationSettings(location_settings_request_builder.build());
-
-    }*/
-
-    /*2*/
-    /*private void initMap() {
-        Log.d(TAG, "initMap: called");
-
-        SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
-                .findFragmentById(R.id.mapFragment);
-        mapFragment.getMapAsync(this);
-    }*/
-
     @Override
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
         Log.d(TAG, "onMapReady: called");
-        stylizeMap ();
+        initMap();
         getUserCurrentLocationAndSaveIntoRemoteDatabase ();
 
     }
 
-    private void stylizeMap() {
+    private void initMap() {
         mMap.setMapStyle(MapStyleOptions.loadRawResourceStyle(RestaurantsActivity.this, R.raw.style_json));
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             Log.d(TAG, "getUserCurrentLocationAndSaveIntoRemoteDatabase: if called");
@@ -336,6 +330,7 @@ public class RestaurantsActivity extends FragmentActivity implements OnMapReadyC
         } else {
             Log.d(TAG, "getUserCurrentLocationAndSaveIntoRemoteDatabase: else called");
             mMap.setMyLocationEnabled(true);
+            mMap.getUiSettings().setMapToolbarEnabled(false);
         }
     }
 
@@ -358,6 +353,7 @@ public class RestaurantsActivity extends FragmentActivity implements OnMapReadyC
                         userCurrentLocationResults[0] = task.getResult();
                         mUserCurrentLocation = userCurrentLocationResults[0];
                         moveCameraToUserCurrentLocation (mUserCurrentLocation);
+                        setUserMarker ();
                         saveUserLocationIntoFirestoreThenDisplayRestaurantsNearUserLocation ();
                         Log.d(TAG, "onComplete: userCurrentLocationResults[0] = " + userCurrentLocationResults[0].getLatitude());
                     } else {
@@ -370,12 +366,23 @@ public class RestaurantsActivity extends FragmentActivity implements OnMapReadyC
 
     }
 
+    private void setUserMarker() {
+        LatLng latLng = new LatLng(mUserCurrentLocation.getLatitude(), mUserCurrentLocation.getLongitude());
+        mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng, 15.0f));
+        mUserMarker = mMap.addMarker(new MarkerOptions()
+                .position(latLng)
+                .title("You are here")
+                .snippet("Find Restaurants around you"));
+        mUserMarker.showInfoWindow();
+    }
+
     private void moveCameraToUserCurrentLocation(Location location) {
         Log.d(TAG, "moveCameraToUserCurrentLocation: called");
         mLastLatLng = new LatLng(location.getLatitude(), location.getLongitude());
         Log.d(TAG, "moveCameraToUserCurrentLocation: latitude = " + mLastLatLng.latitude);
-        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(mLastLatLng, 15));
+        mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(mLastLatLng, 15));
         mMap.addCircle(new CircleOptions().center(mLastLatLng).radius(2.0));
+
     }
 
     private void addOnMyLocationButtonClickListener() {
@@ -512,7 +519,87 @@ public class RestaurantsActivity extends FragmentActivity implements OnMapReadyC
 
                             }
 
+    @Override
+    public void onTap(Restaurant restaurant, int viewId, int itemPosition) {
+        Log.d(TAG, "onTap: viewId = " + viewId);
+        switch (viewId) {
+            case R.id.show_on_map_BTN :
+                Log.d(TAG, "onTap: restaurant.getName() = " + restaurant.getName());
+                setTargetMarker (restaurant, itemPosition);
+                break;
+            case R.id.get_direction_BTN :
+                Log.d(TAG, "onTap: mMarker.getId() = " + mMarker.getId());
+//                setTargetMarker (restaurant, itemPosition);
+                getDirection (restaurant, mUserCurrentLocation, itemPosition);
+
+        }
+
+    }
+
+    private void setUserMarkerWithoutUpdatingCamera() {
+        LatLng latLng = new LatLng(mUserCurrentLocation.getLatitude(), mUserCurrentLocation.getLongitude());
+        mUserMarker = mMap.addMarker(new MarkerOptions()
+                .position(latLng)
+                .title("You are here")
+                .snippet("Find Restaurants around you"));
+        mUserMarker.showInfoWindow();
+    }
+
+    private BitmapDescriptor bitmapDescriptorFromVector(Context context, int vectorResId) {
+        Drawable vectorDrawable = ContextCompat.getDrawable(context, vectorResId);
+        vectorDrawable.setBounds(0, 0, vectorDrawable.getIntrinsicWidth(), vectorDrawable.getIntrinsicHeight());
+        Bitmap bitmap = Bitmap.createBitmap(vectorDrawable.getIntrinsicWidth(), vectorDrawable.getIntrinsicHeight(), Bitmap.Config.ARGB_8888);
+        Canvas canvas = new Canvas(bitmap);
+        vectorDrawable.draw(canvas);
+        return BitmapDescriptorFactory.fromBitmap(bitmap);
+    }
 
 
+    private void getDirection(Restaurant restaurant, Location userCurrentLocation, int itemPosition) {
+        Log.d(TAG, "getDirection: called");
+        Log.d(TAG, "getDirection: itemPosition = " + itemPosition);
+        Log.d(TAG, "getDirection: markerTag = " + mMarker.getTag());
+        if (mMarker != null) {
+            if (itemPosition == (int) mMarker.getTag()) {
+                nowGetDirection(restaurant);
+            } else {
+                setTargetMarker (restaurant, itemPosition);
+                nowGetDirection (restaurant);
+            }
+        }
 
+    }
+
+    private void nowGetDirection(Restaurant restaurant) {
+        Log.d(TAG, "nowGetDirection: called");
+        mUserLatLng = new LatLng(mUserCurrentLocation.getLatitude(), mUserCurrentLocation.getLongitude());
+        mTargetLatLng = new LatLng(restaurant.getGeoLocation().getLatitude(), restaurant.getGeoLocation().getLongitude());
+        mMap.addPolyline(new PolylineOptions().add(mUserLatLng, mTargetLatLng).clickable(true));
+        Log.d(TAG, "nowGetDirection: done");
+        if (mUserLatLng.latitude > mTargetLatLng.latitude) {
+            mMap.animateCamera(CameraUpdateFactory.newLatLngBounds(new LatLngBounds(mTargetLatLng, mUserLatLng), 50));
+        } else {
+            mMap.animateCamera(CameraUpdateFactory.newLatLngBounds(new LatLngBounds(mTargetLatLng, mUserLatLng), 50));
+        }
+    }
+
+
+    private void setTargetMarker(Restaurant restaurant, int itemPosition) {
+        if (mMarker != null) {
+            Log.d(TAG, "onTap: marker not null");
+            mMarker.remove(); // todo : this method is not working maybe because map is getting instantiated twice (onCreate & onResume)
+            mMarker = null;
+            mMap.clear();
+        }
+        setUserMarkerWithoutUpdatingCamera ();
+        LatLng latLng = new LatLng(restaurant.getGeoLocation().getLatitude(), restaurant.getGeoLocation().getLongitude());
+        mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng, 15.0f));
+        mMarker = mMap.addMarker(new MarkerOptions()
+                .position(latLng)
+                .title(restaurant.getName())
+                .snippet(restaurant.getAddress()));
+        mMarker.setTag(itemPosition);
+        mMarker.showInfoWindow();
+        Log.d(TAG, "setTargetMarker: done");
+    }
 }

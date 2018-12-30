@@ -9,6 +9,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -23,6 +24,7 @@ import com.google.android.gms.maps.model.MarkerOptions;
 import java.text.DecimalFormat;
 
 import platinum.whatstheplan.R;
+import platinum.whatstheplan.interfaces.TapListener;
 import platinum.whatstheplan.models.Restaurant;
 import platinum.whatstheplan.models.UserInformation;
 
@@ -36,6 +38,7 @@ public class RestaurantsAdapter extends FirestoreRecyclerAdapter<Restaurant, Res
     UserInformation mUserInformation;
     GoogleMap mMap;
     float[] distanceResults = new float[2];
+    Restaurant mRestaurant;
 
     /**
      * Initialize a {@link RecyclerView.Adapter} that listens to a Firebase query. See
@@ -78,9 +81,13 @@ public class RestaurantsAdapter extends FirestoreRecyclerAdapter<Restaurant, Res
         Glide.with(mContext).load(Uri.parse(restaurant.getImage())).into(holder.restaurant_image_IV);
         LatLng restaurantLatLng = new LatLng(restaurant.getGeoLocation().getLatitude(), restaurant.getGeoLocation().getLongitude());
         mMap.addMarker(new MarkerOptions().position(restaurantLatLng));
+        holder.show_on_button_BTN.setTag(R.id.TAG_FOR_RESTAURANT, restaurant);
+        holder.show_on_button_BTN.setTag(R.id.TAG_FOR_POSITION, position);
+        holder.get_direction_BTN.setTag(R.id.TAG_FOR_RESTAURANT, restaurant);
+        holder.get_direction_BTN.setTag(R.id.TAG_FOR_POSITION, position);
+        holder.get_direction_BTN.setEnabled(false);
 
     }
-
             private float getDistancBetweenTwoPoints(double lat1, double long1, double lat2, double long2) {
                 Location.distanceBetween(lat1, long1, lat1, long2, distanceResults);
                 return distanceResults[0];
@@ -95,10 +102,12 @@ public class RestaurantsAdapter extends FirestoreRecyclerAdapter<Restaurant, Res
         return viewHolder;
     }
 
-    class RestaurantViewHolder extends RecyclerView.ViewHolder {
+    class RestaurantViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
         TextView restaurant_name_TV;
         TextView distance_TV;
         ImageView restaurant_image_IV;
+        Button show_on_button_BTN;
+        Button get_direction_BTN;
 
 
         public RestaurantViewHolder(@NonNull View itemView) {
@@ -106,6 +115,40 @@ public class RestaurantsAdapter extends FirestoreRecyclerAdapter<Restaurant, Res
             restaurant_name_TV = itemView.findViewById(R.id.restaurant_name_TV);
             distance_TV = itemView.findViewById(R.id.distance_TV);
             restaurant_image_IV = itemView.findViewById(R.id.restaurant_image_IV);
+            show_on_button_BTN = itemView.findViewById(R.id.show_on_map_BTN);
+            get_direction_BTN = itemView.findViewById(R.id.get_direction_BTN);
+
+            show_on_button_BTN.setOnClickListener(this);
+            get_direction_BTN.setEnabled(false);
+            get_direction_BTN.setAlpha(0.5f);
+            get_direction_BTN.setOnClickListener(this);
+
+        }
+
+        @Override
+        public void onClick(View view) {
+            switch (view.getId()) {
+                case R.id.show_on_map_BTN :
+                    Log.d(TAG, "onClick: show_on_map_BTN");
+                    setTapListener (view);
+                    get_direction_BTN.setEnabled(true);
+                    get_direction_BTN.setAlpha(1.0f);
+                    break;
+                case R.id.get_direction_BTN :
+                    Log.d(TAG, "onClick: getdirection_btn");
+                    setTapListener(view);
+                    break;
+
+            }
+        }
+
+        public void setTapListener(View view) {
+            mRestaurant = (Restaurant) view.getTag(R.id.TAG_FOR_RESTAURANT);
+            Log.d(TAG, "setTapListener: restaurant.getName() = " + mRestaurant.getName());
+            int position = (int) view.getTag(R.id.TAG_FOR_POSITION);
+            int viewId = view.getId();
+            TapListener tapListener = (TapListener) mContext;
+            tapListener.onTap (mRestaurant, viewId, position);
         }
     }
 
