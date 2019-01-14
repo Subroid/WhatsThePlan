@@ -6,8 +6,8 @@
 
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
-    <!-- ^^runtime permissions for internet and gps -->
 
+    <!-- ^^runtime permissions for internet and gps -->
     <application
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
@@ -31,27 +31,26 @@
         <activity android:name=".activities.ChatActivity" />
         <activity android:name=".activities.MapActivity" />
         <activity android:name=".activities.SportsActivity" />
-
         <activity
             android:name=".activities.OpenEventsActivity"
             android:label="@string/title_activity_open_events" />
         <activity android:name=".activities.authentications.SignUpActivity" />
         <activity android:name=".activities.authentications.SignInActivity" />
         <activity android:name=".activities.authentications.NameSubmitActivity" />
-
         <activity
             android:name=".activities.RestaurantsActivity"
-            android:label="@string/title_activity_restaurants"></activity>
-
+            android:label="@string/title_activity_restaurants" />
         <activity
             android:name=".activities.RestaurantsActivity2"
-            android:label="@string/title_activity_restaurants"></activity>
-
+            android:label="@string/title_activity_restaurants" />
 
         <meta-data
             android:name="com.google.android.geo.API_KEY"
             android:value="@string/google_maps_key" />
 
+        <activity android:name=".activities.FoodListActivity" />
+        <activity android:name=".activities.authentications.PasswordResetActivity" />
+        <activity android:name=".activities.PartiesActivity"></activity>
     </application>
 
 </manifest>

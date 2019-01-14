@@ -45,6 +45,7 @@ public class HomeActivity extends AppCompatActivity {
     private ConstraintLayout restaurantsCL;
     private ConstraintLayout sportsCL;
     private ConstraintLayout openeventsCL;
+    private ConstraintLayout partiesCL;
     private ImageView restaurantsBgIV;
     private ImageView openeventsBgIV;
     private ImageView partiesBgIV;
@@ -83,6 +84,7 @@ public class HomeActivity extends AppCompatActivity {
                     bottomNavigationViewEx = findViewById(R.id.ha_BottomNavigationView);
                     restaurantsCL = findViewById(R.id.restaurants_CL);
                     openeventsCL = findViewById(R.id.openevents_CL);
+                    partiesCL = findViewById(R.id.parties_CL);
                     sportsCL = findViewById(R.id.sports_CL);
                     restaurantsBgIV = findViewById(R.id.restaurants_bg_IV);
                     openeventsBgIV = findViewById(R.id.openevents_bg_IV);
@@ -133,9 +135,21 @@ public class HomeActivity extends AppCompatActivity {
                 restaurantsCL.setOnClickListener(getOnClickListenerInstanceForRestaurantsCL ());
                 sportsCL.setOnClickListener(getOnClickListenerInstanceForSportsCL ());
                 openeventsCL.setOnClickListener(getOnClickListenerInstanceForOpenEventsCL ());
+                partiesCL.setOnClickListener(getOnClickListenerInstanceForPartiesCL ());
             }
 
-                private View.OnClickListener getOnClickListenerInstanceForRestaurantsCL() {
+    private View.OnClickListener getOnClickListenerInstanceForPartiesCL() {
+        View.OnClickListener onClickListener = new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent partiesIntent = new Intent(HomeActivity.this, PartiesActivity.class);
+                startActivity(partiesIntent);
+            }
+        };
+        return onClickListener;
+    }
+
+    private View.OnClickListener getOnClickListenerInstanceForRestaurantsCL() {
                     View.OnClickListener onClickListener = new View.OnClickListener() {
                         @Override
                         public void onClick(View view) {

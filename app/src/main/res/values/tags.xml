@@ -2,5 +2,8 @@
 <resources>
     <item name="TAG_FOR_RESTAURANT" type="id"/>
     <item name="TAG_FOR_POSITION" type="id"/>
+    <item name="TAG_FOR_ID" type="id"/>
+    <item name="TAG_FOR_PARTY" type="id"/>
+    <item name="TAG_FOR_EVENT" type="id"/>
 
 </resources>

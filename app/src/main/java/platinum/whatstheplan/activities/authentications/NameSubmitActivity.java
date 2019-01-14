@@ -65,7 +65,7 @@ public class NameSubmitActivity extends AppCompatActivity implements View.OnClic
                             /*if (task.isSuccessful() && task.getResult() != null) {
                                 UserInformation userInformationResult = task.getResult().toObject(UserInformation.class);
                                 UserProfile userProfile = new UserProfile();
-                                userProfile.setName(userInformationResult.getUserProfile().getName());
+                                userProfile.setEvent_name(userInformationResult.getUserProfile().getEvent_name());
                                 userProfile.setEmail(userInformationResult.getUserProfile().getEmail());
                                 userProfile.setAdmin(userInformationResult.getUserProfile().isAdmin());
                                 userProfile.setPassword(userInformationResult.getUserProfile().getPassword());

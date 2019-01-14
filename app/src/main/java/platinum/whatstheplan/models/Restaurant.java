@@ -8,6 +8,7 @@ public class Restaurant {
     private String address;
     private GeoPoint geoLocation;
     private String image;
+    private String id;
 
     public Restaurant() {
     }
@@ -17,6 +18,14 @@ public class Restaurant {
         this.address = address;
         this.geoLocation = geoLocation;
         this.image = image;
+    }
+
+    public Restaurant(String name, String address, GeoPoint geoLocation, String image, String id) {
+        this.name = name;
+        this.address = address;
+        this.geoLocation = geoLocation;
+        this.image = image;
+        this.id = id;
     }
 
     public String getName() {
@@ -49,5 +58,13 @@ public class Restaurant {
 
     public void setImage(String image) {
         this.image = image;
+    }
+
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
     }
 }

@@ -6,17 +6,23 @@
     android:layout_height="match_parent"
     tools:context=".activities.EventsActivity">
 
+    <android.support.v7.widget.Toolbar
+        android:id="@+id/toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/colorPrimaryDark">
 
-    <TextView
-        android:id="@+id/textView2"
-        android:layout_width="wrap_content"
-        android:layout_height="25dp"
-        android:text="EventsActivity"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.5"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        <TextView
+            android:id="@+id/toolbar_title_TV"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:fontFamily="cursive"
+            android:gravity="center"
+            android:text="Events by Date"
+            android:textColor="@color/WhiteFFFFFF"
+            android:textSize="@dimen/_20ssp" />
+
+    </android.support.v7.widget.Toolbar>
 
 
     <com.ittianyu.bottomnavigationviewex.BottomNavigationViewEx
@@ -24,7 +30,6 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="@drawable/whitesolid_greytop"
-        app:menu="@menu/bottom_navigation_menu"
         app:itemIconTint="@color/Black000000"
         app:itemTextColor="@color/Black000000"
         app:layout_constraintBottom_toBottomOf="parent"
@@ -32,8 +37,53 @@
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="1.0">
+        app:layout_constraintVertical_bias="1.0"
+        app:menu="@menu/bottom_navigation_menu">
 
     </com.ittianyu.bottomnavigationviewex.BottomNavigationViewEx>
+
+    <CalendarView
+        android:id="@+id/calendar_CV"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        app:layout_constraintBottom_toTopOf="@+id/ha_BottomNavigationView"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/ha_BottomNavigationView"
+        app:layout_constraintHeight_default="percent"
+        app:layout_constraintHeight_percent="0.5"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/toolbar"
+        app:layout_constraintVertical_bias="0.0" />
+
+    <TextView
+        android:id="@+id/upcoming_events_TV"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/colorPrimary"
+        android:gravity="center"
+        android:paddingTop="@dimen/_1sdp"
+        android:paddingBottom="@dimen/_1sdp"
+        android:text="Upcoming Events"
+        android:textColor="@color/WhiteFFFFFF"
+        android:textSize="@dimen/_12ssp"
+        android:textStyle="bold"
+        app:layout_constraintBottom_toTopOf="@+id/ha_BottomNavigationView"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/calendar_CV"
+        app:layout_constraintVertical_bias="0.100000024" />
+
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/events_RV"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        app:layout_constraintBottom_toTopOf="@+id/ha_BottomNavigationView"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toEndOf="@id/upcoming_events_TV"
+        app:layout_constraintTop_toBottomOf="@+id/upcoming_events_TV" />
+
 
 </android.support.constraint.ConstraintLayout>

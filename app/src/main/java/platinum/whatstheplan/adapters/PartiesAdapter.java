@@ -15,6 +15,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.request.RequestOptions;
 import com.firebase.ui.database.FirebaseRecyclerOptions;
 import com.firebase.ui.firestore.FirestoreRecyclerAdapter;
 import com.firebase.ui.firestore.FirestoreRecyclerOptions;
@@ -26,21 +27,21 @@ import java.text.DecimalFormat;
 
 import platinum.whatstheplan.R;
 import platinum.whatstheplan.activities.FoodListActivity;
-import platinum.whatstheplan.interfaces.RestaurantItemTapListener;
-import platinum.whatstheplan.models.Restaurant;
+import platinum.whatstheplan.interfaces.PartyItemTapListener;
+import platinum.whatstheplan.models.Party;
 import platinum.whatstheplan.models.UserInformation;
 
 //todo gist this class using naming conventions of model, viewholder etc
 
-public class RestaurantsAdapter extends FirestoreRecyclerAdapter<Restaurant, RestaurantsAdapter.RestaurantViewHolder> {
+public class PartiesAdapter extends FirestoreRecyclerAdapter<Party, PartiesAdapter.PartyViewHolder> {
 
-    private static final String TAG = "RestaurantsAdapterTag";
+    private static final String TAG = "PartiesAdapterTag";
 
     Context mContext;
     UserInformation mUserInformation;
     GoogleMap mMap;
     float[] distanceResults = new float[2];
-    Restaurant mRestaurant;
+    Party mParty;
 
     /**
      * Initialize a {@link RecyclerView.Adapter} that listens to a Firebase query. See
@@ -49,46 +50,46 @@ public class RestaurantsAdapter extends FirestoreRecyclerAdapter<Restaurant, Res
      * @param options
      * @param map
      */
-    public RestaurantsAdapter(@NonNull FirestoreRecyclerOptions<Restaurant> options, Context context, UserInformation userInformation, GoogleMap map) {
+    public PartiesAdapter(@NonNull FirestoreRecyclerOptions<Party> options, Context context, UserInformation userInformation, GoogleMap map) {
         super(options);
-        Log.d(TAG, "RestaurantsAdapter: costructer called");
+        Log.d(TAG, "PartiesAdapter: costructer called");
         mContext = context;
         mUserInformation = userInformation;
         mMap = map;
     }
 
     @Override
-    protected void onBindViewHolder(@NonNull RestaurantViewHolder holder, int position, @NonNull Restaurant restaurant) {
+    protected void onBindViewHolder(@NonNull PartyViewHolder holder, int position, @NonNull Party party) {
 
-        Log.d(TAG, "onBindViewHolder: name = " + restaurant.getName());
-        Log.d(TAG, "onBindViewHolder: address = " + restaurant.getAddress());
+        Log.d(TAG, "onBindViewHolder: name = " + party.getEvent_name());
+        Log.d(TAG, "onBindViewHolder: address = " + party.getVenue_address());
 //        Log.d(TAG, "onBindViewHolder: userGeopoint " + mUserInformation.getUserLocation().getEvent_geopoint());
         /*Log.d(TAG, "onBindViewHolder: userLatitude " + mUserInformation.getUserLocation().getEvent_geopoint().getLatitude());
         Log.d(TAG, "onBindViewHolder: userLongitude " + mUserInformation.getUserLocation().getEvent_geopoint().getLongitude());*/
-        Log.d(TAG, "onBindViewHolder: restaurantGeopoint " + restaurant.getGeoLocation());
+//        Log.d(TAG, "onBindViewHolder: PartyGeopoint " + party.getEvent_geopoint());
         Log.d(TAG, "onBindViewHolder: user geopoint = " + mUserInformation.getUserLocation().getGeoPoint());
 
-        holder.restaurant_name_TV.setText(restaurant.getName());
+        holder.Party_name_TV.setText(party.getEvent_name());
 
-            float distance = getDistancBetweenTwoPoints(
+           /* float distance = getDistancBetweenTwoPoints(
                     mUserInformation.getUserLocation().getGeoPoint().getLatitude(),
                     mUserInformation.getUserLocation().getGeoPoint().getLongitude(),
-                    restaurant.getGeoLocation().getLatitude(),
-                    restaurant.getGeoLocation().getLongitude());
-            distance = distance/1000;
-            DecimalFormat decimalFormat = new DecimalFormat("#.00");
+                    party.getEvent_geopoint().getLatitude(),
+                    party.getEvent_geopoint().getLongitude());*/
+//            distance = distance/1000;
+//            DecimalFormat decimalFormat = new DecimalFormat("#.00");
 
 
-        holder.distance_TV.setText(String.valueOf(decimalFormat.format(distance)) + " km");
-        Glide.with(mContext).load(Uri.parse(restaurant.getImage())).into(holder.restaurant_image_IV);
-        LatLng restaurantLatLng = new LatLng(restaurant.getGeoLocation().getLatitude(), restaurant.getGeoLocation().getLongitude());
-        mMap.addMarker(new MarkerOptions().position(restaurantLatLng));
-        holder.show_on_button_BTN.setTag(R.id.TAG_FOR_RESTAURANT, restaurant);
+//        holder.distance_TV.setText(String.valueOf(decimalFormat.format(distance)) + " km");
+        Glide.with(mContext).load(Uri.parse(party.getEvent_image())).apply(new RequestOptions().fitCenter()).into(holder.Party_image_IV);
+//        LatLng PartyLatLng = new LatLng(party.getEvent_geopoint().getLatitude(), party.getEvent_geopoint().getLongitude());
+//        mMap.addMarker(new MarkerOptions().position(PartyLatLng));
+        holder.show_on_button_BTN.setTag(R.id.TAG_FOR_PARTY, party);
         holder.show_on_button_BTN.setTag(R.id.TAG_FOR_POSITION, position);
-        holder.get_direction_BTN.setTag(R.id.TAG_FOR_RESTAURANT, restaurant);
+        holder.get_direction_BTN.setTag(R.id.TAG_FOR_PARTY, party);
         holder.get_direction_BTN.setTag(R.id.TAG_FOR_POSITION, position);
         holder.get_direction_BTN.setEnabled(false);
-        holder.visit_BTN.setTag(R.id.TAG_FOR_RESTAURANT, restaurant);
+        holder.visit_BTN.setTag(R.id.TAG_FOR_PARTY, party);
 
     }
             private float getDistancBetweenTwoPoints(double lat1, double long1, double lat2, double long2) {
@@ -99,26 +100,26 @@ public class RestaurantsAdapter extends FirestoreRecyclerAdapter<Restaurant, Res
 
     @NonNull
     @Override
-    public RestaurantViewHolder onCreateViewHolder(@NonNull ViewGroup viewGroup, int i) {
-        View itemView = LayoutInflater.from(mContext).inflate(R.layout.layout_restaurant, viewGroup, false);
-        RestaurantViewHolder viewHolder = new RestaurantViewHolder(itemView);
+    public PartyViewHolder onCreateViewHolder(@NonNull ViewGroup viewGroup, int i) {
+        View itemView = LayoutInflater.from(mContext).inflate(R.layout.layout_party, viewGroup, false);
+        PartyViewHolder viewHolder = new PartyViewHolder(itemView);
         return viewHolder;
     }
 
-    class RestaurantViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
-        TextView restaurant_name_TV;
+    class PartyViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
+        TextView Party_name_TV;
         TextView distance_TV;
-        ImageView restaurant_image_IV;
+        ImageView Party_image_IV;
         Button show_on_button_BTN;
         Button get_direction_BTN;
         Button visit_BTN;
 
 
-        public RestaurantViewHolder(@NonNull View itemView) {
+        public PartyViewHolder(@NonNull View itemView) {
             super(itemView);
-            restaurant_name_TV = itemView.findViewById(R.id.restaurant_name_TV);
+            Party_name_TV = itemView.findViewById(R.id.party_name_TV);
             distance_TV = itemView.findViewById(R.id.distance_TV);
-            restaurant_image_IV = itemView.findViewById(R.id.restaurant_image_IV);
+            Party_image_IV = itemView.findViewById(R.id.party_image_IV);
             show_on_button_BTN = itemView.findViewById(R.id.show_on_map_BTN);
             get_direction_BTN = itemView.findViewById(R.id.get_direction_BTN);
             visit_BTN = itemView.findViewById(R.id.visit_BTN);
@@ -146,23 +147,23 @@ public class RestaurantsAdapter extends FirestoreRecyclerAdapter<Restaurant, Res
                     break;
                 case R.id.visit_BTN :
                     Log.d(TAG, "onClick: visit_btn");
-                    Restaurant restaurant = (Restaurant) view.getTag(R.id.TAG_FOR_RESTAURANT);
-                    Log.d(TAG, "onClick: restaurant id = " + restaurant.getId());
+                    Party Party = (Party) view.getTag(R.id.TAG_FOR_PARTY);
+                    Log.d(TAG, "onClick: Party id = " + Party.getEvent_id());
                     Intent intent = new Intent(mContext, FoodListActivity.class);
-                    intent.putExtra("restaurant_name", restaurant_name_TV.getText());
-                    intent.putExtra("restaurant_id", restaurant.getId());
+                    intent.putExtra("Party_name", Party_name_TV.getText());
+                    intent.putExtra("Party_id", Party.getEvent_id());
                     mContext.startActivity(intent);
                     break;
             }
         }
 
         public void setTapListener(View view) {
-            mRestaurant = (Restaurant) view.getTag(R.id.TAG_FOR_RESTAURANT);
-            Log.d(TAG, "setTapListener: restaurant.getEvent_name() = " + mRestaurant.getName());
+            mParty = (Party) view.getTag(R.id.TAG_FOR_PARTY);
+            Log.d(TAG, "setTapListener: Party.getEvent_name() = " + mParty.getEvent_name());
             int position = (int) view.getTag(R.id.TAG_FOR_POSITION);
             int viewId = view.getId();
-            RestaurantItemTapListener restaurantItemTapListener = (RestaurantItemTapListener) mContext;
-            restaurantItemTapListener.onTap (mRestaurant, viewId, position);
+            PartyItemTapListener partyItemTapListener = (PartyItemTapListener) mContext;
+            partyItemTapListener.onTap (mParty, viewId, position);
         }
     }
 }
