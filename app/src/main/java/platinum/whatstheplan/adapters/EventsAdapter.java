@@ -3,7 +3,6 @@ package platinum.whatstheplan.adapters;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
-import android.content.Intent;
 import android.location.Location;
 import android.net.Uri;
 import android.support.annotation.NonNull;
@@ -25,44 +24,37 @@ import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.firestore.GeoPoint;
 import com.shashank.sony.fancytoastlib.FancyToast;
-
-import org.w3c.dom.Document;
 
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.List;
 
 import platinum.whatstheplan.R;
-import platinum.whatstheplan.activities.FoodListActivity;
 import platinum.whatstheplan.interfaces.EventItemTapListener;
 import platinum.whatstheplan.models.Event;
 import platinum.whatstheplan.models.Guest;
-import platinum.whatstheplan.models.Party;
-import platinum.whatstheplan.models.UserProfile;
 import platinum.whatstheplan.utils.BookingDbHandler;
 
-public class EventAdapter extends RecyclerView.Adapter<EventAdapter.EventViewHolder> {
+public class EventsAdapter extends RecyclerView.Adapter<EventsAdapter.EventViewHolder> {
 
     private static final String TAG = "PartiesQueryAdapterTag";
     private Context mContext;
     private List<Event> mEventList = new ArrayList<>();
     private Event mEvent;
     private Location mUserCurrentLocation;
-    GoogleMap mMap;
-    ProgressBar mProgressBar;
+    private GoogleMap mMap;
+    private ProgressBar mProgressBar;
 
     float[] distanceResults = new float[2];
 
-    public EventAdapter() {
+    public EventsAdapter() {
     }
 
-    public EventAdapter(Context context, List<Event> eventList, Event event, Location userCurrentLocation, GoogleMap map, ProgressBar progressBar) {
+    public EventsAdapter(Context context, List<Event> eventList, Event event, Location userCurrentLocation, GoogleMap map, ProgressBar progressBar) {
         mContext = context;
         mEventList = eventList;
         mEvent = event;
@@ -94,6 +86,7 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.EventViewHol
 
         eventViewHolder.venue_name_TV.setText(mEvent.getVenue_name() + " (" +String.valueOf(decimalFormat.format(distance)) + " km)" );
         eventViewHolder.venue_address_TV.setText(mEvent.getVenue_address());
+        eventViewHolder.event_tickets_TV.setText(mEvent.getEvent_tickets()); //todo ticket auto decrease when event booked
         eventViewHolder.event_date_TV.setText(mEvent.getEvent_date());
         eventViewHolder.event_time_TV.setText(mEvent.getEvent_time());
 

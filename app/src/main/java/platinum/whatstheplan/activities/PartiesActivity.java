@@ -31,7 +31,6 @@ import android.widget.Toast;
 
 import com.firebase.geofire.GeoFire;
 import com.firebase.geofire.GeoLocation;
-import com.firebase.geofire.GeoQueryDataEventListener;
 import com.firebase.geofire.GeoQueryEventListener;
 import com.firebase.ui.firestore.FirestoreRecyclerOptions;
 import com.google.android.gms.common.ConnectionResult;
@@ -57,17 +56,14 @@ import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.GeoPoint;
-import com.google.firebase.firestore.model.Document;
 
 import org.imperiumlabs.geofirestore.GeoFirestore;
 import org.imperiumlabs.geofirestore.GeoQuery;
@@ -79,9 +75,8 @@ import java.util.Map;
 
 import platinum.whatstheplan.R;
 import platinum.whatstheplan.adapters.PartiesAdapter;
-import platinum.whatstheplan.adapters.EventAdapter;
+import platinum.whatstheplan.adapters.EventsAdapter;
 import platinum.whatstheplan.interfaces.EventItemTapListener;
-import platinum.whatstheplan.interfaces.PartyItemTapListener;
 import platinum.whatstheplan.models.Event;
 import platinum.whatstheplan.models.Party;
 import platinum.whatstheplan.models.Party2;
@@ -738,9 +733,9 @@ public class PartiesActivity extends FragmentActivity implements
 
                             Log.d(TAG, "onGeoQueryReady: mEventList.size() = " + mEventList.size());
 
-                            EventAdapter eventAdapter = new EventAdapter(PartiesActivity.this, mEventList, mEvent, mUserCurrentLocation, mMap, mProgressBarPB);
+                            EventsAdapter eventsAdapter = new EventsAdapter(PartiesActivity.this, mEventList, mEvent, mUserCurrentLocation, mMap, mProgressBarPB);
                             Log.d(TAG, "onSuccess: adapter called");
-                            mPartiesRV.setAdapter(eventAdapter);
+                            mPartiesRV.setAdapter(eventsAdapter);
                             mProgressBarPB.setVisibility(View.GONE);
                             mPartiesRV.setLayoutManager(new LinearLayoutManager(PartiesActivity.this));
 
