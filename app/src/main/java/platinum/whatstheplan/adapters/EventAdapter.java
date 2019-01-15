@@ -1,6 +1,8 @@
 package platinum.whatstheplan.adapters;
 
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.location.Location;
 import android.net.Uri;
@@ -12,6 +14,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
@@ -19,7 +22,17 @@ import com.bumptech.glide.request.RequestOptions;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.firestore.CollectionReference;
+import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.GeoPoint;
+import com.shashank.sony.fancytoastlib.FancyToast;
+
+import org.w3c.dom.Document;
 
 import java.text.DecimalFormat;
 import java.util.ArrayList;
@@ -29,7 +42,10 @@ import platinum.whatstheplan.R;
 import platinum.whatstheplan.activities.FoodListActivity;
 import platinum.whatstheplan.interfaces.EventItemTapListener;
 import platinum.whatstheplan.models.Event;
+import platinum.whatstheplan.models.Guest;
 import platinum.whatstheplan.models.Party;
+import platinum.whatstheplan.models.UserProfile;
+import platinum.whatstheplan.utils.BookingDbHandler;
 
 public class EventAdapter extends RecyclerView.Adapter<EventAdapter.EventViewHolder> {
 
@@ -39,18 +55,20 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.EventViewHol
     private Event mEvent;
     private Location mUserCurrentLocation;
     GoogleMap mMap;
+    ProgressBar mProgressBar;
 
     float[] distanceResults = new float[2];
 
     public EventAdapter() {
     }
 
-    public EventAdapter(Context mContext, List<Event> mEventList, Event mEvent, Location mUserCurrentLocation, GoogleMap map) {
-        this.mContext = mContext;
-        this.mEventList = mEventList;
-        this.mEvent = mEvent;
-        this.mUserCurrentLocation = mUserCurrentLocation;
-        this.mMap = map;
+    public EventAdapter(Context context, List<Event> eventList, Event event, Location userCurrentLocation, GoogleMap map, ProgressBar progressBar) {
+        mContext = context;
+        mEventList = eventList;
+        mEvent = event;
+        mUserCurrentLocation = userCurrentLocation;
+        mMap = map;
+        mProgressBar = progressBar;
     }
 
 
@@ -88,11 +106,13 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.EventViewHol
         eventViewHolder.get_direction_BTN.setTag(R.id.TAG_FOR_POSITION, position);
         eventViewHolder.get_direction_BTN.setEnabled(false);
         eventViewHolder.booking_BTN.setTag(R.id.TAG_FOR_EVENT, mEvent);
+        eventViewHolder.booking_BTN.setTag(R.id.TAG_FOR_POSITION, position);
+        eventViewHolder.booking_BTN.setTag(R.id.TAG_FOR_EVENT, mEvent);
 
     }
 
     private float getDistancBetweenTwoPoints(double lat1, double long1, double lat2, double long2) {
-        Location.distanceBetween(lat1, long1, lat1, long2, distanceResults);
+        Location.distanceBetween(lat1, long1, lat2, long2, distanceResults);
         return distanceResults[0];
 
     }
@@ -151,8 +171,82 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.EventViewHol
                     setTapListener(view);
                     break;
                 case R.id.booking_BTN:
+                    mEvent = (Event) view.getTag(R.id.TAG_FOR_EVENT);
+                    showConfrimationDialog (mEvent);
+
+                    //todo save event related data in local database
+                    //todo send event related data to remote database
+                    //todo tickets number reduction
                     break;
             }
+        }
+
+        private void showConfrimationDialog(final Event event) {
+            AlertDialog dialog = new AlertDialog.Builder(mContext)
+                    .setTitle(event.getEvent_name())
+                    .setMessage("Do you want to book this event?")
+                    .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialogInterface, int i) {
+                            //todo save event locally and remotely
+                            saveEventBookingLocally (event);
+                            saveEventBookingRemotely (event);
+                        }
+                    })
+                    .setNegativeButton("No", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialogInterface, int i) {
+                            //todo do nothing
+                        }
+                    })
+                    .create();
+            dialog.show();
+        }
+
+        private void saveEventBookingLocally(Event event) {
+            mProgressBar.setVisibility(View.VISIBLE);
+            BookingDbHandler bookingDbHandler = new BookingDbHandler(mContext);
+            bookingDbHandler.addEvent(event);
+        }
+
+        private void saveEventBookingRemotely(final Event event) {
+            final FirebaseFirestore dbFirestore = FirebaseFirestore.getInstance();
+
+            CollectionReference dbRefParties = dbFirestore.collection("Parties");
+            dbRefParties.document(event.getEvent_id()).get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
+                @Override
+                public void onSuccess(DocumentSnapshot documentSnapshot) {
+                    Event gotEvent =  documentSnapshot.toObject(Event.class);
+                    String adminId = gotEvent.getAdmin_id();
+                    Log.d(TAG, "onSuccess: adminId = " + adminId);
+
+                    CollectionReference dbRefBookingsAdminSide = dbFirestore.collection("Admins")
+                            .document(adminId)
+                            .collection("Bookings");
+                    dbRefBookingsAdminSide.document(event.getEvent_id()).set(getGuestInstance()).addOnSuccessListener(new OnSuccessListener<Void>() {
+                        @Override
+                        public void onSuccess(Void aVoid) {
+                            CollectionReference dbRefBookingsClientSide = dbFirestore.collection("Users")
+                                    .document(FirebaseAuth.getInstance().getCurrentUser().getUid())
+                                    .collection("Bookings");
+                            dbRefBookingsClientSide.document(event.getEvent_id()).set(event).addOnSuccessListener(new OnSuccessListener<Void>() {
+                                @Override
+                                public void onSuccess(Void aVoid) {
+                                    mProgressBar.setVisibility(View.INVISIBLE);
+                                    FancyToast.makeText(mContext, "Event booked successfully", FancyToast.LENGTH_LONG, FancyToast.SUCCESS, false).show();
+                                }
+                            });
+                        }
+                    });
+                }
+
+                private Guest getGuestInstance() {
+                    FirebaseUser currentUser = FirebaseAuth.getInstance().getCurrentUser();
+                    Guest guest =  new Guest(currentUser.getDisplayName(), currentUser.getEmail());
+                    return guest;
+                }
+
+            });
         }
 
         public void setTapListener(View view) {

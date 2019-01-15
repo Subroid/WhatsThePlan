@@ -532,6 +532,9 @@ public class PartiesActivity extends FragmentActivity implements
 
 
     private void displayPartiesInTheRangeOf(int radius) {
+        mKeyList.clear();
+        mEventList.clear();
+        Log.d(TAG, "displayPartiesInTheRangeOf: radius = " + radius);
         mGeoLocation = new GeoLocation( mUserCurrentLocation.getLatitude(), mUserCurrentLocation.getLongitude());
         Log.d(TAG, "displayPartiesInTheRangeOf5km: mUserCurrentLocation.getLatitude = " + mUserCurrentLocation.getLatitude());
         Log.d(TAG, "displayPartiesInTheRangeOf5km: mUserCurrentLocation.getLongitude = " + mUserCurrentLocation.getLongitude());
@@ -735,9 +738,9 @@ public class PartiesActivity extends FragmentActivity implements
 
                             Log.d(TAG, "onGeoQueryReady: mEventList.size() = " + mEventList.size());
 
-                            EventAdapter adapter = new EventAdapter(PartiesActivity.this, mEventList, mEvent, mUserCurrentLocation, mMap);
+                            EventAdapter eventAdapter = new EventAdapter(PartiesActivity.this, mEventList, mEvent, mUserCurrentLocation, mMap, mProgressBarPB);
                             Log.d(TAG, "onSuccess: adapter called");
-                            mPartiesRV.setAdapter(adapter);
+                            mPartiesRV.setAdapter(eventAdapter);
                             mProgressBarPB.setVisibility(View.GONE);
                             mPartiesRV.setLayoutManager(new LinearLayoutManager(PartiesActivity.this));
 
@@ -778,6 +781,7 @@ public class PartiesActivity extends FragmentActivity implements
     public void onClick(View view) {
         switch (view.getId()) {
             case R.id.find_BTN  :
+                mProgressBarPB.setVisibility(View.VISIBLE);
                 mRadius = Integer.parseInt(mRadiusET.getText().toString());
                 displayPartiesInTheRangeOf(mRadius);
         }

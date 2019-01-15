@@ -75,6 +75,7 @@ public class EventsActivity extends AppCompatActivity implements CalendarView.On
     public void onSelectedDayChange(@NonNull CalendarView calendarView, int i, int i1, int i2) {
         switch (calendarView.getId()) {
             case R.id.calendar_CV :
+
                 Toast.makeText(mContext,
                         "The Date you selected is " + String.valueOf(i2)  + "/" + String.valueOf(i1+1) + "/" + String.valueOf(i),
                         Toast.LENGTH_LONG)
