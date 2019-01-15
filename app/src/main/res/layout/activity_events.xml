@@ -102,5 +102,18 @@
         app:layout_constraintTop_toBottomOf="@+id/calendar_CV"
         app:layout_constraintVertical_bias="0.5" />
 
+    <TextView
+        android:id="@+id/no_event_TV"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="No event has been booked on the selected date"
+        android:visibility="invisible"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/calendar_CV"
+        app:layout_constraintVertical_bias="0.5"/>
+
 
 </android.support.constraint.ConstraintLayout>

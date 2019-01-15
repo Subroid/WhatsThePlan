@@ -9,6 +9,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -31,6 +32,7 @@ public class SignInActivity extends AppCompatActivity implements View.OnClickLis
     String mEmailString;
     String mPasswordString;
     private TextView mResetPwTV;
+    private ProgressBar progressBar;
 
 
     @Override
@@ -47,12 +49,14 @@ public class SignInActivity extends AppCompatActivity implements View.OnClickLis
         signInBTN.setOnClickListener(this);
         signUpBTN.setOnClickListener(this);
         mResetPwTV.setOnClickListener(this);
+        progressBar = findViewById(R.id.progressbarPB);
     }
 
     @Override
     public void onClick(View view) {
         switch (view.getId()) {
             case R.id.sia_signinBTN :
+                progressBar.setVisibility(View.VISIBLE);
                 signInUsingEmailPassword();
                 break;
             case R.id.sia_signupBTN :
@@ -94,6 +98,7 @@ public class SignInActivity extends AppCompatActivity implements View.OnClickLis
                     mEmailString = emailTIET.getText().toString();
                     mPasswordString = passwordTIET.getText().toString();
                     if (mEmailString.isEmpty() || mPasswordString.isEmpty() || mPasswordString.length() < 6) {
+                        progressBar.setVisibility(View.INVISIBLE);
                         FancyToast.makeText(getApplicationContext(),
                                 "Please type valid Email or Password",
                                 FancyToast.LENGTH_LONG, FancyToast.ERROR,false).show();
@@ -103,10 +108,12 @@ public class SignInActivity extends AppCompatActivity implements View.OnClickLis
                                     @Override
                                     public void onComplete(@NonNull Task<AuthResult> task) {
                                         if (task.isSuccessful()) {
+                                            progressBar.setVisibility(View.INVISIBLE);
                                                 Intent homeIntent = new Intent(SignInActivity.this, HomeActivity.class);
                                             startActivity(homeIntent);
                                             finish();
                                         } else {
+                                            progressBar.setVisibility(View.INVISIBLE);
                                             FancyToast.makeText(getApplicationContext(),
                                                     "There is some error while signing in to your account",
                                                     FancyToast.LENGTH_LONG, FancyToast.ERROR, false).show();

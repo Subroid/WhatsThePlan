@@ -8,6 +8,7 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ProgressBar;
 
 import com.firebase.ui.auth.data.model.User;
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -38,6 +39,7 @@ public class NameSubmitActivity extends AppCompatActivity implements View.OnClic
     String mFirstNameString;
     String mLastNameString;
     String mDocumentId;
+    private ProgressBar progressBar;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -48,6 +50,7 @@ public class NameSubmitActivity extends AppCompatActivity implements View.OnClic
         lastnameTIET = findViewById(R.id.lastnameTIET);
         submitBTN = findViewById(R.id.submitBTN);
         submitBTN.setOnClickListener(this);
+        progressBar = findViewById(R.id.progressbarPB);
 
     }
 
@@ -55,6 +58,7 @@ public class NameSubmitActivity extends AppCompatActivity implements View.OnClic
         public void onClick(View view) {
             switch (view.getId()) {
                 case R.id.submitBTN :
+                    progressBar.setVisibility(View.VISIBLE);
                         mFirstNameString = firstnameTIET.getText().toString();
                         mLastNameString = lastnameTIET.getText().toString();
                         FirebaseUser current_user = FirebaseAuth.getInstance().getCurrentUser();
@@ -92,6 +96,7 @@ public class NameSubmitActivity extends AppCompatActivity implements View.OnClic
                             mFirstNameString + " " + mLastNameString).addOnSuccessListener(new OnSuccessListener<Void>() {
                         @Override
                         public void onSuccess(Void aVoid) {
+                            progressBar.setVisibility(View.INVISIBLE);
                                 Intent homeIntent = new Intent(NameSubmitActivity.this, HomeActivity.class);
                             startActivity(homeIntent);
                             finish();

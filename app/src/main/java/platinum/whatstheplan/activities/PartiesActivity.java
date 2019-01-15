@@ -24,6 +24,7 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.View;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ProgressBar;
@@ -161,7 +162,7 @@ public class PartiesActivity extends FragmentActivity implements
 
     private void performActions() {
         Log.d(TAG, "performActions: called");
-        setClickListeners ();
+        setClickListeners();
         mMapActions();
         mPartiesRvActions();
 
@@ -378,6 +379,7 @@ public class PartiesActivity extends FragmentActivity implements
             mMap.setMyLocationEnabled(true);
             mMap.getUiSettings().setMapToolbarEnabled(false);
         }
+
     }
 
     private void getUserCurrentLocationAndSaveIntoRemoteDatabase() {
@@ -461,8 +463,8 @@ public class PartiesActivity extends FragmentActivity implements
     }
 
     private void saveUserLocationIntoFirestoreThenDisplayPartiesNearUserLocation() {
-        saveUserLocationIntoFirestore ();
-        displayPartiesInTheRangeOf (mRadius);
+        saveUserLocationIntoFirestore();
+        displayPartiesInTheRangeOf(mRadius);
 //        displayPartiesWithin5km();
 //        displayPartiesNearUserLocationAsListItem();
     }
@@ -530,7 +532,7 @@ public class PartiesActivity extends FragmentActivity implements
         mKeyList.clear();
         mEventList.clear();
         Log.d(TAG, "displayPartiesInTheRangeOf: radius = " + radius);
-        mGeoLocation = new GeoLocation( mUserCurrentLocation.getLatitude(), mUserCurrentLocation.getLongitude());
+        mGeoLocation = new GeoLocation(mUserCurrentLocation.getLatitude(), mUserCurrentLocation.getLongitude());
         Log.d(TAG, "displayPartiesInTheRangeOf5km: mUserCurrentLocation.getLatitude = " + mUserCurrentLocation.getLatitude());
         Log.d(TAG, "displayPartiesInTheRangeOf5km: mUserCurrentLocation.getLongitude = " + mUserCurrentLocation.getLongitude());
         DatabaseReference mDbPartiesFirebase = mDbFirebase.getReference("PartiesLocations");
@@ -667,6 +669,7 @@ public class PartiesActivity extends FragmentActivity implements
 
 
     private String newKey = "";
+
     @Override
     public void onKeyEntered(String key, GeoLocation location) {
 
@@ -688,7 +691,7 @@ public class PartiesActivity extends FragmentActivity implements
 
         Log.d(TAG, "onKeyEntered: mKeyList.size = " + mKeyList.size());
 
-    }   
+    }
 
     @Override
     public void onKeyExited(String s) {
@@ -708,13 +711,15 @@ public class PartiesActivity extends FragmentActivity implements
     @Override
     public void onGeoQueryReady() {
         Log.d(TAG, "onGeoQueryReady: called ");
+        Log.d(TAG, "onGeoQueryReady: mLoopStarted = " + mLoopStarted);
 
         if (!mLoopStarted) {
             for (i = 0; i < mKeyList.size(); i++) {
                 mLoopStarted = true;
                 Log.d(TAG, "onGeoQueryReady: i = " + i);
                 String key = mKeyList.get(i);
-                if (i == mKeyList.size() -1 ) {
+                Log.d(TAG, "onGeoQueryReady: key = " + key);
+                if (i == mKeyList.size() - 1) {
                     mLoopFinished = true;
                 }
                 Log.d(TAG, "onGeoQueryReady: loopFinished " + mLoopFinished);
@@ -733,12 +738,13 @@ public class PartiesActivity extends FragmentActivity implements
 
                             Log.d(TAG, "onGeoQueryReady: mEventList.size() = " + mEventList.size());
 
-                            EventsAdapter eventsAdapter = new EventsAdapter(PartiesActivity.this, mEventList, mEvent, mUserCurrentLocation, mMap, mProgressBarPB);
+                            EventsAdapter eventsAdapter = new EventsAdapter(PartiesActivity.this, mEventList, mUserCurrentLocation, mMap, mProgressBarPB);
                             Log.d(TAG, "onSuccess: adapter called");
                             mPartiesRV.setAdapter(eventsAdapter);
                             mProgressBarPB.setVisibility(View.GONE);
                             mPartiesRV.setLayoutManager(new LinearLayoutManager(PartiesActivity.this));
 
+                            hideSoftKeyboard(PartiesActivity.this, mRadiusET);
 
                         }
 
@@ -747,7 +753,6 @@ public class PartiesActivity extends FragmentActivity implements
 
             }
         }
-
 
     }
 
@@ -775,10 +780,23 @@ public class PartiesActivity extends FragmentActivity implements
     @Override
     public void onClick(View view) {
         switch (view.getId()) {
-            case R.id.find_BTN  :
+            case R.id.find_BTN:
+                hideSoftKeyboard(PartiesActivity.this, mRadiusET);
                 mProgressBarPB.setVisibility(View.VISIBLE);
                 mRadius = Integer.parseInt(mRadiusET.getText().toString());
+
+                mLoopStarted = false;
+                i = 0;
+                mLoopFinished = false;
                 displayPartiesInTheRangeOf(mRadius);
         }
     }
+
+    public void hideSoftKeyboard(Context context, View view) {
+        InputMethodManager inputMethodManager =
+                (InputMethodManager) context.getSystemService(Context.INPUT_METHOD_SERVICE);
+        inputMethodManager.hideSoftInputFromWindow(view.getWindowToken(), 0);
+
+    }
+
 }

@@ -41,7 +41,7 @@ import platinum.whatstheplan.utils.BookingDbHandler;
 
 public class EventsAdapter extends RecyclerView.Adapter<EventsAdapter.EventViewHolder> {
 
-    private static final String TAG = "PartiesQueryAdapterTag";
+    private static final String TAG = "EventsAdapter";
     private Context mContext;
     private List<Event> mEventList = new ArrayList<>();
     private Event mEvent;
@@ -54,10 +54,9 @@ public class EventsAdapter extends RecyclerView.Adapter<EventsAdapter.EventViewH
     public EventsAdapter() {
     }
 
-    public EventsAdapter(Context context, List<Event> eventList, Event event, Location userCurrentLocation, GoogleMap map, ProgressBar progressBar) {
+    public EventsAdapter(Context context, List<Event> eventList, Location userCurrentLocation, GoogleMap map, ProgressBar progressBar) {
         mContext = context;
         mEventList = eventList;
-        mEvent = event;
         mUserCurrentLocation = userCurrentLocation;
         mMap = map;
         mProgressBar = progressBar;
@@ -74,6 +73,8 @@ public class EventsAdapter extends RecyclerView.Adapter<EventsAdapter.EventViewH
 
     @Override
     public void onBindViewHolder(@NonNull EventViewHolder eventViewHolder, int position) {
+        mEvent = mEventList.get(position);
+
         eventViewHolder.event_name_TV.setText(mEvent.getEvent_name());
 
         float distance = getDistancBetweenTwoPoints(
@@ -86,13 +87,14 @@ public class EventsAdapter extends RecyclerView.Adapter<EventsAdapter.EventViewH
 
         eventViewHolder.venue_name_TV.setText(mEvent.getVenue_name() + " (" +String.valueOf(decimalFormat.format(distance)) + " km)" );
         eventViewHolder.venue_address_TV.setText(mEvent.getVenue_address());
-        eventViewHolder.event_tickets_TV.setText(mEvent.getEvent_tickets()); //todo ticket auto decrease when event booked
+        eventViewHolder.event_tickets_TV.setText("Tickets : " + String.valueOf(mEvent.getEvent_tickets()) + "/" +String.valueOf(mEvent.getEvent_tickets())); //todo ticket auto decrease when event booked
         eventViewHolder.event_date_TV.setText(mEvent.getEvent_date());
         eventViewHolder.event_time_TV.setText(mEvent.getEvent_time());
 
         Glide.with(mContext).load(Uri.parse(mEvent.getEvent_image())).apply(new RequestOptions().fitCenter()).into(eventViewHolder.event_image_IV);
-        LatLng PartyLatLng = new LatLng(mEvent.getEvent_geopoint().getLatitude(), mEvent.getEvent_geopoint().getLongitude());
-        mMap.addMarker(new MarkerOptions().position(PartyLatLng));
+        Glide.with(mContext).load(Uri.parse(mEvent.getEvent_image())).apply(new RequestOptions().fitCenter()).into(eventViewHolder.event_layout_bg_IV);
+        LatLng eventLatLng = new LatLng(mEvent.getEvent_geopoint().getLatitude(), mEvent.getEvent_geopoint().getLongitude());
+        mMap.addMarker(new MarkerOptions().position(eventLatLng));
         eventViewHolder.show_on_map_BTN.setTag(R.id.TAG_FOR_EVENT, mEvent);
         eventViewHolder.show_on_map_BTN.setTag(R.id.TAG_FOR_POSITION, position);
         eventViewHolder.get_direction_BTN.setTag(R.id.TAG_FOR_EVENT, mEvent);
@@ -101,7 +103,7 @@ public class EventsAdapter extends RecyclerView.Adapter<EventsAdapter.EventViewH
         eventViewHolder.booking_BTN.setTag(R.id.TAG_FOR_EVENT, mEvent);
         eventViewHolder.booking_BTN.setTag(R.id.TAG_FOR_POSITION, position);
         eventViewHolder.booking_BTN.setTag(R.id.TAG_FOR_EVENT, mEvent);
-
+        mProgressBar.setVisibility(View.GONE);
     }
 
     private float getDistancBetweenTwoPoints(double lat1, double long1, double lat2, double long2) {
@@ -127,7 +129,7 @@ public class EventsAdapter extends RecyclerView.Adapter<EventsAdapter.EventViewH
         private Button show_on_map_BTN;
         private Button booking_BTN;
         private Button get_direction_BTN;
-
+        private ImageView event_layout_bg_IV;
 
         public EventViewHolder(@NonNull View itemView) {
             super(itemView);
@@ -141,6 +143,7 @@ public class EventsAdapter extends RecyclerView.Adapter<EventsAdapter.EventViewH
             show_on_map_BTN = itemView.findViewById(R.id.show_on_map_BTN);
             booking_BTN = itemView.findViewById(R.id.booking_BTN);
             get_direction_BTN = itemView.findViewById(R.id.get_direction_BTN);
+            event_layout_bg_IV = itemView.findViewById(R.id.event_layout_bg_IV);
 
             show_on_map_BTN.setOnClickListener(this);
             get_direction_BTN.setEnabled(false);
@@ -166,9 +169,6 @@ public class EventsAdapter extends RecyclerView.Adapter<EventsAdapter.EventViewH
                 case R.id.booking_BTN:
                     mEvent = (Event) view.getTag(R.id.TAG_FOR_EVENT);
                     showConfrimationDialog (mEvent);
-
-                    //todo save event related data in local database
-                    //todo send event related data to remote database
                     //todo tickets number reduction
                     break;
             }
@@ -181,7 +181,7 @@ public class EventsAdapter extends RecyclerView.Adapter<EventsAdapter.EventViewH
                     .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
                         @Override
                         public void onClick(DialogInterface dialogInterface, int i) {
-                            //todo save event locally and remotely
+                            mProgressBar.setVisibility(View.VISIBLE);
                             saveEventBookingLocally (event);
                             saveEventBookingRemotely (event);
                         }
@@ -197,7 +197,7 @@ public class EventsAdapter extends RecyclerView.Adapter<EventsAdapter.EventViewH
         }
 
         private void saveEventBookingLocally(Event event) {
-            mProgressBar.setVisibility(View.VISIBLE);
+
             BookingDbHandler bookingDbHandler = new BookingDbHandler(mContext);
             bookingDbHandler.addEvent(event);
         }
@@ -216,7 +216,10 @@ public class EventsAdapter extends RecyclerView.Adapter<EventsAdapter.EventViewH
                     CollectionReference dbRefBookingsAdminSide = dbFirestore.collection("Admins")
                             .document(adminId)
                             .collection("Bookings");
-                    dbRefBookingsAdminSide.document(event.getEvent_id()).set(getGuestInstance()).addOnSuccessListener(new OnSuccessListener<Void>() {
+                    CollectionReference dbRefGuests = dbRefBookingsAdminSide.document(event.getEvent_id()).collection("Guests");
+                    dbRefGuests.document(FirebaseAuth.getInstance().getCurrentUser().getUid())
+                            .set(getGuestInstance())
+                            .addOnSuccessListener(new OnSuccessListener<Void>() {
                         @Override
                         public void onSuccess(Void aVoid) {
                             CollectionReference dbRefBookingsClientSide = dbFirestore.collection("Users")

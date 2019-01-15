@@ -13,7 +13,7 @@ import platinum.whatstheplan.utils.BottomNavigationViewHelper;
 
 public class ChatActivity extends AppCompatActivity {
 
-    private static final String TAG = "ChatActivity";
+    private static final String TAG = "ChatActivityTag";
     private BottomNavigationViewEx bottomNavigationViewEx;
     private Context mContext;
 

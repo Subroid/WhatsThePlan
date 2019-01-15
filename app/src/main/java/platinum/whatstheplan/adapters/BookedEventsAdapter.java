@@ -79,6 +79,7 @@ public class BookedEventsAdapter extends RecyclerView.Adapter<BookedEventsAdapte
         eventViewHolder.event_time_TV.setText(mEvent.getEvent_time());
 
         Glide.with(mContext).load(Uri.parse(mEvent.getEvent_image())).apply(new RequestOptions().fitCenter()).into(eventViewHolder.event_image_IV);
+        Glide.with(mContext).load(Uri.parse(mEvent.getEvent_image())).apply(new RequestOptions().fitCenter()).into(eventViewHolder.event_layout_bg_IV);
         mProgressBar.setVisibility(View.INVISIBLE);
 
     }
@@ -96,6 +97,7 @@ public class BookedEventsAdapter extends RecyclerView.Adapter<BookedEventsAdapte
         private TextView event_date_TV;
         private TextView event_time_TV;
         private ImageView event_image_IV;
+        private ImageView event_layout_bg_IV;
 
 
         public EventViewHolder(@NonNull View itemView) {
@@ -106,6 +108,7 @@ public class BookedEventsAdapter extends RecyclerView.Adapter<BookedEventsAdapte
             event_date_TV = itemView.findViewById(R.id.event_date_TV);
             event_time_TV = itemView.findViewById(R.id.event_time_TV);
             event_image_IV = itemView.findViewById(R.id.event_image_IV);
+            event_layout_bg_IV = itemView.findViewById(R.id.event_layout_bg_IV);
 
         }
     }
