@@ -39,18 +39,18 @@ public class BottomNavigationViewHelper {
                                         Intent homeIntent = new Intent(context, HomeActivity.class);
                                     context.startActivity(homeIntent);
                                     break;
-                                case R.id.ic_events :
+                                 case R.id.ic_events :
                                         Intent eventsIntent = new Intent(context, EventsActivity.class);
                                     context.startActivity(eventsIntent);
                                     break;
-                                case R.id.ic_add :
+                               /* case R.id.ic_add :
                                     Intent addEventIntent = new Intent(context, AddEventActivity.class);
                                 context.startActivity(addEventIntent);
                                 break;
                                 case R.id.ic_chat :
                                     Intent chatIntent = new Intent(context, ChatActivity.class);
                                 context.startActivity(chatIntent);
-                                break;
+                                break;*/
                                 case R.id.ic_map :
                                     Intent mapIntent = new Intent(context, MapActivity.class);
                                 context.startActivity(mapIntent);

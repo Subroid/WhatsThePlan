@@ -5,6 +5,9 @@
         <!-- ^NoActionBar used instead of DarkActionBar for getting rid of default old ActionBar
                 Toolbar would be used instead-->
         <item name="android:navigationBarColor">@color/colorPrimaryDark</item>
+        <item name="android:itemBackground">@color/colorPrimaryDark</item>
+        <item name="android:textColor">@color/Black000000</item>
+        <item name="android:textColorSecondary">@color/WhiteFFFFFF</item>
 
         <!-- Customize your theme here. -->
         <item name="colorPrimary">@color/colorPrimary</item>

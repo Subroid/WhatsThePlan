@@ -25,6 +25,7 @@ import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.CollectionReference;
+import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.shashank.sony.fancytoastlib.FancyToast;
@@ -62,7 +63,6 @@ public class EventsAdapter extends RecyclerView.Adapter<EventsAdapter.EventViewH
         mProgressBar = progressBar;
     }
 
-
     @NonNull
     @Override
     public EventViewHolder onCreateViewHolder(@NonNull ViewGroup viewGroup, int i) {
@@ -85,9 +85,9 @@ public class EventsAdapter extends RecyclerView.Adapter<EventsAdapter.EventViewH
         distance = distance / 1000;
         DecimalFormat decimalFormat = new DecimalFormat("#.00");
 
-        eventViewHolder.venue_name_TV.setText(mEvent.getVenue_name() + " (" +String.valueOf(decimalFormat.format(distance)) + " km)" );
-        eventViewHolder.venue_address_TV.setText(mEvent.getVenue_address());
-        eventViewHolder.event_tickets_TV.setText("Tickets : " + String.valueOf(mEvent.getEvent_tickets()) + "/" +String.valueOf(mEvent.getEvent_tickets())); //todo ticket auto decrease when event booked
+        eventViewHolder.venue_name_TV.setText("Venue : " + mEvent.getVenue_name() + " (" +String.valueOf(decimalFormat.format(distance)) + " km)" );
+        eventViewHolder.venue_address_TV.setText("Address : " + mEvent.getVenue_address());
+        eventViewHolder.event_tickets_TV.setText("Tickets : " + String.valueOf(mEvent.getEvent_tickets()));
         eventViewHolder.event_date_TV.setText(mEvent.getEvent_date());
         eventViewHolder.event_time_TV.setText(mEvent.getEvent_time());
 
@@ -97,9 +97,6 @@ public class EventsAdapter extends RecyclerView.Adapter<EventsAdapter.EventViewH
         mMap.addMarker(new MarkerOptions().position(eventLatLng));
         eventViewHolder.show_on_map_BTN.setTag(R.id.TAG_FOR_EVENT, mEvent);
         eventViewHolder.show_on_map_BTN.setTag(R.id.TAG_FOR_POSITION, position);
-        eventViewHolder.get_direction_BTN.setTag(R.id.TAG_FOR_EVENT, mEvent);
-        eventViewHolder.get_direction_BTN.setTag(R.id.TAG_FOR_POSITION, position);
-        eventViewHolder.get_direction_BTN.setEnabled(false);
         eventViewHolder.booking_BTN.setTag(R.id.TAG_FOR_EVENT, mEvent);
         eventViewHolder.booking_BTN.setTag(R.id.TAG_FOR_POSITION, position);
         eventViewHolder.booking_BTN.setTag(R.id.TAG_FOR_EVENT, mEvent);
@@ -128,7 +125,6 @@ public class EventsAdapter extends RecyclerView.Adapter<EventsAdapter.EventViewH
         private TextView event_tickets_TV;
         private Button show_on_map_BTN;
         private Button booking_BTN;
-        private Button get_direction_BTN;
         private ImageView event_layout_bg_IV;
 
         public EventViewHolder(@NonNull View itemView) {
@@ -142,13 +138,9 @@ public class EventsAdapter extends RecyclerView.Adapter<EventsAdapter.EventViewH
             event_tickets_TV = itemView.findViewById(R.id.event_tickets_TV);
             show_on_map_BTN = itemView.findViewById(R.id.show_on_map_BTN);
             booking_BTN = itemView.findViewById(R.id.booking_BTN);
-            get_direction_BTN = itemView.findViewById(R.id.get_direction_BTN);
             event_layout_bg_IV = itemView.findViewById(R.id.event_layout_bg_IV);
 
             show_on_map_BTN.setOnClickListener(this);
-            get_direction_BTN.setEnabled(false);
-            get_direction_BTN.setAlpha(0.5f);
-            get_direction_BTN.setOnClickListener(this);
             booking_BTN.setOnClickListener(this);
 
         }
@@ -159,17 +151,10 @@ public class EventsAdapter extends RecyclerView.Adapter<EventsAdapter.EventViewH
                 case R.id.show_on_map_BTN:
                     Log.d(TAG, "onClick: show_on_map_BTN");
                     setTapListener(view);
-                    get_direction_BTN.setEnabled(true);
-                    get_direction_BTN.setAlpha(1.0f);
-                    break;
-                case R.id.get_direction_BTN:
-                    Log.d(TAG, "onClick: getdirection_btn");
-                    setTapListener(view);
                     break;
                 case R.id.booking_BTN:
                     mEvent = (Event) view.getTag(R.id.TAG_FOR_EVENT);
                     showConfrimationDialog (mEvent);
-                    //todo tickets number reduction
                     break;
             }
         }
@@ -205,35 +190,51 @@ public class EventsAdapter extends RecyclerView.Adapter<EventsAdapter.EventViewH
         private void saveEventBookingRemotely(final Event event) {
             final FirebaseFirestore dbFirestore = FirebaseFirestore.getInstance();
 
-            CollectionReference dbRefParties = dbFirestore.collection("Parties");
-            dbRefParties.document(event.getEvent_id()).get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
+            final CollectionReference dbRefEventType = dbFirestore.collection(event.getEvent_type());
+            final DocumentReference dbRefEvent = dbRefEventType.document(event.getEvent_id());
+            dbRefEvent.get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
                 @Override
                 public void onSuccess(DocumentSnapshot documentSnapshot) {
-                    Event gotEvent =  documentSnapshot.toObject(Event.class);
-                    String adminId = gotEvent.getAdmin_id();
-                    Log.d(TAG, "onSuccess: adminId = " + adminId);
-
-                    CollectionReference dbRefBookingsAdminSide = dbFirestore.collection("Admins")
-                            .document(adminId)
-                            .collection("Bookings");
-                    CollectionReference dbRefGuests = dbRefBookingsAdminSide.document(event.getEvent_id()).collection("Guests");
-                    dbRefGuests.document(FirebaseAuth.getInstance().getCurrentUser().getUid())
-                            .set(getGuestInstance())
-                            .addOnSuccessListener(new OnSuccessListener<Void>() {
+                    final Event gotEvent =  documentSnapshot.toObject(Event.class);
+                    final String adminId = gotEvent.getAdmin_id();
+                    final int gotEvent_eventTickets = gotEvent.getEvent_tickets();
+                    dbRefEvent.update("event_tickets", gotEvent_eventTickets-1).addOnSuccessListener(new OnSuccessListener<Void>() {
                         @Override
                         public void onSuccess(Void aVoid) {
-                            CollectionReference dbRefBookingsClientSide = dbFirestore.collection("Users")
-                                    .document(FirebaseAuth.getInstance().getCurrentUser().getUid())
-                                    .collection("Bookings");
-                            dbRefBookingsClientSide.document(event.getEvent_id()).set(event).addOnSuccessListener(new OnSuccessListener<Void>() {
+                            final DocumentReference dbRefAdmin = dbFirestore.collection("Admins")
+                                    .document(adminId);
+                            DocumentReference dbRefEvent = dbRefAdmin.collection("Events")
+                                    .document(event.getEvent_id());
+                            dbRefEvent.update("event_tickets", gotEvent_eventTickets-1).addOnSuccessListener(new OnSuccessListener<Void>() {
                                 @Override
                                 public void onSuccess(Void aVoid) {
-                                    mProgressBar.setVisibility(View.INVISIBLE);
-                                    FancyToast.makeText(mContext, "Event booked successfully", FancyToast.LENGTH_LONG, FancyToast.SUCCESS, false).show();
+                                    CollectionReference dbRefBookingsAdminSide = dbRefAdmin.collection("Bookings");
+                                    CollectionReference dbRefGuests = dbRefBookingsAdminSide.document(event.getEvent_id()).collection("Guests");
+                                    dbRefGuests.document(FirebaseAuth.getInstance().getCurrentUser().getUid())
+                                            .set(getGuestInstance())
+                                            .addOnSuccessListener(new OnSuccessListener<Void>() {
+                                                @Override
+                                                public void onSuccess(Void aVoid) {
+                                                    CollectionReference dbRefBookingsClientSide = dbFirestore.collection("Users")
+                                                            .document(FirebaseAuth.getInstance().getCurrentUser().getUid())
+                                                            .collection("Bookings");
+                                                    dbRefBookingsClientSide.document(event.getEvent_id()).set(event).addOnSuccessListener(new OnSuccessListener<Void>() {
+                                                        @Override
+                                                        public void onSuccess(Void aVoid) {
+                                                            mProgressBar.setVisibility(View.INVISIBLE);
+                                                            FancyToast.makeText(mContext, "Event booked successfully", FancyToast.LENGTH_LONG, FancyToast.SUCCESS, false).show();
+                                                        }
+
+                                                    });
+                                                }
+                                            });
                                 }
                             });
+
                         }
                     });
+
+
                 }
 
                 private Guest getGuestInstance() {
@@ -247,7 +248,7 @@ public class EventsAdapter extends RecyclerView.Adapter<EventsAdapter.EventViewH
 
         public void setTapListener(View view) {
             mEvent = (Event) view.getTag(R.id.TAG_FOR_EVENT);
-            Log.d(TAG, "setTapListener: Party.getEvent_name() = " + mEvent.getEvent_name());
+            Log.d(TAG, "setTapListener: getEvent_name() = " + mEvent.getEvent_name());
             int position = (int) view.getTag(R.id.TAG_FOR_POSITION);
             int viewId = view.getId();
             EventItemTapListener eventItemTapListener = (EventItemTapListener) mContext;

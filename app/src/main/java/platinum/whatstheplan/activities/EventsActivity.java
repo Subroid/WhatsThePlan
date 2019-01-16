@@ -118,8 +118,8 @@ public class EventsActivity extends AppCompatActivity implements CalendarView.On
         eventsRV.setAdapter(bookedEventsAdapter);
         eventsRV.setLayoutManager(new LinearLayoutManager(mContext));
         progressBar.setVisibility(View.INVISIBLE);
-        if (eventsRV.getAdapter().getItemCount() == 0) {
-            noeventTV.setVisibility(View.VISIBLE);
+        if (eventsRV.getAdapter().getItemCount() > 0) {
+            noeventTV.setVisibility(View.INVISIBLE);
         }
     }
 }

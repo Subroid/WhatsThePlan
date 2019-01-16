@@ -13,8 +13,11 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
+import android.widget.Toolbar;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
@@ -29,6 +32,7 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.GeoPoint;
 import com.ittianyu.bottomnavigationviewex.BottomNavigationViewEx;
+import com.shashank.sony.fancytoastlib.FancyToast;
 
 import platinum.whatstheplan.R;
 import platinum.whatstheplan.activities.authentications.SignInActivity;
@@ -42,10 +46,13 @@ public class HomeActivity extends AppCompatActivity {
     private static final String TAG = "HomeActivityTag";
     private BottomNavigationViewEx bottomNavigationViewEx;
     private Context mContext;
+    private android.support.v7.widget.Toolbar toolbarTB;
     private ConstraintLayout restaurantsCL;
     private ConstraintLayout sportsCL;
     private ConstraintLayout openeventsCL;
     private ConstraintLayout partiesCL;
+    private ConstraintLayout featuredCL;
+    private ConstraintLayout exclusiveCL;
     private ImageView restaurantsBgIV;
     private ImageView openeventsBgIV;
     private ImageView partiesBgIV;
@@ -69,6 +76,28 @@ public class HomeActivity extends AppCompatActivity {
 
     }
 
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.menu_options, menu);
+        return true;
+    }
+
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+
+        switch (item.getItemId()) {
+            case R.id.sign_out :
+                FirebaseAuth.getInstance().signOut();
+                Intent signInIntent = new Intent(HomeActivity.this, SignInActivity.class);
+                startActivity(signInIntent);
+
+        }
+
+        return super.onOptionsItemSelected(item);
+    }
+
         private void getCurrentUser() {
         Log.d(TAG, "getCurrentUser: mIsGpsEnabled = " + mIsGpsEnabled);
             mCurrentUser = com.google.firebase.auth.FirebaseAuth.getInstance().getCurrentUser();
@@ -81,11 +110,14 @@ public class HomeActivity extends AppCompatActivity {
 
         private void initViewsAndVariables() {
                     mContext = HomeActivity.this;
+                    toolbarTB  = findViewById(R.id.toolbar);
                     bottomNavigationViewEx = findViewById(R.id.ha_BottomNavigationView);
                     restaurantsCL = findViewById(R.id.restaurants_CL);
                     openeventsCL = findViewById(R.id.openevents_CL);
                     partiesCL = findViewById(R.id.parties_CL);
                     sportsCL = findViewById(R.id.sports_CL);
+                    featuredCL = findViewById(R.id.featured_CL);
+                    exclusiveCL = findViewById(R.id.exclusive_CL);
                     restaurantsBgIV = findViewById(R.id.restaurants_bg_IV);
                     openeventsBgIV = findViewById(R.id.openevents_bg_IV);
                     partiesBgIV = findViewById(R.id.parties_bg_IV);
@@ -96,6 +128,8 @@ public class HomeActivity extends AppCompatActivity {
                 }
 
         private void performActions() {
+            setSupportActionBar(toolbarTB);
+            getSupportActionBar().setDisplayShowTitleEnabled(false);
             performBottomNavigationViewExActions ();
             performClicks ();
             performImageViewsActions ();
@@ -136,20 +170,32 @@ public class HomeActivity extends AppCompatActivity {
                 sportsCL.setOnClickListener(getOnClickListenerInstanceForSportsCL ());
                 openeventsCL.setOnClickListener(getOnClickListenerInstanceForOpenEventsCL ());
                 partiesCL.setOnClickListener(getOnClickListenerInstanceForPartiesCL ());
+                featuredCL.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        FancyToast.makeText(mContext, "Coming Soon", FancyToast.LENGTH_SHORT, FancyToast.INFO, false).show();
+                    }
+                });
+                exclusiveCL.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        FancyToast.makeText(mContext, "Coming Soon", FancyToast.LENGTH_SHORT, FancyToast.INFO, false).show();
+                    }
+                });
             }
 
-    private View.OnClickListener getOnClickListenerInstanceForPartiesCL() {
-        View.OnClickListener onClickListener = new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Intent partiesIntent = new Intent(HomeActivity.this, PartiesActivity.class);
-                startActivity(partiesIntent);
-            }
-        };
-        return onClickListener;
-    }
+                private View.OnClickListener getOnClickListenerInstanceForPartiesCL() {
+                    View.OnClickListener onClickListener = new View.OnClickListener() {
+                        @Override
+                        public void onClick(View view) {
+                            Intent partiesIntent = new Intent(HomeActivity.this, PartiesActivity.class);
+                            startActivity(partiesIntent);
+                        }
+                    };
+                    return onClickListener;
+                }
 
-    private View.OnClickListener getOnClickListenerInstanceForRestaurantsCL() {
+                private View.OnClickListener getOnClickListenerInstanceForRestaurantsCL() {
                     View.OnClickListener onClickListener = new View.OnClickListener() {
                         @Override
                         public void onClick(View view) {

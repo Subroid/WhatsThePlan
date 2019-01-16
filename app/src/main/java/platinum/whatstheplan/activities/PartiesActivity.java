@@ -75,12 +75,9 @@ import java.util.List;
 import java.util.Map;
 
 import platinum.whatstheplan.R;
-import platinum.whatstheplan.adapters.PartiesAdapter;
 import platinum.whatstheplan.adapters.EventsAdapter;
 import platinum.whatstheplan.interfaces.EventItemTapListener;
 import platinum.whatstheplan.models.Event;
-import platinum.whatstheplan.models.Party;
-import platinum.whatstheplan.models.Party2;
 import platinum.whatstheplan.models.UserInformation;
 import platinum.whatstheplan.models.UserLocation;
 import platinum.whatstheplan.models.UserProfile;
@@ -93,7 +90,6 @@ public class PartiesActivity extends FragmentActivity implements
         OnMapReadyCallback,
         EventItemTapListener,
         GeoQueryEventListener, View.OnClickListener {
-    //todo all the methods which returns or accepts parameter of Context or Activity
 
     private static final String TAG = "PartiesActivityTag";
 
@@ -125,28 +121,21 @@ public class PartiesActivity extends FragmentActivity implements
     private Event mEvent;
     private List<Event> mEventList;
     private List<String> mKeyList;
-    private Party2 mParty;
-    private List<Party2> mPartyList;
     private int mRadius;
 
+    @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_parties);
-        // Obtain the SupportMapFragment and get notified when the mapFragment is ready to be used.
 
-//        initviewsAndVariables ();
         Log.d(TAG, "onCreate: called");
         initViewsAndVariables();
         performActions();
-
-//        createLocationRequest ();
-//        saveUserLocationIntoFirestore ();
 
     }
 
     private void initViewsAndVariables() {
         Log.d(TAG, "initViewsAndVariables: called");
-        mPartyList = new ArrayList<>();
         mKeyList = new ArrayList<>();
         mEventList = new ArrayList<>();
         mPartiesRV = findViewById(R.id.parties_RV);
@@ -270,42 +259,6 @@ public class PartiesActivity extends FragmentActivity implements
         Intent location_setting_intent = new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS);
         startActivityForResult(location_setting_intent, REQUEST_LOCATION_SETTINGS_CODE_51);
     }
-
-
-    /*1*/
-    /*private void createLocationRequest() {
-
-        Log.d(TAG, "createLocationRequest: mIsGpsEnabled = " + mIsGpsEnabled);
-
-        LocationManager locationManager = (LocationManager) getSystemService(LocationManager.GPS_PROVIDER);
-
-        if (!locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
-            mIsGpsEnabled = false;
-            enableGpsIntent();
-        } else {
-            mIsGpsEnabled = true;
-            initMap();
-        }
-
-        *//*Task<LocationSettingsResponse> taskLocationSettingsResponse = getLocationSettingsTask();
-
-        taskLocationSettingsResponse.addOnCompleteListener(new OnCompleteListener<LocationSettingsResponse>() {
-            @Override
-            public void onComplete(@NonNull Task<LocationSettingsResponse> task) {
-                Log.d(TAG, "onComplete: taskLocationSettingsResponse called");
-                mIsGpsEnabled = task.getResult().getLocationSettingsStates().isGpsUsable();
-                Log.d(TAG, "onComplete: tLSR mIsGpsEnabled = " + mIsGpsEnabled);
-                if (!mIsGpsEnabled) {
-                    //TODO Create dialog before going to setting_intent
-                    enableGpsIntent();
-                } else {
-                    Log.d(TAG, "onComplete: tLSR else called");
-                    initMap();
-                }
-            }
-        });*//*
-
-    }*/
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
@@ -464,9 +417,9 @@ public class PartiesActivity extends FragmentActivity implements
 
     private void saveUserLocationIntoFirestoreThenDisplayPartiesNearUserLocation() {
         saveUserLocationIntoFirestore();
-        displayPartiesInTheRangeOf(mRadius);
+        displayPartiesNearUserLocation(mRadius);
 //        displayPartiesWithin5km();
-//        displayPartiesNearUserLocationAsListItem();
+//        displayPartiesNearUserLocation();
     }
 
     private void requestLocationPermissions() {
@@ -487,17 +440,6 @@ public class PartiesActivity extends FragmentActivity implements
             @Override
             public void onComplete(@NonNull Task<DocumentSnapshot> task) {
                 if (task.isSuccessful()) {
-//                                        UserInformation userInformationResult = task.getResult().toObject(UserInformation.class);
-//                                        UserProfile userProfile = new UserProfile();
-                                        /*UserLocation userLocation = new UserLocation(new GeoPoint(
-                                                mUserCurrentLocation.getLatitude(), mUserCurrentLocation.getLongitude()),
-                                                null);*/
-                                        /*userProfile.setEvent_name(userInformationResult.getUserProfile().getEvent_name());
-                                        userProfile.setEmail(userInformationResult.getUserProfile().getEmail());
-                                        userProfile.setPassword(userInformationResult.getUserProfile().getPassword());
-                                        userProfile.setUid(userInformationResult.getUserProfile().getUid());
-                                        userProfile.setAdmin(userInformationResult.getUserProfile().isAdmin());
-                                        UserInformation userInformation = new UserInformation(userProfile, userLocation);*/
 
                     Map<String, Object> dataUserLocation = new HashMap<>();
                     UserLocation userLocation = new UserLocation(new GeoPoint(
@@ -528,10 +470,10 @@ public class PartiesActivity extends FragmentActivity implements
                         }*/
 
 
-    private void displayPartiesInTheRangeOf(int radius) {
+    private void displayPartiesNearUserLocation(int radius) {
         mKeyList.clear();
         mEventList.clear();
-        Log.d(TAG, "displayPartiesInTheRangeOf: radius = " + radius);
+        Log.d(TAG, "displayPartiesNearUserLocation: radius = " + radius);
         mGeoLocation = new GeoLocation(mUserCurrentLocation.getLatitude(), mUserCurrentLocation.getLongitude());
         Log.d(TAG, "displayPartiesInTheRangeOf5km: mUserCurrentLocation.getLatitude = " + mUserCurrentLocation.getLatitude());
         Log.d(TAG, "displayPartiesInTheRangeOf5km: mUserCurrentLocation.getLongitude = " + mUserCurrentLocation.getLongitude());
@@ -540,63 +482,6 @@ public class PartiesActivity extends FragmentActivity implements
         mGeoFireQuery = mGeoFirebase.queryAtLocation(mGeoLocation, radius);
         mGeoFireQuery.removeAllListeners();
         mGeoFireQuery.addGeoQueryEventListener(this);
-
-//        mGeoFireQuery.addGeoQueryDataEventListener(this);
-
-    }
-
-    private void displayPartiesWithin5km() {
-        Log.d(TAG, "displayPartiesWithin5km: called");
-        mQueryCenter = new GeoPoint(
-                mUserCurrentLocation.getLatitude(), mUserCurrentLocation.getLongitude());
-        CollectionReference mDbPartiesRef = mDbFirestore.collection("Parties");
-        mGeoFirestore = new GeoFirestore(mDbPartiesRef);
-        mGeoQuery = mGeoFirestore.queryAtLocation(mQueryCenter, 500);
-        mGeoQuery.removeAllListeners();
-//        mGeoQuery.addGeoQueryEventListener(this);
-//        mGeoQuery.addGeoQueryDataEventListener(this);
-
-    }
-
-    private void displayPartiesNearUserLocationAsListItem() {
-        Log.d(TAG, "displayPartiesNearUserLocationAsListItem: called 1");
-
-        CollectionReference mDbPartiesRef = mDbFirestore.collection("Parties");
-        final FirestoreRecyclerOptions<Party> frOptions =
-                new FirestoreRecyclerOptions.Builder<Party>()
-                        .setQuery(mDbPartiesRef, Party.class)
-                        .build();
-
-        Task<DocumentSnapshot> task = mDbFirestore.collection("Users").document(FirebaseAuth.getInstance().getUid()).get();
-        task.addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
-            @Override
-            public void onComplete(@NonNull Task<DocumentSnapshot> task) {
-                if (task.isSuccessful() && task.getResult() != null) {
-                    UserInformation userInformationResult = task.getResult().toObject(UserInformation.class);
-                    UserProfile userProfile = new UserProfile();
-                    UserLocation userLocation = new UserLocation();
-                    userProfile.setName(userInformationResult.getUserProfile().getName());
-                    userProfile.setEmail(userInformationResult.getUserProfile().getEmail());
-                    userProfile.setPassword(userInformationResult.getUserProfile().getPassword());
-                    userProfile.setUid(userInformationResult.getUserProfile().getUid());
-                    userProfile.setAdmin(userInformationResult.getUserProfile().isAdmin());
-                    userLocation.setGeoPoint(userInformationResult.getUserLocation().getGeoPoint());
-                    userLocation.setTimeStamp(userInformationResult.getUserLocation().getTimeStamp());
-                    mUserInformation = userInformationResult;
-                    Log.d(TAG, "displayPartiesNearUserLocationAsListItem: user name = " + mUserInformation.getUserProfile().getName());
-                    Log.d(TAG, "displayPartiesNearUserLocationAsListItem: timestamp = " + mUserInformation.getUserLocation().getTimeStamp());
-                    PartiesAdapter adapter = new PartiesAdapter(frOptions, PartiesActivity.this, mUserInformation, mMap);
-
-                    Log.d(TAG, "displayPartiesNearUserLocationAsListItem: called 2");
-
-
-                    mPartiesRV.setAdapter(adapter);
-                    adapter.startListening();
-                    mPartiesRV.setLayoutManager(new LinearLayoutManager(PartiesActivity.this));
-                }
-            }
-        });
-
 
     }
 
@@ -766,12 +651,11 @@ public class PartiesActivity extends FragmentActivity implements
         Log.d(TAG, "onTap: viewId = " + viewId);
         switch (viewId) {
             case R.id.show_on_map_BTN:
-                Log.d(TAG, "onTap: Party.getEvent_name() = " + event.getEvent_name());
+                Log.d(TAG, "onTap: getEvent_name() = " + event.getEvent_name());
                 setTargetMarker(event, tappedItemPosition);
                 break;
             case R.id.get_direction_BTN:
                 Log.d(TAG, "onTap: mMarker.getEvent_id() = " + mMarker.getId());
-//                setTargetMarker (Party, itemPosition);
                 getDirection(event, mUserCurrentLocation, tappedItemPosition);
 
         }
@@ -788,7 +672,7 @@ public class PartiesActivity extends FragmentActivity implements
                 mLoopStarted = false;
                 i = 0;
                 mLoopFinished = false;
-                displayPartiesInTheRangeOf(mRadius);
+                displayPartiesNearUserLocation(mRadius);
         }
     }
 
