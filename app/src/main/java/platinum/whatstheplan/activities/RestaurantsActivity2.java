@@ -48,7 +48,7 @@ public class RestaurantsActivity2 extends FragmentActivity implements OnMapReady
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_restaurants);
+        setContentView(R.layout.activity_foodsdrinks);
         // Obtain the SupportMapFragment and get notified when the mapFragment is ready to be used.
 
 //        initviewsAndVariables ();

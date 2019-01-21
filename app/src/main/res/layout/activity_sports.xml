@@ -10,9 +10,10 @@
         android:id="@+id/toolbar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:background="@color/colorPrimaryDark"
         app:layout_constraintHeight_default="percent"
         app:layout_constraintHeight_percent="0.1"
-        android:background="@color/colorPrimaryDark">
+        app:layout_constraintTop_toTopOf="parent">
 
         <TextView
             android:layout_width="wrap_content"
@@ -28,17 +29,17 @@
             android:layout_width="@dimen/_50sdp"
             android:layout_height="wrap_content"
             android:background="@color/WhiteFFFFFF"
-            android:padding="@dimen/_3sdp"
             android:gravity="center"
+            android:padding="@dimen/_3sdp"
             android:text="5"
-            android:textSize="@dimen/_14ssp"/>
+            android:textSize="@dimen/_14ssp" />
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_marginLeft="@dimen/_20sdp"
             android:fontFamily="cursive"
             android:gravity="center"
-            android:layout_marginLeft="@dimen/_20sdp"
             android:text="km"
             android:textColor="@color/WhiteFFFFFF"
             android:textSize="@dimen/_20ssp" />
@@ -47,20 +48,20 @@
             android:id="@+id/find_BTN"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_marginLeft="@dimen/_10sdp"
             android:background="@drawable/round_shpae_persianpink"
+            android:elevation="@dimen/_3sdp"
             android:fontFamily="sans-serif-condensed"
             android:minWidth="0dp"
             android:minHeight="0dp"
-            android:layout_marginLeft="@dimen/_10sdp"
             android:padding="@dimen/_2sdp"
             android:paddingStart="@dimen/_15sdp"
             android:paddingEnd="@dimen/_15sdp"
-            android:elevation="@dimen/_3sdp"
             android:text="Find"
             android:textAllCaps="false"
             android:textColor="@color/WhiteFFFFFF"
             android:textSize="@dimen/_10ssp"
-            android:textStyle="bold"/>
+            android:textStyle="bold" />
 
     </android.support.v7.widget.Toolbar>
 
@@ -92,6 +93,19 @@
         app:layout_constraintVertical_bias="0.0"
         tools:listitem="@layout/layout_event" />
 
+
+    <TextView
+        android:id="@+id/no_event_TV"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="No event found"
+        android:visibility="invisible"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.4" />
 
     <fragment xmlns:map="http://schemas.android.com/apk/res-auto"
         xmlns:tools="http://schemas.android.com/tools"

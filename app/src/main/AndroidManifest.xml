@@ -34,7 +34,7 @@
         <activity android:name=".activities.authentications.SignInActivity" />
         <activity android:name=".activities.authentications.NameSubmitActivity" />
         <activity
-            android:name=".activities.RestaurantsActivity"
+            android:name=".activities.FoodsDrinksActivity"
             android:label="@string/title_activity_restaurants" />
         <activity
             android:name=".activities.RestaurantsActivity2"

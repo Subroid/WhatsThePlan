@@ -2,15 +2,17 @@ package platinum.whatstheplan.models;
 
 public class Guest {
 
-    public String guest_name;
-    public String guest_email;
+    private String guest_name;
+    private String guest_email;
+    private String guest_id;
 
     public Guest() {
     }
 
-    public Guest(String guest_name, String guest_email) {
+    public Guest(String guest_name, String guest_email, String guest_id) {
         this.guest_name = guest_name;
         this.guest_email = guest_email;
+        this.guest_id = guest_id;
     }
 
     public String getGuest_name() {

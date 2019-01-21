@@ -28,6 +28,7 @@ import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ProgressBar;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.firebase.geofire.GeoFire;
@@ -95,6 +96,7 @@ public class SportsActivity extends FragmentActivity implements
     private ProgressBar mProgressBarPB;
     private EditText mRadiusET;
     private Button mFindBTN;
+    private TextView mNoEventTV;
     private LocationRequest mLocationRequest;
     private FusedLocationProviderClient mFusedLocationProviderClient;
     private Location mUserCurrentLocation;
@@ -137,6 +139,7 @@ public class SportsActivity extends FragmentActivity implements
         mEventList = new ArrayList<>();
         mSportsRV = findViewById(R.id.sports_RV);
         mRadiusET = findViewById(R.id.radius_ET);
+        mNoEventTV = findViewById(R.id.no_event_TV);
         mRadius = Integer.parseInt(mRadiusET.getText().toString());
         mFindBTN = findViewById(R.id.find_BTN);
         mProgressBarPB = findViewById(R.id.progressBar);
@@ -594,6 +597,11 @@ public class SportsActivity extends FragmentActivity implements
     public void onGeoQueryReady() {
         Log.d(TAG, "onGeoQueryReady: called ");
         Log.d(TAG, "onGeoQueryReady: mLoopStarted = " + mLoopStarted);
+
+        if (mKeyList.size() == 0) {
+            mProgressBarPB.setVisibility(View.GONE);
+            mNoEventTV.setVisibility(View.VISIBLE);
+        }
 
         if (!mLoopStarted) {
             for (i = 0; i < mKeyList.size(); i++) {

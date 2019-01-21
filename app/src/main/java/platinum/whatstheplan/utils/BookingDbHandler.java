@@ -17,7 +17,7 @@ public class BookingDbHandler extends SQLiteOpenHelper {
     private static final int DATABASE_VERSION = 1;
 
     private static final String TABLE_BOOKINGS_PARTIES = "BookingsParties";
-    private static final String TABLE_BOOKINGS_FOODS = "BookingsFoods";
+    private static final String TABLE_BOOKINGS_FOODSDRINKS = "BookingsFoodsDrinks";
     private static final String TABLE_BOOKINGS_SPORTS = "BookingsSports";
     private static final String TABLE_BOOKINGS_OPENEVENTS = "BookingsOpenEvents";
 
@@ -56,8 +56,8 @@ public class BookingDbHandler extends SQLiteOpenHelper {
 
         sqLiteDatabase.execSQL(CREATE_TABLE_BOOKINGS_PARTIES);
 
-        String CREATE_TABLE_BOOKINGS_FOODS = "CREATE TABLE " +
-                TABLE_BOOKINGS_FOODS +
+        String CREATE_TABLE_BOOKINGS_FOODSDRINKS = "CREATE TABLE " +
+                TABLE_BOOKINGS_FOODSDRINKS +
                 "(" + COLUMN_EVENTNO + " INTEGER PRIMARY KEY," +
                 COLUMN_EVENTID + " TEXT," +
                 COLUMN_EVENTNAME + " TEXT," +
@@ -68,7 +68,7 @@ public class BookingDbHandler extends SQLiteOpenHelper {
                 COLUMN_VENUEADDRESS + " TEXT," +
                 COLUMN_VENUEIMAGE + " TEXT" +")";
 
-        sqLiteDatabase.execSQL(CREATE_TABLE_BOOKINGS_FOODS);
+        sqLiteDatabase.execSQL(CREATE_TABLE_BOOKINGS_FOODSDRINKS);
 
         String CREATE_TABLE_BOOKINGS_OPENEVENTS = "CREATE TABLE " +
                 TABLE_BOOKINGS_OPENEVENTS +
@@ -103,7 +103,7 @@ public class BookingDbHandler extends SQLiteOpenHelper {
     @Override
     public void onUpgrade(SQLiteDatabase sqLiteDatabase, int i, int i1) {
         sqLiteDatabase.execSQL("DROP TABLE IF EXISTS " + TABLE_BOOKINGS_PARTIES);
-        sqLiteDatabase.execSQL("DROP TABLE IF EXISTS " + TABLE_BOOKINGS_FOODS);
+        sqLiteDatabase.execSQL("DROP TABLE IF EXISTS " + TABLE_BOOKINGS_FOODSDRINKS);
         sqLiteDatabase.execSQL("DROP TABLE IF EXISTS " + TABLE_BOOKINGS_SPORTS);
         sqLiteDatabase.execSQL("DROP TABLE IF EXISTS " + TABLE_BOOKINGS_OPENEVENTS);
     }
@@ -114,8 +114,8 @@ public class BookingDbHandler extends SQLiteOpenHelper {
             case "Parties" :
                 db.insert(TABLE_BOOKINGS_PARTIES, null, getContentValues (event));
                 break;
-            case "Restaurants" :
-                db.insert(TABLE_BOOKINGS_FOODS, null, getContentValues (event));
+            case "Foods Drinks" :
+                db.insert(TABLE_BOOKINGS_FOODSDRINKS, null, getContentValues (event));
                 break;
             case "Sports" :
                 db.insert(TABLE_BOOKINGS_SPORTS, null, getContentValues (event));
@@ -149,8 +149,8 @@ public class BookingDbHandler extends SQLiteOpenHelper {
             case "Parties" :
                 db.execSQL("DELETE FROM " + TABLE_BOOKINGS_PARTIES + " WHERE " + COLUMN_EVENTID + "= '" + event.getEvent_id() + "'");
                 break;
-            case "Restaurants" :
-                db.execSQL("DELETE FROM " + TABLE_BOOKINGS_FOODS + " WHERE " + COLUMN_EVENTID + "= '" + event.getEvent_id() + "'");
+            case "FoodsDrinks" :
+                db.execSQL("DELETE FROM " + TABLE_BOOKINGS_FOODSDRINKS + " WHERE " + COLUMN_EVENTID + "= '" + event.getEvent_id() + "'");
                 break;
             case "Sports" :
                 db.execSQL("DELETE FROM " + TABLE_BOOKINGS_SPORTS + " WHERE " + COLUMN_EVENTID + "= '" + event.getEvent_id() + "'");
@@ -167,7 +167,7 @@ public class BookingDbHandler extends SQLiteOpenHelper {
         List<Event> eventList = new ArrayList<>();
 
         findEventsFromTable (date, TABLE_BOOKINGS_PARTIES, eventList);
-        findEventsFromTable (date, TABLE_BOOKINGS_FOODS, eventList);
+        findEventsFromTable (date, TABLE_BOOKINGS_FOODSDRINKS, eventList);
         findEventsFromTable (date, TABLE_BOOKINGS_SPORTS, eventList);
         findEventsFromTable (date, TABLE_BOOKINGS_OPENEVENTS, eventList);
 

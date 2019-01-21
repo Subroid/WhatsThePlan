@@ -239,7 +239,7 @@ public class EventsAdapter extends RecyclerView.Adapter<EventsAdapter.EventViewH
 
                 private Guest getGuestInstance() {
                     FirebaseUser currentUser = FirebaseAuth.getInstance().getCurrentUser();
-                    Guest guest =  new Guest(currentUser.getDisplayName(), currentUser.getEmail());
+                    Guest guest =  new Guest(currentUser.getDisplayName(), currentUser.getEmail(), currentUser.getUid());
                     return guest;
                 }
 

@@ -1,15 +1,10 @@
 package platinum.whatstheplan.activities;
 
-import android.Manifest;
 import android.content.Context;
 import android.content.Intent;
-import android.content.pm.PackageManager;
 import android.location.Location;
-import android.provider.Settings;
-import android.support.annotation.NonNull;
 import android.support.constraint.ConstraintLayout;
 import android.support.design.bottomnavigation.LabelVisibilityMode;
-import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -17,29 +12,16 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
-import android.widget.Toolbar;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
-import com.google.android.gms.location.FusedLocationProviderClient;
-import com.google.android.gms.location.LocationServices;
-import com.google.android.gms.location.LocationSettingsRequest;
-import com.google.android.gms.location.LocationSettingsResponse;
-import com.google.android.gms.location.SettingsClient;
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.firestore.GeoPoint;
 import com.ittianyu.bottomnavigationviewex.BottomNavigationViewEx;
 import com.shashank.sony.fancytoastlib.FancyToast;
 
 import platinum.whatstheplan.R;
 import platinum.whatstheplan.activities.authentications.SignInActivity;
-import platinum.whatstheplan.models.UserLocation;
 import platinum.whatstheplan.utils.BottomNavigationViewHelper;
-
-import static platinum.whatstheplan.utils.Constants.REQUEST_LOCATION_PERMISSIONS_CODE_52;
 
 public class HomeActivity extends AppCompatActivity {
 
@@ -199,7 +181,7 @@ public class HomeActivity extends AppCompatActivity {
                     View.OnClickListener onClickListener = new View.OnClickListener() {
                         @Override
                         public void onClick(View view) {
-                            Intent restaurantsIntent = new Intent(HomeActivity.this, RestaurantsActivity.class);
+                            Intent restaurantsIntent = new Intent(HomeActivity.this, FoodsDrinksActivity.class);
                             startActivity(restaurantsIntent);
                         }
                     };
