@@ -20,7 +20,7 @@
             android:layout_height="wrap_content"
             android:fontFamily="cursive"
             android:gravity="center"
-            android:text="Foods&amp;Drinks within "
+            android:text="Restaurants within "
             android:textColor="@color/WhiteFFFFFF"
             android:textSize="@dimen/_16ssp" />
 
@@ -31,7 +31,7 @@
             android:background="@color/WhiteFFFFFF"
             android:gravity="center"
             android:padding="@dimen/_3sdp"
-            android:text="5"
+            android:text="50"
             android:textSize="@dimen/_14ssp" />
 
         <TextView
@@ -80,22 +80,8 @@
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_bias="0.55" />
 
-
-    <TextView
-        android:id="@+id/no_event_TV"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="No event has been booked on the selected date"
-        android:visibility="invisible"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.5"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/calendar_CV"
-        app:layout_constraintVertical_bias="0.5" />
-
     <android.support.v7.widget.RecyclerView
-        android:id="@+id/foodsdrinks_RV"
+        android:id="@+id/parties_RV"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         app:layout_constraintBottom_toTopOf="@id/mapFragment"
@@ -105,7 +91,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/toolbar"
         app:layout_constraintVertical_bias="0.0"
-        tools:listitem="@layout/layout_event"  />
+        tools:listitem="@layout/layout_venue" />
 
     <fragment xmlns:map="http://schemas.android.com/apk/res-auto"
         xmlns:tools="http://schemas.android.com/tools"
@@ -119,9 +105,23 @@
         map:layout_constraintHeight_percent="0.35"
         map:layout_constraintHorizontal_bias="0.5"
         map:layout_constraintStart_toStartOf="parent"
-        map:layout_constraintTop_toBottomOf="@id/foodsdrinks_RV"
+        map:layout_constraintTop_toBottomOf="@id/parties_RV"
         map:layout_constraintVertical_bias="1.0"
-        tools:context=".activities.Foods &amp; DrinksActivity" />
+        tools:context=".activities.PartyEventsActivity" />
+
+
+    <TextView
+        android:id="@+id/no_venue_TV"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="No venue found"
+        android:visibility="invisible"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.4" />
 
 </android.support.constraint.ConstraintLayout>
 

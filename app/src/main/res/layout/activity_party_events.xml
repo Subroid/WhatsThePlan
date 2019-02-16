@@ -31,7 +31,7 @@
             android:background="@color/WhiteFFFFFF"
             android:gravity="center"
             android:padding="@dimen/_3sdp"
-            android:text="5"
+            android:text="50"
             android:textSize="@dimen/_14ssp" />
 
         <TextView

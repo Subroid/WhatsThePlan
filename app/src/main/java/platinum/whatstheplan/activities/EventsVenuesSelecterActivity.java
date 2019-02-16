@@ -16,12 +16,15 @@ import com.google.firebase.auth.FirebaseAuth;
 import platinum.whatstheplan.R;
 import platinum.whatstheplan.activities.authentications.SignInActivity;
 
-public class PartyEventsVenuesSelecterActivity extends AppCompatActivity implements View.OnClickListener {
+public class EventsVenuesSelecterActivity extends AppCompatActivity implements View.OnClickListener {
 
     private com.google.firebase.auth.FirebaseUser mCurrentUser;
     private ImageView eventsIV;
     private ImageView venuesIV;
     private Toolbar toolbarTB;
+    private int mEventType = 0;
+    private Class mVenuesClassName;
+    private Class mEventsClassName;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -44,13 +47,13 @@ public class PartyEventsVenuesSelecterActivity extends AppCompatActivity impleme
 
         setSupportActionBar(toolbarTB);
         getSupportActionBar().setDisplayShowTitleEnabled(false);
-        Glide.with(PartyEventsVenuesSelecterActivity.this)
+        Glide.with(EventsVenuesSelecterActivity.this)
                 .load(R.drawable.events)
                 .apply(RequestOptions.circleCropTransform())
                 .into(eventsIV);
         eventsIV.setOnClickListener(this);
 
-        Glide.with(PartyEventsVenuesSelecterActivity.this)
+        Glide.with(EventsVenuesSelecterActivity.this)
                 .load(R.drawable.venues)
                 .apply(RequestOptions.circleCropTransform())
                 .into(venuesIV);
@@ -58,6 +61,19 @@ public class PartyEventsVenuesSelecterActivity extends AppCompatActivity impleme
     }
 
     private void initViewsAndVariables() {
+        if (getIntent() != null) {
+            mEventType = getIntent().getIntExtra("event_type", 0);
+            switch (mEventType) {
+                case 1 :
+                    mVenuesClassName = PartyVenuesActivity.class;
+                    mEventsClassName = PartyEventsActivity.class;
+                    break;
+                case 2 :
+                    mVenuesClassName = FoodsDrinksVenuesActivity.class;
+                    mEventsClassName = FoodsDrinksActivity.class;
+                    break;
+            }
+        }
         toolbarTB = findViewById(R.id.toolbar);
         eventsIV = findViewById(R.id.events_IV);
         venuesIV = findViewById(R.id.venues_IV);
@@ -67,15 +83,15 @@ public class PartyEventsVenuesSelecterActivity extends AppCompatActivity impleme
     public void onClick(View view) {
         switch (view.getId()) {
             case R.id.events_IV :
-                navigateToNewActivity (PartyEventsActivity.class);
+                navigateToNewActivity (mEventsClassName);
                 break;
             case R.id.venues_IV :
-                navigateToNewActivity(PartyVenuesActivity.class);
+                navigateToNewActivity(mVenuesClassName);
         }
     }
 
     private void navigateToNewActivity(Class classname) {
-        Intent intent = new Intent(PartyEventsVenuesSelecterActivity.this, classname);
+        Intent intent = new Intent(EventsVenuesSelecterActivity.this, classname);
         startActivity(intent);
     }
 

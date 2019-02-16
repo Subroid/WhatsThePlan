@@ -15,7 +15,8 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
         <activity android:name=".activities.PartyVenuesActivity"></activity>
-        <activity android:name=".activities.PartyEventsVenuesSelecterActivity" />
+        <activity android:name=".activities.FoodsDrinksVenuesActivity"></activity>
+        <activity android:name=".activities.EventsVenuesSelecterActivity" />
         <activity
             android:name=".activities.LandActivity"
             android:screenOrientation="portrait"
@@ -35,11 +36,9 @@
         <activity android:name=".activities.authentications.SignInActivity" />
         <activity android:name=".activities.authentications.NameSubmitActivity" />
         <activity
-            android:name=".activities.FoodsDrinksActivity"
-            android:label="@string/title_activity_restaurants" />
+            android:name=".activities.FoodsDrinksActivity" />
         <activity
-            android:name=".activities.RestaurantsActivity2"
-            android:label="@string/title_activity_restaurants" />
+            android:name=".activities.RestaurantsActivity2" />
 
         <meta-data
             android:name="com.google.android.geo.API_KEY"
