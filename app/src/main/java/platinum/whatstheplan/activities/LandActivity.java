@@ -19,8 +19,7 @@ public class LandActivity extends AppCompatActivity {
     @Override
     protected void onRestart() {
         super.onRestart();
-            Intent homeIntent = new Intent(LandActivity.this, HomeActivity.class);
-        startActivity(homeIntent);
+        jumpToHomeActivity();
         finish();
     }
 

@@ -7,7 +7,6 @@
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
 
-    <!-- ^^runtime permissions for internet and gps -->
     <application
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
@@ -15,6 +14,8 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
+        <activity android:name=".activities.PartyVenuesActivity"></activity>
+        <activity android:name=".activities.PartyEventsVenuesSelecterActivity" />
         <activity
             android:name=".activities.LandActivity"
             android:screenOrientation="portrait"
@@ -46,9 +47,9 @@
 
         <activity android:name=".activities.FoodListActivity" />
         <activity android:name=".activities.authentications.PasswordResetActivity" />
-        <activity android:name=".activities.PartiesActivity"></activity>
-        <activity android:name=".activities.SportsActivity"></activity>
-        <activity android:name=".activities.OpenEventsActivity"></activity>
+        <activity android:name=".activities.PartyEventsActivity" />
+        <activity android:name=".activities.SportsActivity" />
+        <activity android:name=".activities.OpenEventsActivity" />
     </application>
 
 </manifest>

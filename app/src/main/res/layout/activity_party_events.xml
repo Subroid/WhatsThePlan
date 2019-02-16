@@ -107,7 +107,7 @@
         map:layout_constraintStart_toStartOf="parent"
         map:layout_constraintTop_toBottomOf="@id/parties_RV"
         map:layout_constraintVertical_bias="1.0"
-        tools:context=".activities.PartiesActivity" />
+        tools:context=".activities.PartyEventsActivity" />
 
 
     <TextView

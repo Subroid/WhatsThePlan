@@ -170,7 +170,7 @@ public class HomeActivity extends AppCompatActivity {
                     View.OnClickListener onClickListener = new View.OnClickListener() {
                         @Override
                         public void onClick(View view) {
-                            Intent partiesIntent = new Intent(HomeActivity.this, PartiesActivity.class);
+                            Intent partiesIntent = new Intent(HomeActivity.this, PartyEventsVenuesSelecterActivity.class);
                             startActivity(partiesIntent);
                         }
                     };
