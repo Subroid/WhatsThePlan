@@ -20,13 +20,12 @@ public class LandActivity extends AppCompatActivity {
     protected void onRestart() {
         super.onRestart();
         jumpToHomeActivity();
-        finish();
     }
 
         private void jumpToHomeActivity() {
                     Intent homeIntent = new Intent(LandActivity.this, HomeActivity.class);
-                startActivity(homeIntent);
-                finish();
+            finish();
+            startActivity(homeIntent);
 
             }
 }

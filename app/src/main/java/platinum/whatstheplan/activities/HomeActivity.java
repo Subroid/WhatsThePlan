@@ -58,6 +58,11 @@ public class HomeActivity extends AppCompatActivity {
 
     }
 
+    @Override
+    protected void onResume() {
+        super.onResume();
+        getCurrentUser();
+    }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -170,7 +175,7 @@ public class HomeActivity extends AppCompatActivity {
                     View.OnClickListener onClickListener = new View.OnClickListener() {
                         @Override
                         public void onClick(View view) {
-                            Intent partiesIntent = new Intent(HomeActivity.this, EventsVenuesSelecterActivity.class);
+                            Intent partiesIntent = new Intent(HomeActivity.this, PartyVenuesActivity.class);
                             partiesIntent.putExtra("event_type", 1);
                             startActivity(partiesIntent);
                         }
@@ -182,7 +187,7 @@ public class HomeActivity extends AppCompatActivity {
                     View.OnClickListener onClickListener = new View.OnClickListener() {
                         @Override
                         public void onClick(View view) {
-                            Intent restaurantsIntent = new Intent(HomeActivity.this, EventsVenuesSelecterActivity.class);
+                            Intent restaurantsIntent = new Intent(HomeActivity.this, FoodsDrinksVenuesActivity.class);
                             restaurantsIntent.putExtra("event_type", 2);
                             startActivity(restaurantsIntent);
                         }

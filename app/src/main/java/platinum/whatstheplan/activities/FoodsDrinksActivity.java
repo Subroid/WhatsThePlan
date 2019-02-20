@@ -146,7 +146,7 @@ public class FoodsDrinksActivity extends FragmentActivity implements
         mDbFirestore = FirebaseFirestore.getInstance();
         mDbFirebase = FirebaseDatabase.getInstance();
         mUser = FirebaseAuth.getInstance().getCurrentUser();
-        mFusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(FoodsDrinksActivity.this);
+
     }
 
     private void performActions() {
@@ -329,8 +329,7 @@ public class FoodsDrinksActivity extends FragmentActivity implements
             requestLocationPermissions();
         } else {
             Log.d(TAG, "getUserCurrentLocationAndSaveIntoRemoteDatabase: else called");
-            mMap.setMyLocationEnabled(true);
-            mMap.getUiSettings().setMapToolbarEnabled(false);
+            getUserCurrentLocationAndSaveIntoRemoteDatabase();
         }
 
     }
@@ -343,7 +342,10 @@ public class FoodsDrinksActivity extends FragmentActivity implements
             requestLocationPermissions();
         } else {
             Log.d(TAG, "getUserCurrentLocationAndSaveIntoRemoteDatabase: else called");
-
+            mMap.setMyLocationEnabled(true);
+            mMap.getUiSettings().setMapToolbarEnabled(false);
+            mMap.getUiSettings().setMyLocationButtonEnabled(true);
+            mFusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(FoodsDrinksActivity.this);
 
             Task<Location> taskLastLocation = mFusedLocationProviderClient.getLastLocation();
             taskLastLocation.addOnCompleteListener(new OnCompleteListener<Location>() {

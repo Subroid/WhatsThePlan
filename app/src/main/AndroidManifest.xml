@@ -14,8 +14,9 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".activities.PartyVenuesActivity"></activity>
-        <activity android:name=".activities.FoodsDrinksVenuesActivity"></activity>
+        <activity android:name=".activities.PartyEventsActivity"></activity>
+        <activity android:name=".activities.PartyVenuesActivity" />
+        <activity android:name=".activities.FoodsDrinksVenuesActivity" />
         <activity android:name=".activities.EventsVenuesSelecterActivity" />
         <activity
             android:name=".activities.LandActivity"
@@ -35,10 +36,8 @@
         <activity android:name=".activities.authentications.SignUpActivity" />
         <activity android:name=".activities.authentications.SignInActivity" />
         <activity android:name=".activities.authentications.NameSubmitActivity" />
-        <activity
-            android:name=".activities.FoodsDrinksActivity" />
-        <activity
-            android:name=".activities.RestaurantsActivity2" />
+        <activity android:name=".activities.FoodsDrinksActivity" />
+        <activity android:name=".activities.RestaurantsActivity2" />
 
         <meta-data
             android:name="com.google.android.geo.API_KEY"
@@ -53,7 +52,6 @@
         <uses-library
             android:name="org.apache.http.legacy"
             android:required="false" />
-
     </application>
 
 </manifest>

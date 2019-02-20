@@ -1,8 +1,7 @@
 package platinum.whatstheplan.adapters;
 
-import android.app.AlertDialog;
 import android.content.Context;
-import android.content.DialogInterface;
+import android.content.Intent;
 import android.location.Location;
 import android.net.Uri;
 import android.support.annotation.NonNull;
@@ -21,24 +20,15 @@ import com.bumptech.glide.request.RequestOptions;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
-import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.firestore.CollectionReference;
-import com.google.firebase.firestore.DocumentReference;
-import com.google.firebase.firestore.DocumentSnapshot;
-import com.google.firebase.firestore.FirebaseFirestore;
-import com.shashank.sony.fancytoastlib.FancyToast;
 
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.List;
 
 import platinum.whatstheplan.R;
+import platinum.whatstheplan.activities.PartyEventsActivity;
 import platinum.whatstheplan.interfaces.VenueItemTapListener;
 import platinum.whatstheplan.models.Venue;
-import platinum.whatstheplan.models.Guest;
-import platinum.whatstheplan.utils.BookingDbHandler;
 
 public class VenuesAdapter extends RecyclerView.Adapter<VenuesAdapter.VenueViewHolder> {
 
@@ -79,7 +69,7 @@ public class VenuesAdapter extends RecyclerView.Adapter<VenuesAdapter.VenueViewH
         mVenue = mVenueList.get(position);
 
         venueViewHolder.venue_name_TV.setText(mVenue.getVenue_name());
-
+        Log.d(TAG, "onBindViewHolder: venue name " + mVenue.getVenue_name());
         float distance = getDistancBetweenTwoPoints(
                 mUserCurrentLocation.getLatitude(),
                 mUserCurrentLocation.getLongitude(),
@@ -94,6 +84,7 @@ public class VenuesAdapter extends RecyclerView.Adapter<VenuesAdapter.VenueViewH
        venueViewHolder.venue_type_TV.setText("Type : \n" + mVenue.getVenue_type());
        venueViewHolder.venue_main_event_TV.setText("Main Event : \n" + mVenue.getVenue_main_event());
        venueViewHolder.venue_sub_events_TV.setText("Sub Events : " + mVenue.getVenue_sub_events());
+       venueViewHolder.show_events_BTN.setTag(mVenue.getVenue_id());
 
         Glide.with(mContext).load(Uri.parse(mVenue.getVenue_image())).apply(new RequestOptions().fitCenter()).into(venueViewHolder.venue_image_IV);
         Glide.with(mContext).load(Uri.parse(mVenue.getVenue_image())).apply(new RequestOptions().fitCenter()).into(venueViewHolder.venue_layout_bg_IV);
@@ -127,6 +118,7 @@ public class VenuesAdapter extends RecyclerView.Adapter<VenuesAdapter.VenueViewH
         private ImageView venue_image_IV;
         private ImageView venue_layout_bg_IV;
         private Button show_on_map_BTN;
+        private Button show_events_BTN;
 
         public VenueViewHolder(@NonNull View itemView) {
             super(itemView);
@@ -138,8 +130,10 @@ public class VenuesAdapter extends RecyclerView.Adapter<VenuesAdapter.VenueViewH
             venue_image_IV = itemView.findViewById(R.id.venue_image_IV);
             venue_layout_bg_IV = itemView.findViewById(R.id.venue_layout_bg_IV);
             show_on_map_BTN = itemView.findViewById(R.id.show_on_map_BTN);
+            show_events_BTN = itemView.findViewById(R.id.show_events_BTN);
 
             show_on_map_BTN.setOnClickListener(this);
+            show_events_BTN.setOnClickListener(this);
 
         }
 
@@ -150,7 +144,17 @@ public class VenuesAdapter extends RecyclerView.Adapter<VenuesAdapter.VenueViewH
                     Log.d(TAG, "onClick: show_on_map_BTN");
                     setTapListener(view);
                     break;
+                case R.id.show_events_BTN:
+                    Log.d(TAG, "onClick: show_events_BTN");
+                    String venueId = (String) show_events_BTN.getTag();
+                    navigateToActivity (mContext, PartyEventsActivity.class);
+                    break;
             }
+        }
+
+        private void navigateToActivity(Context mContext, Class classname) {
+            Intent intent = new Intent(mContext, classname);
+            mContext.startActivity(intent);
         }
 
 

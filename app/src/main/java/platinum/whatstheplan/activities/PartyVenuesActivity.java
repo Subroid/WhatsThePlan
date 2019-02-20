@@ -92,7 +92,7 @@ public class PartyVenuesActivity extends FragmentActivity implements
         GeoQueryEventListener, View.OnClickListener  {
 
 
-    private static final String TAG = "PartiesActivityTag";
+    private static final String TAG = "PartyVenuesActivityTag";
 
     private GoogleMap mMap;
     private ProgressBar mProgressBarPB;
@@ -149,7 +149,7 @@ public class PartyVenuesActivity extends FragmentActivity implements
         mDbFirestore = FirebaseFirestore.getInstance();
         mDbFirebase = FirebaseDatabase.getInstance();
         mUser = FirebaseAuth.getInstance().getCurrentUser();
-        mFusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(PartyVenuesActivity.this);
+
     }
 
     private void performActions() {
@@ -267,6 +267,7 @@ public class PartyVenuesActivity extends FragmentActivity implements
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         Log.d(TAG, "onActivityResult: called");
+        Log.d(TAG, "onActivityResult: resultCode : " + resultCode);
 
         switch (requestCode) {
             case REQUEST_LOCATION_SETTINGS_CODE_51:
@@ -286,6 +287,7 @@ public class PartyVenuesActivity extends FragmentActivity implements
                 android.Manifest.permission.ACCESS_FINE_LOCATION)
                 == PackageManager.PERMISSION_GRANTED) {
             mLocationPermissionGranted = true;
+            mMapActions();
             //todo
         } else {
             ActivityCompat.requestPermissions(this,
@@ -300,7 +302,9 @@ public class PartyVenuesActivity extends FragmentActivity implements
     @Override
     public void onRequestPermissionsResult(int requestCode,
                                            @NonNull String permissions[],
-                                           @NonNull int[] grantResults) {
+                                           @NonNull int[] grantResults)
+
+    {
         Log.d(TAG, "onRequestPermissionsResult: " + requestCode + " " + permissions.length + " " + grantResults.length);
         Log.d(TAG, "onRequestPermissionsResult: mLocationPermissionGranted = " + mLocationPermissionGranted);
 
@@ -311,6 +315,7 @@ public class PartyVenuesActivity extends FragmentActivity implements
                 if (grantResults.length > 0
                         && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                     mLocationPermissionGranted = true;
+                    mMapActions();
                 }
             }
         }
@@ -321,19 +326,18 @@ public class PartyVenuesActivity extends FragmentActivity implements
         mMap = googleMap;
         Log.d(TAG, "onMapReady: called");
         initMap();
-        getUserCurrentLocationAndSaveIntoRemoteDatabase();
 
     }
 
     private void initMap() {
+        Log.d(TAG, "initMap: called");
         mMap.setMapStyle(MapStyleOptions.loadRawResourceStyle(PartyVenuesActivity.this, R.raw.style_json));
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             Log.d(TAG, "getUserCurrentLocationAndSaveIntoRemoteDatabase: if called");
-            requestLocationPermissions();
+            requestLocationPermission();
         } else {
             Log.d(TAG, "getUserCurrentLocationAndSaveIntoRemoteDatabase: else called");
-            mMap.setMyLocationEnabled(true);
-            mMap.getUiSettings().setMapToolbarEnabled(false);
+            getUserCurrentLocationAndSaveIntoRemoteDatabase();
         }
 
     }
@@ -343,12 +347,16 @@ public class PartyVenuesActivity extends FragmentActivity implements
         final Location[] userCurrentLocationResults = {new Location(LocationManager.GPS_PROVIDER)};
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             Log.d(TAG, "getUserCurrentLocationAndSaveIntoRemoteDatabase: if called");
-            requestLocationPermissions();
+            requestLocationPermission();
         } else {
             Log.d(TAG, "getUserCurrentLocationAndSaveIntoRemoteDatabase: else called");
-
+            mMap.setMyLocationEnabled(true);
+            mMap.getUiSettings().setMapToolbarEnabled(false);
+            mMap.getUiSettings().setMyLocationButtonEnabled(true);
+            mFusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(PartyVenuesActivity.this);
 
             Task<Location> taskLastLocation = mFusedLocationProviderClient.getLastLocation();
+            Log.d(TAG, "getUserCurrentLocationAndSaveIntoRemoteDatabase: taskLastLocation : " + taskLastLocation.toString());
             taskLastLocation.addOnCompleteListener(new OnCompleteListener<Location>() {
                 @Override
                 public void onComplete(@NonNull Task<Location> task) {
@@ -370,6 +378,39 @@ public class PartyVenuesActivity extends FragmentActivity implements
 
     }
 
+
+    private void addOnMyLocationButtonClickListener() {
+        Log.d(TAG, "addOnMyLocationButtonClickListener: called");
+        //todo prompting user for clicking my location button on map
+
+        mMap.setOnMyLocationButtonClickListener(new GoogleMap.OnMyLocationButtonClickListener() {
+            @Override
+            public boolean onMyLocationButtonClick() {
+                Log.d(TAG, "onMyLocationButtonClick: called");
+                Log.d(TAG, "addOnMyLocationButtonClickListener: mMap.isMyLocationEnabled " + mMap.isMyLocationEnabled());
+//                if (ActivityCompat.checkSelfPermission(PartyVenuesActivity.this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+//                    requestLocationPermission();
+//                    Log.d(TAG, "onMyLocationButtonClick: if");
+//                    return false;
+//                }
+//                mMap.setMyLocationEnabled(true);
+                Log.d(TAG, "onMyLocationButtonClick: before task = mFusedLocationProviderClient.getLastLocation();");
+                Task<Location> task = mFusedLocationProviderClient.getLastLocation();
+                task.addOnCompleteListener(new OnCompleteListener<Location>() {
+                    @Override
+                    public void onComplete(@NonNull Task<Location> task) {
+                        if (task.isSuccessful() && task.getResult() != null) {
+                            mUserCurrentLocation = task.getResult();
+                            moveCameraToUserCurrentLocation(mUserCurrentLocation);
+                            saveUserLocationIntoFirestoreThenDisplayPartiesNearUserLocation();
+                        }
+                    }
+                });
+                return true;
+            }
+        });
+    }
+
     private void setUserMarker() {
         LatLng latLng = new LatLng(mUserCurrentLocation.getLatitude(), mUserCurrentLocation.getLongitude());
         mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng, 15.0f));
@@ -389,34 +430,6 @@ public class PartyVenuesActivity extends FragmentActivity implements
 
     }
 
-    private void addOnMyLocationButtonClickListener() {
-        Log.d(TAG, "addOnMyLocationButtonClickListener: called");
-        //todo prompting user for clicking my location button on map
-        mMap.setOnMyLocationButtonClickListener(new GoogleMap.OnMyLocationButtonClickListener() {
-            @Override
-            public boolean onMyLocationButtonClick() {
-                Log.d(TAG, "onMyLocationButtonClick: called");
-                if (ActivityCompat.checkSelfPermission(PartyVenuesActivity.this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-                    requestLocationPermissions();
-                    Log.d(TAG, "onMyLocationButtonClick: if");
-                    return false;
-                }
-                mMap.setMyLocationEnabled(true);
-                Task<Location> task = mFusedLocationProviderClient.getLastLocation();
-                task.addOnCompleteListener(new OnCompleteListener<Location>() {
-                    @Override
-                    public void onComplete(@NonNull Task<Location> task) {
-                        if (task.isSuccessful() && task.getResult() != null) {
-                            mUserCurrentLocation = task.getResult();
-                            moveCameraToUserCurrentLocation(mUserCurrentLocation);
-                            saveUserLocationIntoFirestoreThenDisplayPartiesNearUserLocation();
-                        }
-                    }
-                });
-                return true;
-            }
-        });
-    }
 
     private void saveUserLocationIntoFirestoreThenDisplayPartiesNearUserLocation() {
         saveUserLocationIntoFirestore();

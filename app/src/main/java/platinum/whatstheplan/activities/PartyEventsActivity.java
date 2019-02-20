@@ -147,7 +147,7 @@ public class PartyEventsActivity extends FragmentActivity implements
         mDbFirestore = FirebaseFirestore.getInstance();
         mDbFirebase = FirebaseDatabase.getInstance();
         mUser = FirebaseAuth.getInstance().getCurrentUser();
-        mFusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(PartyEventsActivity.this);
+
     }
 
     private void performActions() {
@@ -284,6 +284,7 @@ public class PartyEventsActivity extends FragmentActivity implements
                 android.Manifest.permission.ACCESS_FINE_LOCATION)
                 == PackageManager.PERMISSION_GRANTED) {
             mLocationPermissionGranted = true;
+            mMapActions();
             //todo
         } else {
             ActivityCompat.requestPermissions(this,
@@ -309,6 +310,7 @@ public class PartyEventsActivity extends FragmentActivity implements
                 if (grantResults.length > 0
                         && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                     mLocationPermissionGranted = true;
+                    mMapActions();
                 }
             }
         }
@@ -319,7 +321,6 @@ public class PartyEventsActivity extends FragmentActivity implements
         mMap = googleMap;
         Log.d(TAG, "onMapReady: called");
         initMap();
-        getUserCurrentLocationAndSaveIntoRemoteDatabase();
 
     }
 
@@ -327,11 +328,11 @@ public class PartyEventsActivity extends FragmentActivity implements
         mMap.setMapStyle(MapStyleOptions.loadRawResourceStyle(PartyEventsActivity.this, R.raw.style_json));
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             Log.d(TAG, "getUserCurrentLocationAndSaveIntoRemoteDatabase: if called");
-            requestLocationPermissions();
+            requestLocationPermission();
         } else {
             Log.d(TAG, "getUserCurrentLocationAndSaveIntoRemoteDatabase: else called");
-            mMap.setMyLocationEnabled(true);
-            mMap.getUiSettings().setMapToolbarEnabled(false);
+            getUserCurrentLocationAndSaveIntoRemoteDatabase();
+
         }
 
     }
@@ -341,10 +342,13 @@ public class PartyEventsActivity extends FragmentActivity implements
         final Location[] userCurrentLocationResults = {new Location(LocationManager.GPS_PROVIDER)};
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             Log.d(TAG, "getUserCurrentLocationAndSaveIntoRemoteDatabase: if called");
-            requestLocationPermissions();
+            requestLocationPermission();
         } else {
             Log.d(TAG, "getUserCurrentLocationAndSaveIntoRemoteDatabase: else called");
-
+            mMap.setMyLocationEnabled(true);
+            mMap.getUiSettings().setMapToolbarEnabled(false);
+            mMap.getUiSettings().setMyLocationButtonEnabled(true);
+            mFusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(PartyEventsActivity.this);
 
             Task<Location> taskLastLocation = mFusedLocationProviderClient.getLastLocation();
             taskLastLocation.addOnCompleteListener(new OnCompleteListener<Location>() {
@@ -394,12 +398,12 @@ public class PartyEventsActivity extends FragmentActivity implements
             @Override
             public boolean onMyLocationButtonClick() {
                 Log.d(TAG, "onMyLocationButtonClick: called");
-                if (ActivityCompat.checkSelfPermission(PartyEventsActivity.this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-                    requestLocationPermissions();
-                    Log.d(TAG, "onMyLocationButtonClick: if");
-                    return false;
-                }
-                mMap.setMyLocationEnabled(true);
+//                if (ActivityCompat.checkSelfPermission(PartyEventsActivity.this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+//                    requestLocationPermission();
+//                    Log.d(TAG, "onMyLocationButtonClick: if");
+//                    return false;
+//                }
+//                mMap.setMyLocationEnabled(true);
                 Task<Location> task = mFusedLocationProviderClient.getLastLocation();
                 task.addOnCompleteListener(new OnCompleteListener<Location>() {
                     @Override
@@ -430,7 +434,7 @@ public class PartyEventsActivity extends FragmentActivity implements
                 REQUEST_LOCATION_PERMISSIONS_CODE_52);
     }
 
-    private void saveUserLocationIntoFirestore() {
+    private void saveUserLocationIntoFirestore()  {
 
         Log.d(TAG, "saveUserLocationIntoFirestore: called");
 
