@@ -49,6 +49,11 @@
         <activity android:name=".activities.PartyEventsActivity" />
         <activity android:name=".activities.SportsActivity" />
         <activity android:name=".activities.OpenEventsActivity" />
+
+        <uses-library
+            android:name="org.apache.http.legacy"
+            android:required="false" />
+
     </application>
 
 </manifest>
