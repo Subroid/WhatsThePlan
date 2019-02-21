@@ -328,7 +328,7 @@ public class FoodsDrinksVenuesActivity extends FragmentActivity implements
         mMap.setMapStyle(MapStyleOptions.loadRawResourceStyle(FoodsDrinksVenuesActivity.this, R.raw.style_json));
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             Log.d(TAG, "getUserCurrentLocationAndSaveIntoRemoteDatabase: if called");
-            requestLocationPermissions();
+            requestLocationPermission();
         } else {
             Log.d(TAG, "getUserCurrentLocationAndSaveIntoRemoteDatabase: else called");
             getUserCurrentLocationAndSaveIntoRemoteDatabase();
@@ -342,7 +342,7 @@ public class FoodsDrinksVenuesActivity extends FragmentActivity implements
         final Location[] userCurrentLocationResults = {new Location(LocationManager.GPS_PROVIDER)};
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             Log.d(TAG, "getUserCurrentLocationAndSaveIntoRemoteDatabase: if called");
-            requestLocationPermissions();
+            requestLocationPermission();
         } else {
             Log.d(TAG, "getUserCurrentLocationAndSaveIntoRemoteDatabase: else called");
 
@@ -399,12 +399,12 @@ public class FoodsDrinksVenuesActivity extends FragmentActivity implements
             @Override
             public boolean onMyLocationButtonClick() {
                 Log.d(TAG, "onMyLocationButtonClick: called");
-                if (ActivityCompat.checkSelfPermission(FoodsDrinksVenuesActivity.this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+               /* if (ActivityCompat.checkSelfPermission(FoodsDrinksVenuesActivity.this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
                     requestLocationPermissions();
                     Log.d(TAG, "onMyLocationButtonClick: if");
                     return false;
                 }
-                mMap.setMyLocationEnabled(true);
+                mMap.setMyLocationEnabled(true);*/
                 Task<Location> task = mFusedLocationProviderClient.getLastLocation();
                 task.addOnCompleteListener(new OnCompleteListener<Location>() {
                     @Override
