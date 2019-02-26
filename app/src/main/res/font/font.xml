@@ -35,5 +35,9 @@
         android:font="@font/navibase"
         app:font="@font/navibase"/>
 
+    <font
+        android:font="@font/nyala"
+        app:font="@font/nyala"/>
+
 
 </font-family>

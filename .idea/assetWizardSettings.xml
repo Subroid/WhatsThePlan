@@ -137,7 +137,7 @@
                                 <PersistentState>
                                   <option name="values">
                                     <map>
-                                      <entry key="url" value="jar:file:/C:/Program%20Files/Android/Android%20Studio/plugins/android/lib/android.jar!/images/material_design_icons/action/ic_home_black_24dp.xml" />
+                                      <entry key="url" value="jar:file:/C:/Program%20Files/Android/Android%20Studio/plugins/android/lib/android.jar!/images/material_design_icons/communication/ic_phone_black_24dp.xml" />
                                     </map>
                                   </option>
                                 </PersistentState>
@@ -147,9 +147,8 @@
                         </option>
                         <option name="values">
                           <map>
-                            <entry key="assetSourceType" value="FILE" />
-                            <entry key="color" value="0f2c99" />
-                            <entry key="outputName" value="ic_pin_red" />
+                            <entry key="color" value="ffffff" />
+                            <entry key="outputName" value="ic_phone_whiteffffff_24dp" />
                             <entry key="sourceFile" value="E:\WhatsThePlan related\Assets\Bottom Navigation Icons\pin_blue.svg" />
                           </map>
                         </option>

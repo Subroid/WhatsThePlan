@@ -4,22 +4,23 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@drawable/gradient_blue"
+    android:background="@drawable/polywall_white"
     tools:context=".activities.HomeActivity">
 
     <android.support.v7.widget.Toolbar
         android:id="@+id/toolbar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@color/colorPrimaryDark"
+        android:background="@color/MidnightBlue191970"
         app:layout_constraintTop_toTopOf="parent">
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:fontFamily="cursive"
+            android:fontFamily="@font/nyala"
             android:gravity="center"
             android:text="What's The Plan"
+            android:textScaleX="1.1"
             android:textColor="@color/WhiteFFFFFF"
             android:textSize="@dimen/_20ssp" />
 
@@ -29,10 +30,10 @@
         android:id="@+id/ha_BottomNavigationView"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@drawable/whitesolid_greytop"
+        android:background="@color/MidnightBlue191970"
         app:elevation="@dimen/_1sdp"
-        app:itemIconTint="@color/Black000000"
-        app:itemTextColor="@color/Black000000"
+        app:itemIconTint="@color/WhiteFFFFFF"
+        app:itemTextColor="@color/WhiteFFFFFF"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.5"
@@ -53,10 +54,10 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHeight_default="percent"
         app:layout_constraintHeight_percent="0.2"
-        app:layout_constraintHorizontal_bias="0.149"
+        app:layout_constraintHorizontal_bias="0.15"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/toolbar"
-        app:layout_constraintVertical_bias="0.099"
+        app:layout_constraintVertical_bias="0.2"
         app:layout_constraintWidth_default="percent"
         app:layout_constraintWidth_percent="0.3">
 
@@ -95,7 +96,7 @@
             android:id="@+id/textView4"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Foods Drinks"
+            android:text="Restaurnats"
             android:textColor="@color/Black000000"
             android:textSize="@dimen/_14ssp"
             android:textStyle="bold"
@@ -112,6 +113,7 @@
     // ^Restaurants display ends here
 
     // ^Parties display begins here
+    //0.85 0.1
 
     <android.support.constraint.ConstraintLayout
         android:id="@+id/parties_CL"
@@ -121,10 +123,10 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHeight_default="percent"
         app:layout_constraintHeight_percent="0.2"
-        app:layout_constraintHorizontal_bias="0.15"
+        app:layout_constraintHorizontal_bias="0.85"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/toolbar"
-        app:layout_constraintVertical_bias="0.5"
+        app:layout_constraintVertical_bias="0.2"
         app:layout_constraintWidth_default="percent"
         app:layout_constraintWidth_percent="0.3">
 
@@ -184,6 +186,7 @@
         android:id="@+id/featured_CL"
         android:layout_width="0dp"
         android:layout_height="0dp"
+        android:visibility="gone"
         app:layout_constraintBottom_toTopOf="@+id/ha_BottomNavigationView"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHeight_default="percent"
@@ -246,6 +249,7 @@
     // ^Featured display ends here
 
     // ^Open Events display begins here
+    //0.85 0.5
 
     <android.support.constraint.ConstraintLayout
         android:id="@+id/openevents_CL"
@@ -258,7 +262,7 @@
         app:layout_constraintHorizontal_bias="0.85"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/toolbar"
-        app:layout_constraintVertical_bias="0.1"
+        app:layout_constraintVertical_bias="0.65"
         app:layout_constraintWidth_default="percent"
         app:layout_constraintWidth_percent="0.3">
 
@@ -313,6 +317,7 @@
     // ^Open Events display ends here
 
     // ^Sports display begins here
+    //0.15 0.5
 
     <android.support.constraint.ConstraintLayout
         android:id="@+id/sports_CL"
@@ -322,10 +327,10 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHeight_default="percent"
         app:layout_constraintHeight_percent="0.2"
-        app:layout_constraintHorizontal_bias="0.85"
+        app:layout_constraintHorizontal_bias="0.15"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/toolbar"
-        app:layout_constraintVertical_bias="0.5"
+        app:layout_constraintVertical_bias="0.65"
         app:layout_constraintWidth_default="percent"
         app:layout_constraintWidth_percent="0.3">
 
@@ -385,6 +390,7 @@
         android:id="@+id/exclusive_CL"
         android:layout_width="0dp"
         android:layout_height="0dp"
+        android:visibility="gone"
         app:layout_constraintBottom_toTopOf="@+id/ha_BottomNavigationView"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHeight_default="percent"

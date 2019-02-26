@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/blue_noise"
+    tools:context=".activities.authentications.VerifyPhoneActivity">
+
+    <EditText
+        android:id="@+id/verify_code_ET"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        app:layout_constraintWidth_default="percent"
+        app:layout_constraintHeight_default="percent"
+        android:drawableStart="@drawable/ic_phone_whiteffffff_24dp"
+        android:hint="Enter OTP"
+        android:gravity="center"
+        android:inputType="phone"
+        android:maxLength="10"
+        android:padding="@dimen/_10sdp"
+        android:textColor="@color/WhiteFFFFFF"
+        android:textColorHint="@color/GreyCDCDCD"
+        app:backgroundTint="@color/WhiteFFFFFF"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintWidth_percent="0.6" />
+
+
+    <Button
+        android:id="@+id/verify_BTN"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        app:layout_constraintWidth_default="percent"
+        app:layout_constraintHeight_default="percent"
+        android:minWidth="0dp"
+        android:minHeight="0dp"
+        android:paddingTop="@dimen/_4sdp"
+        android:paddingBottom="@dimen/_4sdp"
+        android:background="@drawable/round_shpae_blue10e7dc"
+        android:enabled="false"
+        android:fontFamily="cursive"
+        android:text="Verify Code"
+        android:textAllCaps="false"
+        android:textColor="@color/WhiteFFFFFF"
+        android:textSize="@dimen/_16ssp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/verify_code_ET"
+        app:layout_constraintVertical_bias="0.2"
+        app:layout_constraintWidth_percent="0.6" />
+
+    <ProgressBar
+        android:id="@+id/verify_PB"
+        style="?android:attr/progressBarStyle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:visibility="invisible"
+        android:indeterminateTint="@color/WhiteFFFFFF"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/verify_code_ET"
+        app:layout_constraintVertical_bias="0.2"
+        app:layout_constraintWidth_percent="0.6" />
+
+    <Button
+        android:id="@+id/resend_BTN"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        app:layout_constraintWidth_default="percent"
+        app:layout_constraintHeight_default="percent"
+        android:minWidth="0dp"
+        android:minHeight="0dp"
+        android:paddingTop="@dimen/_4sdp"
+        android:paddingBottom="@dimen/_4sdp"
+        android:background="@drawable/round_shpae_blue10e7dc"
+        android:fontFamily="cursive"
+        android:text="Resend OTP"
+        android:textAllCaps="false"
+        android:textColor="@color/WhiteFFFFFF"
+        android:textSize="@dimen/_16ssp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/verify_BTN"
+        app:layout_constraintVertical_bias="0.2"
+        app:layout_constraintWidth_percent="0.6" />
+
+
+    <ProgressBar
+        android:id="@+id/resend_PB"
+        style="?android:attr/progressBarStyle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:visibility="invisible"
+        android:indeterminateTint="@color/WhiteFFFFFF"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/verify_BTN"
+        app:layout_constraintVertical_bias="0.2"
+        app:layout_constraintWidth_percent="0.6" />
+
+
+
+</android.support.constraint.ConstraintLayout>

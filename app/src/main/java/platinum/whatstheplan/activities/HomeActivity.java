@@ -20,6 +20,7 @@ import com.ittianyu.bottomnavigationviewex.BottomNavigationViewEx;
 import com.shashank.sony.fancytoastlib.FancyToast;
 
 import platinum.whatstheplan.R;
+import platinum.whatstheplan.activities.authentications.PhoneAuthActivity;
 import platinum.whatstheplan.activities.authentications.SignInActivity;
 import platinum.whatstheplan.utils.BottomNavigationViewHelper;
 
@@ -90,7 +91,7 @@ public class HomeActivity extends AppCompatActivity {
             mCurrentUser = com.google.firebase.auth.FirebaseAuth.getInstance().getCurrentUser();
             if (mCurrentUser == null) {
                 android.content.Intent signInIntent = new android.content.Intent(HomeActivity.this,
-                        SignInActivity.class);
+                        PhoneAuthActivity.class);
                 startActivity(signInIntent);
             }
         }

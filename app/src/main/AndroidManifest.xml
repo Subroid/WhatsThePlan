@@ -14,7 +14,7 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".activities.PartyEventsActivity"></activity>
+        <activity android:name=".activities.PartyEventsActivity"/>
         <activity android:name=".activities.PartyVenuesActivity" />
         <activity android:name=".activities.FoodsDrinksVenuesActivity" />
         <activity android:name=".activities.EventsVenuesSelecterActivity" />
@@ -36,6 +36,8 @@
         <activity android:name=".activities.authentications.SignUpActivity" />
         <activity android:name=".activities.authentications.SignInActivity" />
         <activity android:name=".activities.authentications.NameSubmitActivity" />
+        <activity android:name=".activities.authentications.PhoneAuthActivity" />
+        <activity android:name=".activities.authentications.VerifyPhoneActivity" />
         <activity android:name=".activities.FoodsDrinksActivity" />
         <activity android:name=".activities.RestaurantsActivity2" />
 
@@ -45,7 +47,6 @@
 
         <activity android:name=".activities.FoodListActivity" />
         <activity android:name=".activities.authentications.PasswordResetActivity" />
-        <activity android:name=".activities.PartyEventsActivity" />
         <activity android:name=".activities.SportsActivity" />
         <activity android:name=".activities.OpenEventsActivity" />
 
