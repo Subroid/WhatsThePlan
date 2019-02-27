@@ -91,7 +91,7 @@ public class FoodsDrinksVenuesActivity extends FragmentActivity implements
         GeoQueryEventListener, View.OnClickListener  {
 
 
-    private static final String TAG = "PartiesActivityTag";
+    private static final String TAG = "RestaurantsActivityTag";
 
     private GoogleMap mMap;
     private ProgressBar mProgressBarPB;
@@ -106,7 +106,7 @@ public class FoodsDrinksVenuesActivity extends FragmentActivity implements
     private boolean mLocationPermissionGranted = false;
     private FirebaseFirestore mDbFirestore;
     private FirebaseDatabase mDbFirebase;
-    private RecyclerView mPartiesRV;
+    private RecyclerView mRestaurantsRV;
     private UserInformation mUserInformation;
     private FirebaseUser mUser;
     private Marker mMarker;
@@ -140,9 +140,10 @@ public class FoodsDrinksVenuesActivity extends FragmentActivity implements
         mKeyList = new ArrayList<>();
         mVenueList = new ArrayList<>();
         mNoVenueTV = findViewById(R.id.no_venue_TV);
-        mPartiesRV = findViewById(R.id.parties_RV);
+        mRestaurantsRV = findViewById(R.id.parties_RV);
         mRadiusET = findViewById(R.id.radius_ET);
         mRadius = Integer.parseInt(mRadiusET.getText().toString());
+        Log.d(TAG, "initViewsAndVariables: mRadius : " + mRadius);
         mFindBTN = findViewById(R.id.find_BTN);
         mProgressBarPB = findViewById(R.id.progressBar);
         mDbFirestore = FirebaseFirestore.getInstance();
@@ -155,7 +156,7 @@ public class FoodsDrinksVenuesActivity extends FragmentActivity implements
         Log.d(TAG, "performActions: called");
         setClickListeners();
         mMapActions();
-        mPartiesRvActions();
+        mRestaurantsRvActions();
 
     }
 
@@ -170,13 +171,13 @@ public class FoodsDrinksVenuesActivity extends FragmentActivity implements
         mapFragment.getMapAsync(FoodsDrinksVenuesActivity.this);
     }
 
-    private void mPartiesRvActions() {
-        Log.d(TAG, "mPartiesRvActions: called");
-        mPartiesRV.setHasFixedSize(true);
+    private void mRestaurantsRvActions() {
+        Log.d(TAG, "mRestaurantsRvActions: called");
+        mRestaurantsRV.setHasFixedSize(true);
         DividerItemDecoration itemDecorator = new DividerItemDecoration
                 (FoodsDrinksVenuesActivity.this, DividerItemDecoration.VERTICAL);
         itemDecorator.setDrawable(ContextCompat.getDrawable(FoodsDrinksVenuesActivity.this, R.drawable.divider));
-        mPartiesRV.addItemDecoration(itemDecorator);
+        mRestaurantsRV.addItemDecoration(itemDecorator);
 
     }
 
@@ -361,7 +362,7 @@ public class FoodsDrinksVenuesActivity extends FragmentActivity implements
                         mUserCurrentLocation = userCurrentLocationResults[0];
                         moveCameraToUserCurrentLocation(mUserCurrentLocation);
                         setUserMarker();
-                        saveUserLocationIntoFirestoreThenDisplayPartiesNearUserLocation();
+                        saveUserLocationIntoFirestoreThenDisplayRestaurantsNearUserLocation();
                         Log.d(TAG, "onComplete: userCurrentLocationResults[0] = " + userCurrentLocationResults[0].getLatitude());
                     } else {
                         Log.d(TAG, "onComplete: else else");
@@ -379,7 +380,7 @@ public class FoodsDrinksVenuesActivity extends FragmentActivity implements
         mUserMarker = mMap.addMarker(new MarkerOptions()
                 .position(latLng)
                 .title("You are here")
-                .snippet("Find Parties around you"));
+                .snippet("Find Restaurants around you"));
         mUserMarker.showInfoWindow();
     }
 
@@ -412,7 +413,7 @@ public class FoodsDrinksVenuesActivity extends FragmentActivity implements
                         if (task.isSuccessful() && task.getResult() != null) {
                             mUserCurrentLocation = task.getResult();
                             moveCameraToUserCurrentLocation(mUserCurrentLocation);
-                            saveUserLocationIntoFirestoreThenDisplayPartiesNearUserLocation();
+                            saveUserLocationIntoFirestoreThenDisplayRestaurantsNearUserLocation();
                         }
                     }
                 });
@@ -421,11 +422,11 @@ public class FoodsDrinksVenuesActivity extends FragmentActivity implements
         });
     }
 
-    private void saveUserLocationIntoFirestoreThenDisplayPartiesNearUserLocation() {
+    private void saveUserLocationIntoFirestoreThenDisplayRestaurantsNearUserLocation() {
         saveUserLocationIntoFirestore();
-        displayPartiesNearUserLocation(mRadius);
-//        displayPartiesWithin5km();
-//        displayPartiesNearUserLocation();
+        displayRestaurantsNearUserLocation(mRadius);
+//        displayRestaurantsWithin5km();
+//        displayRestaurantsNearUserLocation();
     }
 
     private void requestLocationPermissions() {
@@ -476,15 +477,15 @@ public class FoodsDrinksVenuesActivity extends FragmentActivity implements
                         }*/
 
 
-    private void displayPartiesNearUserLocation(int radius) {
+    private void displayRestaurantsNearUserLocation(int radius) {
         mKeyList.clear();
         mVenueList.clear();
-        Log.d(TAG, "displayPartiesNearUserLocation: radius = " + radius);
+        Log.d(TAG, "displayRestaurantsNearUserLocation: radius = " + radius);
         mGeoLocation = new GeoLocation(mUserCurrentLocation.getLatitude(), mUserCurrentLocation.getLongitude());
-        Log.d(TAG, "displayPartiesInTheRangeOf5km: mUserCurrentLocation.getLatitude = " + mUserCurrentLocation.getLatitude());
-        Log.d(TAG, "displayPartiesInTheRangeOf5km: mUserCurrentLocation.getLongitude = " + mUserCurrentLocation.getLongitude());
-        DatabaseReference mDbPartiesFirebase = mDbFirebase.getReference("Foods DrinksVenues");
-        mGeoFirebase = new GeoFire(mDbPartiesFirebase);
+        Log.d(TAG, "displayRestaurantsInTheRangeOf5km: mUserCurrentLocation.getLatitude = " + mUserCurrentLocation.getLatitude());
+        Log.d(TAG, "displayRestaurantsInTheRangeOf5km: mUserCurrentLocation.getLongitude = " + mUserCurrentLocation.getLongitude());
+        DatabaseReference mDbRestaurantsFirebase = mDbFirebase.getReference("Foods DrinksVenues");
+        mGeoFirebase = new GeoFire(mDbRestaurantsFirebase);
         mGeoFireQuery = mGeoFirebase.queryAtLocation(mGeoLocation, radius);
         mGeoFireQuery.removeAllListeners();
         mGeoFireQuery.addGeoQueryEventListener(this);
@@ -496,7 +497,7 @@ public class FoodsDrinksVenuesActivity extends FragmentActivity implements
         mUserMarker = mMap.addMarker(new MarkerOptions()
                 .position(latLng)
                 .title("You are here")
-                .snippet("Find Parties around you"));
+                .snippet("Find Restaurants around you"));
         mUserMarker.showInfoWindow();
     }
 
@@ -631,10 +632,12 @@ public class FoodsDrinksVenuesActivity extends FragmentActivity implements
 
                             VenuesAdapter venuesAdapter = new VenuesAdapter(FoodsDrinksVenuesActivity.this, mVenueList, mUserCurrentLocation, mMap, mProgressBarPB);
                             Log.d(TAG, "onSuccess: adapter called");
-                            mPartiesRV.setAdapter(venuesAdapter);
+                            mRestaurantsRV.setAdapter(venuesAdapter);
                             mProgressBarPB.setVisibility(View.GONE);
-                            mPartiesRV.setLayoutManager(new LinearLayoutManager(FoodsDrinksVenuesActivity.this));
-
+                            mRestaurantsRV.setLayoutManager(new LinearLayoutManager(FoodsDrinksVenuesActivity.this));
+                            if (mRestaurantsRV.getAdapter().getItemCount() > 1) {
+                                mNoVenueTV.setVisibility(View.GONE);
+                            }
                             hideSoftKeyboard(FoodsDrinksVenuesActivity.this, mRadiusET);
 
                         }
@@ -678,7 +681,7 @@ public class FoodsDrinksVenuesActivity extends FragmentActivity implements
                 mLoopStarted = false;
                 i = 0;
                 mLoopFinished = false;
-                displayPartiesNearUserLocation(mRadius);
+                displayRestaurantsNearUserLocation(mRadius);
         }
     }
 

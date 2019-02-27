@@ -107,7 +107,7 @@ public class PartyVenuesActivity extends FragmentActivity implements
     private boolean mLocationPermissionGranted = false;
     private FirebaseFirestore mDbFirestore;
     private FirebaseDatabase mDbFirebase;
-    private RecyclerView mPartiesRV;
+    private RecyclerView mVenuesRV;
     private UserInformation mUserInformation;
     private FirebaseUser mUser;
     private Marker mMarker;
@@ -141,7 +141,7 @@ public class PartyVenuesActivity extends FragmentActivity implements
         mKeyList = new ArrayList<>();
         mVenueList = new ArrayList<>();
         mNoVenueTV = findViewById(R.id.no_venue_TV);
-        mPartiesRV = findViewById(R.id.parties_RV);
+        mVenuesRV = findViewById(R.id.parties_RV);
         mRadiusET = findViewById(R.id.radius_ET);
         mRadius = Integer.parseInt(mRadiusET.getText().toString());
         mFindBTN = findViewById(R.id.find_BTN);
@@ -156,7 +156,7 @@ public class PartyVenuesActivity extends FragmentActivity implements
         Log.d(TAG, "performActions: called");
         setClickListeners();
         mMapActions();
-        mPartiesRvActions();
+        mVenuesRvActions();
 
     }
 
@@ -171,13 +171,13 @@ public class PartyVenuesActivity extends FragmentActivity implements
         mapFragment.getMapAsync(PartyVenuesActivity.this);
     }
 
-    private void mPartiesRvActions() {
-        Log.d(TAG, "mPartiesRvActions: called");
-        mPartiesRV.setHasFixedSize(true);
+    private void mVenuesRvActions() {
+        Log.d(TAG, "mVenuesRvActions: called");
+        mVenuesRV.setHasFixedSize(true);
         DividerItemDecoration itemDecorator = new DividerItemDecoration
                 (PartyVenuesActivity.this, DividerItemDecoration.VERTICAL);
         itemDecorator.setDrawable(ContextCompat.getDrawable(PartyVenuesActivity.this, R.drawable.divider));
-        mPartiesRV.addItemDecoration(itemDecorator);
+        mVenuesRV.addItemDecoration(itemDecorator);
 
     }
 
@@ -366,7 +366,7 @@ public class PartyVenuesActivity extends FragmentActivity implements
                         mUserCurrentLocation = userCurrentLocationResults[0];
                         moveCameraToUserCurrentLocation(mUserCurrentLocation);
                         setUserMarker();
-                        saveUserLocationIntoFirestoreThenDisplayPartiesNearUserLocation();
+                        saveUserLocationIntoFirestoreThenDisplayVenuesNearUserLocation();
                         Log.d(TAG, "onComplete: userCurrentLocationResults[0] = " + userCurrentLocationResults[0].getLatitude());
                     } else {
                         Log.d(TAG, "onComplete: else else");
@@ -402,7 +402,7 @@ public class PartyVenuesActivity extends FragmentActivity implements
                         if (task.isSuccessful() && task.getResult() != null) {
                             mUserCurrentLocation = task.getResult();
                             moveCameraToUserCurrentLocation(mUserCurrentLocation);
-                            saveUserLocationIntoFirestoreThenDisplayPartiesNearUserLocation();
+                            saveUserLocationIntoFirestoreThenDisplayVenuesNearUserLocation();
                         }
                     }
                 });
@@ -417,7 +417,7 @@ public class PartyVenuesActivity extends FragmentActivity implements
         mUserMarker = mMap.addMarker(new MarkerOptions()
                 .position(latLng)
                 .title("You are here")
-                .snippet("Find Parties around you"));
+                .snippet("Find Venues around you"));
         mUserMarker.showInfoWindow();
     }
 
@@ -431,11 +431,11 @@ public class PartyVenuesActivity extends FragmentActivity implements
     }
 
 
-    private void saveUserLocationIntoFirestoreThenDisplayPartiesNearUserLocation() {
+    private void saveUserLocationIntoFirestoreThenDisplayVenuesNearUserLocation() {
         saveUserLocationIntoFirestore();
-        displayPartiesNearUserLocation(mRadius);
-//        displayPartiesWithin5km();
-//        displayPartiesNearUserLocation();
+        displayVenuesNearUserLocation(mRadius);
+//        displayVenuesWithin5km();
+//        displayVenuesNearUserLocation();
     }
 
     private void requestLocationPermissions() {
@@ -486,15 +486,15 @@ public class PartyVenuesActivity extends FragmentActivity implements
                         }*/
 
 
-    private void displayPartiesNearUserLocation(int radius) {
+    private void displayVenuesNearUserLocation(int radius) {
         mKeyList.clear();
         mVenueList.clear();
-        Log.d(TAG, "displayPartiesNearUserLocation: radius = " + radius);
+        Log.d(TAG, "displayVenuesNearUserLocation: radius = " + radius);
         mGeoLocation = new GeoLocation(mUserCurrentLocation.getLatitude(), mUserCurrentLocation.getLongitude());
-        Log.d(TAG, "displayPartiesInTheRangeOf5km: mUserCurrentLocation.getLatitude = " + mUserCurrentLocation.getLatitude());
-        Log.d(TAG, "displayPartiesInTheRangeOf5km: mUserCurrentLocation.getLongitude = " + mUserCurrentLocation.getLongitude());
-        DatabaseReference mDbPartiesFirebase = mDbFirebase.getReference("PartiesVenues");
-        mGeoFirebase = new GeoFire(mDbPartiesFirebase);
+        Log.d(TAG, "displayVenuesInTheRangeOf5km: mUserCurrentLocation.getLatitude = " + mUserCurrentLocation.getLatitude());
+        Log.d(TAG, "displayVenuesInTheRangeOf5km: mUserCurrentLocation.getLongitude = " + mUserCurrentLocation.getLongitude());
+        DatabaseReference mDbVenuesFirebase = mDbFirebase.getReference("VenuesVenues");
+        mGeoFirebase = new GeoFire(mDbVenuesFirebase);
         mGeoFireQuery = mGeoFirebase.queryAtLocation(mGeoLocation, radius);
         mGeoFireQuery.removeAllListeners();
         mGeoFireQuery.addGeoQueryEventListener(this);
@@ -506,7 +506,7 @@ public class PartyVenuesActivity extends FragmentActivity implements
         mUserMarker = mMap.addMarker(new MarkerOptions()
                 .position(latLng)
                 .title("You are here")
-                .snippet("Find Parties around you"));
+                .snippet("Find Venues around you"));
         mUserMarker.showInfoWindow();
     }
 
@@ -625,7 +625,7 @@ public class PartyVenuesActivity extends FragmentActivity implements
                 }
                 Log.d(TAG, "onGeoQueryReady: loopFinished " + mLoopFinished);
 
-                mDbFirestore.collection("PartiesVenues").document(key).get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
+                mDbFirestore.collection("VenuesVenues").document(key).get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
                     @Override
                     public void onSuccess(DocumentSnapshot documentSnapshot) {
 
@@ -641,9 +641,12 @@ public class PartyVenuesActivity extends FragmentActivity implements
 
                             VenuesAdapter venuesAdapter = new VenuesAdapter(PartyVenuesActivity.this, mVenueList, mUserCurrentLocation, mMap, mProgressBarPB);
                             Log.d(TAG, "onSuccess: adapter called");
-                            mPartiesRV.setAdapter(venuesAdapter);
+                            mVenuesRV.setAdapter(venuesAdapter);
                             mProgressBarPB.setVisibility(View.GONE);
-                            mPartiesRV.setLayoutManager(new LinearLayoutManager(PartyVenuesActivity.this));
+                            mVenuesRV.setLayoutManager(new LinearLayoutManager(PartyVenuesActivity.this));
+                            if (mVenuesRV.getAdapter().getItemCount() > 1) {
+                                mNoVenueTV.setVisibility(View.GONE);
+                            }
 
                             hideSoftKeyboard(PartyVenuesActivity.this, mRadiusET);
 
@@ -688,7 +691,7 @@ public class PartyVenuesActivity extends FragmentActivity implements
                 mLoopStarted = false;
                 i = 0;
                 mLoopFinished = false;
-                displayPartiesNearUserLocation(mRadius);
+                displayVenuesNearUserLocation(mRadius);
         }
     }
 

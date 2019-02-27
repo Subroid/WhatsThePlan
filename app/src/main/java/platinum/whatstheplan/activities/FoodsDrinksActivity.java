@@ -635,6 +635,9 @@ public class FoodsDrinksActivity extends FragmentActivity implements
                             mFoodsDrinksRV.setAdapter(eventsAdapter);
                             mProgressBarPB.setVisibility(View.GONE);
                             mFoodsDrinksRV.setLayoutManager(new LinearLayoutManager(FoodsDrinksActivity.this));
+                            if (mFoodsDrinksRV.getAdapter().getItemCount() > 1) {
+                                mNoEventTV.setVisibility(View.GONE);
+                            }
 
                             hideSoftKeyboard(FoodsDrinksActivity.this, mRadiusET);
 

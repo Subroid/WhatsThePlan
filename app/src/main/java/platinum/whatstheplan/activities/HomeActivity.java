@@ -78,7 +78,7 @@ public class HomeActivity extends AppCompatActivity {
         switch (item.getItemId()) {
             case R.id.sign_out :
                 FirebaseAuth.getInstance().signOut();
-                Intent signInIntent = new Intent(HomeActivity.this, SignInActivity.class);
+                Intent signInIntent = new Intent(HomeActivity.this, PhoneAuthActivity.class);
                 startActivity(signInIntent);
 
         }
@@ -217,6 +217,12 @@ public class HomeActivity extends AppCompatActivity {
                     };
                     return onClickListener;
                 }
+
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        finish();
+    }
 
 
 }

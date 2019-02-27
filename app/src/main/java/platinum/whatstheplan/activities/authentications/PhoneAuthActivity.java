@@ -71,6 +71,12 @@ public class PhoneAuthActivity extends AppCompatActivity implements View.OnClick
 
         }
 
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        finish();
+    }
+
 
 
 }

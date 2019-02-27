@@ -23,7 +23,7 @@
             android:text="Foods&amp;Drinks within "
             android:textColor="@color/WhiteFFFFFF"
             android:textSize="@dimen/_16ssp" />
-
+<!--gone-->
         <EditText
             android:id="@+id/radius_ET"
             android:layout_width="@dimen/_50sdp"
@@ -31,9 +31,11 @@
             android:background="@color/WhiteFFFFFF"
             android:gravity="center"
             android:padding="@dimen/_3sdp"
-            android:text="5"
-            android:textSize="@dimen/_14ssp" />
+            android:text="150"
+            android:textSize="@dimen/_14ssp"
+            android:visibility="gone"/>
 
+        <!--gone-->
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -42,8 +44,10 @@
             android:gravity="center"
             android:text="km"
             android:textColor="@color/WhiteFFFFFF"
-            android:textSize="@dimen/_20ssp" />
+            android:textSize="@dimen/_20ssp"
+            android:visibility="gone"/>
 
+        <!--gone-->
         <Button
             android:id="@+id/find_BTN"
             android:layout_width="wrap_content"
@@ -61,7 +65,8 @@
             android:textAllCaps="false"
             android:textColor="@color/WhiteFFFFFF"
             android:textSize="@dimen/_10ssp"
-            android:textStyle="bold" />
+            android:textStyle="bold"
+            android:visibility="gone"/>
 
     </android.support.v7.widget.Toolbar>
 
@@ -97,7 +102,7 @@
     <android.support.v7.widget.RecyclerView
         android:id="@+id/foodsdrinks_RV"
         android:layout_width="match_parent"
-        android:layout_height="0dp"
+        android:layout_height="match_parent"
         app:layout_constraintBottom_toTopOf="@id/mapFragment"
         app:layout_constraintEnd_toStartOf="parent"
         app:layout_constraintHeight_default="percent"
@@ -112,7 +117,7 @@
         android:id="@+id/mapFragment"
         android:name="com.google.android.gms.maps.SupportMapFragment"
         android:layout_width="match_parent"
-        android:layout_height="0dp"
+        android:layout_height="1dp"
         map:layout_constraintBottom_toBottomOf="parent"
         map:layout_constraintEnd_toEndOf="parent"
         map:layout_constraintHeight_default="percent"

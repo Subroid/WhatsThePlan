@@ -50,8 +50,7 @@
                                           <PersistentState>
                                             <option name="values">
                                               <map>
-                                                <entry key="scalingPercent" value="91" />
-                                                <entry key="trimmed" value="true" />
+                                                <entry key="scalingPercent" value="73" />
                                               </map>
                                             </option>
                                           </PersistentState>
@@ -62,8 +61,8 @@
                                   <option name="values">
                                     <map>
                                       <entry key="backgroundAssetType" value="COLOR" />
-                                      <entry key="backgroundColor" value="10e7dc" />
-                                      <entry key="foregroundImage" value="E:\WhatsThePlan related\Assets\whatstheplan.webp" />
+                                      <entry key="backgroundColor" value="ffffff" />
+                                      <entry key="foregroundImage" value="E:\WhatsThePlan related\Assets\logo by designevo\logo_128.png" />
                                       <entry key="legacyIconShape" value="CIRCLE" />
                                     </map>
                                   </option>

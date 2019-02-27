@@ -22,6 +22,7 @@ import android.os.Bundle;
 import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.text.format.DateUtils;
 import android.util.Log;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
@@ -69,7 +70,12 @@ import com.google.firebase.firestore.GeoPoint;
 import org.imperiumlabs.geofirestore.GeoFirestore;
 import org.imperiumlabs.geofirestore.GeoQuery;
 
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -122,6 +128,7 @@ public class PartyEventsActivity extends FragmentActivity implements
     private List<Event> mEventList;
     private List<String> mKeyList;
     private int mRadius;
+    private Date mCurrentDateTime;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -141,7 +148,8 @@ public class PartyEventsActivity extends FragmentActivity implements
         mNoEventTV = findViewById(R.id.no_event_TV);
         mPartiesRV = findViewById(R.id.parties_RV);
         mRadiusET = findViewById(R.id.radius_ET);
-        mRadius = Integer.parseInt(mRadiusET.getText().toString());
+//        mRadius = Integer.parseInt(mRadiusET.getText().toString());
+        mRadius = 2000;
         mFindBTN = findViewById(R.id.find_BTN);
         mProgressBarPB = findViewById(R.id.progressBar);
         mDbFirestore = FirebaseFirestore.getInstance();
@@ -486,6 +494,8 @@ public class PartyEventsActivity extends FragmentActivity implements
         mGeoFirebase = new GeoFire(mDbPartiesFirebase);
         mGeoFireQuery = mGeoFirebase.queryAtLocation(mGeoLocation, radius);
         mGeoFireQuery.removeAllListeners();
+        mCurrentDateTime = Calendar.getInstance().getTime();
+        Log.d(TAG, "onSuccess: currentDateTime : " + mCurrentDateTime);
         mGeoFireQuery.addGeoQueryEventListener(this);
 
     }
@@ -619,7 +629,26 @@ public class PartyEventsActivity extends FragmentActivity implements
                     public void onSuccess(DocumentSnapshot documentSnapshot) {
 
                         mEvent = documentSnapshot.toObject(Event.class);
-                        mEventList.add(mEvent);
+
+
+                        String dateEventAsText = mEvent.getEvent_date();
+//                        String timeEventAsText = mEvent.getEvent_time();
+
+                        SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
+                        Date strDate = null;
+                        try {
+                            strDate = sdf.parse(dateEventAsText);
+                            Log.d(TAG, "onSuccess: strDate : " + strDate);
+                            Log.d(TAG, "onSuccess: strTodayDate : " + new Date());
+                        } catch (ParseException e) {
+                            e.printStackTrace();
+                        }
+                        if (new Date().after(strDate)) {
+                            Log.d(TAG, "onSuccess: event expired");
+                        } else {
+                            Log.d(TAG, "onSuccess: event not expired");
+                            mEventList.add(mEvent);
+                        }
 
                         Log.d(TAG, "onSuccess: mEvent.getEvent_name() = " + mEvent.getEvent_name());
 
@@ -633,6 +662,9 @@ public class PartyEventsActivity extends FragmentActivity implements
                             mPartiesRV.setAdapter(eventsAdapter);
                             mProgressBarPB.setVisibility(View.GONE);
                             mPartiesRV.setLayoutManager(new LinearLayoutManager(PartyEventsActivity.this));
+                            if (mPartiesRV.getAdapter().getItemCount() > 1) {
+                                mNoEventTV.setVisibility(View.GONE);
+                            }
 
                             hideSoftKeyboard(PartyEventsActivity.this, mRadiusET);
 
@@ -644,6 +676,14 @@ public class PartyEventsActivity extends FragmentActivity implements
             }
         }
 
+    }
+
+    private String getDateToday() {
+        Calendar calendar = Calendar.getInstance();
+        String date = calendar.get(Calendar.DAY_OF_MONTH) + "/"
+                + (calendar.get(Calendar.MONTH)+1)
+                + "/" + calendar.get(Calendar.YEAR);
+        return date;
     }
 
     @Override
@@ -687,5 +727,7 @@ public class PartyEventsActivity extends FragmentActivity implements
         inputMethodManager.hideSoftInputFromWindow(view.getWindowToken(), 0);
 
     }
+
+
 
 }

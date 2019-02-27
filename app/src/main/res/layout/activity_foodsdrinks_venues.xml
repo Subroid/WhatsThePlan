@@ -18,12 +18,13 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:fontFamily="cursive"
+            android:fontFamily="@font/nyala"
             android:gravity="center"
-            android:text="Restaurants within "
+            android:text="Restaurants around you"
             android:textColor="@color/WhiteFFFFFF"
-            android:textSize="@dimen/_16ssp" />
+            android:textSize="@dimen/_20ssp" />
 
+<!--visibility gone-->
         <EditText
             android:id="@+id/radius_ET"
             android:layout_width="@dimen/_50sdp"
@@ -31,9 +32,11 @@
             android:background="@color/WhiteFFFFFF"
             android:gravity="center"
             android:padding="@dimen/_3sdp"
-            android:text="50"
-            android:textSize="@dimen/_14ssp" />
+            android:text="150"
+            android:textSize="@dimen/_14ssp"
+            android:visibility="gone"/>
 
+<!--visibility gone-->
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -42,8 +45,10 @@
             android:gravity="center"
             android:text="km"
             android:textColor="@color/WhiteFFFFFF"
-            android:textSize="@dimen/_20ssp" />
+            android:textSize="@dimen/_20ssp"
+            android:visibility="gone"/>
 
+<!--visibility gone-->
         <Button
             android:id="@+id/find_BTN"
             android:layout_width="wrap_content"
@@ -61,7 +66,8 @@
             android:textAllCaps="false"
             android:textColor="@color/WhiteFFFFFF"
             android:textSize="@dimen/_10ssp"
-            android:textStyle="bold" />
+            android:textStyle="bold"
+            android:visibility="gone"/>
 
     </android.support.v7.widget.Toolbar>
 
@@ -83,11 +89,12 @@
     <android.support.v7.widget.RecyclerView
         android:id="@+id/parties_RV"
         android:layout_width="match_parent"
-        android:layout_height="0dp"
+        android:layout_height="match_parent"
         app:layout_constraintBottom_toTopOf="@id/mapFragment"
         app:layout_constraintEnd_toStartOf="parent"
         app:layout_constraintHeight_default="percent"
         app:layout_constraintHeight_percent="0.6"
+        app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/toolbar"
         app:layout_constraintVertical_bias="0.0"
@@ -98,7 +105,7 @@
         android:id="@+id/mapFragment"
         android:name="com.google.android.gms.maps.SupportMapFragment"
         android:layout_width="match_parent"
-        android:layout_height="0dp"
+        android:layout_height="1dp"
         map:layout_constraintBottom_toBottomOf="parent"
         map:layout_constraintEnd_toEndOf="parent"
         map:layout_constraintHeight_default="percent"
@@ -107,14 +114,14 @@
         map:layout_constraintStart_toStartOf="parent"
         map:layout_constraintTop_toBottomOf="@id/parties_RV"
         map:layout_constraintVertical_bias="1.0"
-        tools:context=".activities.PartyEventsActivity" />
+        tools:context=".activities.PartyEventsActivity"/>
 
 
     <TextView
         android:id="@+id/no_venue_TV"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="No venue found"
+        android:text="No Restaurant found"
         android:visibility="invisible"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"

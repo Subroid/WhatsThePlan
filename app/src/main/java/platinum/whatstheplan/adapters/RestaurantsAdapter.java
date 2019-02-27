@@ -100,7 +100,7 @@ public class RestaurantsAdapter extends FirestoreRecyclerAdapter<Restaurant, Res
     @NonNull
     @Override
     public RestaurantViewHolder onCreateViewHolder(@NonNull ViewGroup viewGroup, int i) {
-        View itemView = LayoutInflater.from(mContext).inflate(R.layout.layout_restaurant, viewGroup, false);
+        View itemView = LayoutInflater.from(mContext).inflate(R.layout.layout_restaurant_notused, viewGroup, false);
         RestaurantViewHolder viewHolder = new RestaurantViewHolder(itemView);
         return viewHolder;
     }

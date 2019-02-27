@@ -87,7 +87,7 @@
                 android:layout_height="0dp"
                 android:fontFamily="monospace"
                 android:gravity="center"
-                android:text="Tickets : 100"
+                android:text="Entry Stag : 100"
                 android:textColor="@color/WhiteFFFFFF"
                 android:textSize="@dimen/_10ssp"
                 android:textStyle="bold"
@@ -187,6 +187,7 @@
         app:layout_constraintTop_toBottomOf="@+id/venue_name_TV"
         app:layout_constraintVertical_bias="0.0" />
 
+    <!--gone-->
     <Button
         android:id="@+id/show_on_map_BTN"
         android:layout_width="wrap_content"
@@ -209,7 +210,8 @@
         app:layout_constraintHorizontal_bias="0.05"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.98" />
+        app:layout_constraintVertical_bias="0.98"
+        android:visibility="gone"/>
 
 
     <Button

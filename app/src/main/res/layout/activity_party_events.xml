@@ -18,9 +18,9 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:fontFamily="cursive"
+            android:fontFamily="@font/nyala"
             android:gravity="center"
-            android:text="Parties within "
+            android:text="Parties around you "
             android:textColor="@color/WhiteFFFFFF"
             android:textSize="@dimen/_20ssp" />
 
@@ -32,8 +32,10 @@
             android:gravity="center"
             android:padding="@dimen/_3sdp"
             android:text="50"
-            android:textSize="@dimen/_14ssp" />
+            android:textSize="@dimen/_14ssp"
+            android:visibility="gone"/>
 
+<!--visibility gone-->
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -42,8 +44,10 @@
             android:gravity="center"
             android:text="km"
             android:textColor="@color/WhiteFFFFFF"
-            android:textSize="@dimen/_20ssp" />
+            android:textSize="@dimen/_20ssp"
+            android:visibility="gone"/>
 
+<!--visibility gone-->
         <Button
             android:id="@+id/find_BTN"
             android:layout_width="wrap_content"
@@ -61,7 +65,8 @@
             android:textAllCaps="false"
             android:textColor="@color/WhiteFFFFFF"
             android:textSize="@dimen/_10ssp"
-            android:textStyle="bold" />
+            android:textStyle="bold"
+            android:visibility="gone"/>
 
     </android.support.v7.widget.Toolbar>
 
