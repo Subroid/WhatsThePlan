@@ -2,7 +2,6 @@ package platinum.whatstheplan.utils;
 
 import android.content.Context;
 import android.content.Intent;
-import android.content.res.ColorStateList;
 import android.content.res.Resources;
 import android.support.annotation.NonNull;
 import android.support.design.widget.BottomNavigationView;
@@ -11,9 +10,7 @@ import android.view.MenuItem;
 import com.ittianyu.bottomnavigationviewex.BottomNavigationViewEx;
 
 import platinum.whatstheplan.R;
-import platinum.whatstheplan.activities.AddEventActivity;
-import platinum.whatstheplan.activities.ChatActivity;
-import platinum.whatstheplan.activities.EventsActivity;
+import platinum.whatstheplan.activities.BookingsActivity;
 import platinum.whatstheplan.activities.HomeActivity;
 import platinum.whatstheplan.activities.MapActivity;
 
@@ -40,7 +37,7 @@ public class BottomNavigationViewHelper {
                                     context.startActivity(homeIntent);
                                     break;
                                  case R.id.ic_events :
-                                        Intent eventsIntent = new Intent(context, EventsActivity.class);
+                                        Intent eventsIntent = new Intent(context, BookingsActivity.class);
                                     context.startActivity(eventsIntent);
                                     break;
                                /* case R.id.ic_add :

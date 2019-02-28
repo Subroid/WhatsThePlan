@@ -32,7 +32,7 @@ import platinum.whatstheplan.models.UserInformation;
 
 //todo gist this class using naming conventions of model, viewholder etc
 
-public class RestaurantsAdapter extends FirestoreRecyclerAdapter<Restaurant, RestaurantsAdapter.RestaurantViewHolder> {
+public class RestaurantsAdapterUnusable extends FirestoreRecyclerAdapter<Restaurant, RestaurantsAdapterUnusable.RestaurantViewHolder> {
 
     private static final String TAG = "RestaurantsAdapterTag";
 
@@ -49,9 +49,9 @@ public class RestaurantsAdapter extends FirestoreRecyclerAdapter<Restaurant, Res
      * @param options
      * @param map
      */
-    public RestaurantsAdapter(@NonNull FirestoreRecyclerOptions<Restaurant> options, Context context, UserInformation userInformation, GoogleMap map) {
+    public RestaurantsAdapterUnusable(@NonNull FirestoreRecyclerOptions<Restaurant> options, Context context, UserInformation userInformation, GoogleMap map) {
         super(options);
-        Log.d(TAG, "RestaurantsAdapter: costructer called");
+        Log.d(TAG, "RestaurantsAdapterUnusable: costructer called");
         mContext = context;
         mUserInformation = userInformation;
         mMap = map;

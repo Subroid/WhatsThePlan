@@ -81,7 +81,7 @@
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
 
-
+<!--invisibile-->
             <TextView
                 android:id="@+id/venue_type_TV"
                 android:layout_width="match_parent"
@@ -96,11 +96,12 @@
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintHeight_default="percent"
                 app:layout_constraintHeight_percent="0.25"
-                app:layout_constraintHorizontal_bias="0.5"
+                app:layout_constraintHorizontal_bias="0.0"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/venue_name_TV" />
+                app:layout_constraintTop_toBottomOf="@+id/venue_name_TV"
+                android:visibility="invisible"/>
 
-
+<!--invisible-->
             <TextView
                 android:id="@+id/venue_main_event_TV"
                 android:layout_width="match_parent"
@@ -117,7 +118,8 @@
                 app:layout_constraintHeight_percent="0.25"
                 app:layout_constraintHorizontal_bias="0.5"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/venue_type_TV" />
+                app:layout_constraintTop_toBottomOf="@+id/venue_type_TV"
+                android:visibility="invisible"/>
 
         </android.support.constraint.ConstraintLayout>
 
@@ -163,7 +165,7 @@
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/venue_sub_events_TV"
-        app:layout_constraintVertical_bias="0.0" />
+        app:layout_constraintVertical_bias="0.5" />
 
     <!--gone visibility-->
     <Button
@@ -191,6 +193,7 @@
         app:layout_constraintVertical_bias="0.98"
         android:visibility="gone"/>
 
+    <!--gone-->
     <Button
         android:id="@+id/show_events_BTN"
         android:layout_width="wrap_content"
@@ -214,7 +217,8 @@
         app:layout_constraintHorizontal_bias="0.951"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.98"/>
+        app:layout_constraintVertical_bias="0.98"
+        android:visibility="gone"/>
 
 
 

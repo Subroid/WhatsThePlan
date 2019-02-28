@@ -4,7 +4,7 @@ android {
     compileSdkVersion 28
     defaultConfig {
         applicationId "platinum.whatstheplan"
-        minSdkVersion 21
+        minSdkVersion 24
         targetSdkVersion 28
         versionCode 1
         versionName "1.0"
@@ -90,6 +90,9 @@ dependencies {
 
     // geofire by firebase
     implementation 'com.firebase:geofire-android:2.3.1'
+
+    // google pay api
+    implementation 'com.google.android.gms:play-services-wallet:16.0.0'
 
 
     implementation fileTree(dir: 'libs', include: ['*.jar'])

@@ -14,7 +14,8 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".activities.PartyEventsActivity"/>
+        <activity android:name=".activities.PaymentActivity"></activity>
+        <activity android:name=".activities.PartyEventsActivity" />
         <activity android:name=".activities.PartyVenuesActivity" />
         <activity android:name=".activities.FoodsDrinksVenuesActivity" />
         <activity android:name=".activities.EventsVenuesSelecterActivity" />
@@ -29,7 +30,7 @@
             </intent-filter>
         </activity>
         <activity android:name=".activities.HomeActivity" />
-        <activity android:name=".activities.EventsActivity" />
+        <activity android:name=".activities.BookingsActivity" />
         <activity android:name=".activities.AddEventActivity" />
         <activity android:name=".activities.ChatActivity" />
         <activity android:name=".activities.MapActivity" />
@@ -40,15 +41,17 @@
         <activity android:name=".activities.authentications.VerifyPhoneActivity" />
         <activity android:name=".activities.FoodsDrinksActivity" />
         <activity android:name=".activities.RestaurantsActivity2" />
-
-        <meta-data
-            android:name="com.google.android.geo.API_KEY"
-            android:value="@string/google_maps_key" />
-
         <activity android:name=".activities.FoodListActivity" />
         <activity android:name=".activities.authentications.PasswordResetActivity" />
         <activity android:name=".activities.SportsActivity" />
         <activity android:name=".activities.OpenEventsActivity" />
+
+        <meta-data
+            android:name="com.google.android.geo.API_KEY"
+            android:value="@string/google_maps_key" />
+        <meta-data
+            android:name="com.google.android.gms.wallet.api.enabled"
+            android:value="true" />
 
         <uses-library
             android:name="org.apache.http.legacy"

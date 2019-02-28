@@ -5,7 +5,7 @@ import android.os.Parcelable;
 
 import com.google.firebase.firestore.GeoPoint;
 
-public class Venue implements Parcelable {
+public class RestaurantVenue implements Parcelable {
 
     private String venue_id;
     private String venue_name;
@@ -15,14 +15,15 @@ public class Venue implements Parcelable {
     private String venue_sub_events;
     private String venue_image;
     private String admin_id;
-
+    private int venue_tickets;  //require merge
+    private String venue_date;
 
     private GeoPoint venue_geopoint;
 
-    public Venue() {
+    public RestaurantVenue() {
     }
 
-    public Venue(String venue_id, String venue_name, String venue_address, String venue_type, String venue_main_event, String venue_sub_events, String venue_image, String admin_id, GeoPoint venue_geopoint) {
+    public RestaurantVenue(String venue_id, String venue_name, String venue_address, String venue_type, String venue_main_event, String venue_sub_events, String venue_image, String admin_id, GeoPoint venue_geopoint) {
         this.venue_id = venue_id;
         this.venue_name = venue_name;
         this.venue_address = venue_address;
@@ -34,8 +35,32 @@ public class Venue implements Parcelable {
         this.venue_geopoint = venue_geopoint;
     }
 
+    public RestaurantVenue(String venue_id, String venue_name, String venue_address, String venue_type, String venue_main_event, String venue_sub_events, String venue_image, String admin_id, String venue_date, GeoPoint venue_geopoint) {
+        this.venue_id = venue_id;
+        this.venue_name = venue_name;
+        this.venue_address = venue_address;
+        this.venue_type = venue_type;
+        this.venue_main_event = venue_main_event;
+        this.venue_sub_events = venue_sub_events;
+        this.venue_image = venue_image;
+        this.admin_id = admin_id;
+        this.venue_date = venue_date;
+        this.venue_geopoint = venue_geopoint;
+    }
+    //    public RestaurantVenue(String venue_id, String venue_name, String venue_address, String venue_type, String venue_main_event, String venue_sub_events, String venue_image, String admin_id, int venue_tickets, GeoPoint venue_geopoint) {
+//        this.venue_id = venue_id;
+//        this.venue_name = venue_name;
+//        this.venue_address = venue_address;
+//        this.venue_type = venue_type;
+//        this.venue_main_event = venue_main_event;
+//        this.venue_sub_events = venue_sub_events;
+//        this.venue_image = venue_image;
+//        this.admin_id = admin_id;
+//        this.venue_tickets = venue_tickets;
+//        this.venue_geopoint = venue_geopoint;
+//    }
 
-    protected Venue(Parcel in) {
+    protected RestaurantVenue(Parcel in) {
         venue_id = in.readString();
         venue_name = in.readString();
         venue_address = in.readString();
@@ -47,17 +72,18 @@ public class Venue implements Parcelable {
         Double lat = in.readDouble();
         Double lng = in.readDouble();
         venue_geopoint = new GeoPoint(lat, lng);
+        venue_date = in.readString();
     }
 
-    public static final Creator<Venue> CREATOR = new Creator<Venue>() {
+    public static final Creator<RestaurantVenue> CREATOR = new Creator<RestaurantVenue>() {
         @Override
-        public Venue createFromParcel(Parcel in) {
-            return new Venue(in);
+        public RestaurantVenue createFromParcel(Parcel in) {
+            return new RestaurantVenue(in);
         }
 
         @Override
-        public Venue[] newArray(int size) {
-            return new Venue[size];
+        public RestaurantVenue[] newArray(int size) {
+            return new RestaurantVenue[size];
         }
     };
 
@@ -134,7 +160,21 @@ public class Venue implements Parcelable {
     }
 
 
+    public int getVenue_tickets() {
+        return venue_tickets;
+    }
 
+    public void setVenue_tickets(int venue_tickets) {
+        this.venue_tickets = venue_tickets;
+    }
+
+    public String getVenue_date() {
+        return venue_date;
+    }
+
+    public void setVenue_date(String venue_date) {
+        this.venue_date = venue_date;
+    }
 
     @Override
     public int describeContents() {
@@ -153,5 +193,6 @@ public class Venue implements Parcelable {
         parcel.writeString(admin_id);
         parcel.writeDouble(venue_geopoint.getLatitude());
         parcel.writeDouble(venue_geopoint.getLongitude());
+        parcel.writeString(venue_date);
     }
 }

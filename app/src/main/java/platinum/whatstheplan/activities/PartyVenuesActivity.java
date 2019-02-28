@@ -491,8 +491,8 @@ public class PartyVenuesActivity extends FragmentActivity implements
         mVenueList.clear();
         Log.d(TAG, "displayVenuesNearUserLocation: radius = " + radius);
         mGeoLocation = new GeoLocation(mUserCurrentLocation.getLatitude(), mUserCurrentLocation.getLongitude());
-        Log.d(TAG, "displayVenuesInTheRangeOf5km: mUserCurrentLocation.getLatitude = " + mUserCurrentLocation.getLatitude());
-        Log.d(TAG, "displayVenuesInTheRangeOf5km: mUserCurrentLocation.getLongitude = " + mUserCurrentLocation.getLongitude());
+        Log.d(TAG, "displayVenuesNearUserLocation: mUserCurrentLocation.getLatitude = " + mUserCurrentLocation.getLatitude());
+        Log.d(TAG, "displayVenuesNearUserLocation: mUserCurrentLocation.getLongitude = " + mUserCurrentLocation.getLongitude());
         DatabaseReference mDbVenuesFirebase = mDbFirebase.getReference("VenuesVenues");
         mGeoFirebase = new GeoFire(mDbVenuesFirebase);
         mGeoFireQuery = mGeoFirebase.queryAtLocation(mGeoLocation, radius);

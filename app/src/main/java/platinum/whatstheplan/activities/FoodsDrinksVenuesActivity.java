@@ -75,11 +75,11 @@ import java.util.List;
 import java.util.Map;
 
 import platinum.whatstheplan.R;
-import platinum.whatstheplan.adapters.VenuesAdapter;
-import platinum.whatstheplan.interfaces.VenueItemTapListener;
+import platinum.whatstheplan.adapters.RestaurantVenuesAdapter;
+import platinum.whatstheplan.interfaces.RestaurantVenueItemTapListener;
 import platinum.whatstheplan.models.UserInformation;
 import platinum.whatstheplan.models.UserLocation;
-import platinum.whatstheplan.models.Venue;
+import platinum.whatstheplan.models.RestaurantVenue;
 
 import static platinum.whatstheplan.utils.Constants.REQUEST_ERROR_DIALOG_CODE_61;
 import static platinum.whatstheplan.utils.Constants.REQUEST_LOCATION_PERMISSIONS_CODE_52;
@@ -87,17 +87,17 @@ import static platinum.whatstheplan.utils.Constants.REQUEST_LOCATION_SETTINGS_CO
 
 public class FoodsDrinksVenuesActivity extends FragmentActivity implements
         OnMapReadyCallback,
-        VenueItemTapListener,
+        RestaurantVenueItemTapListener,
         GeoQueryEventListener, View.OnClickListener  {
 
 
-    private static final String TAG = "RestaurantsActivityTag";
+    private static final String TAG = "FoodsDrinksVenuesTag";
 
     private GoogleMap mMap;
     private ProgressBar mProgressBarPB;
     private EditText mRadiusET;
     private Button mFindBTN;
-    private TextView mNoVenueTV;
+    private TextView mNoRestaurantVenueTV;
     private LocationRequest mLocationRequest;
     private FusedLocationProviderClient mFusedLocationProviderClient;
     private Location mUserCurrentLocation;
@@ -119,8 +119,8 @@ public class FoodsDrinksVenuesActivity extends FragmentActivity implements
     private GeoQuery mGeoQuery;
     private com.firebase.geofire.GeoQuery mGeoFireQuery;
     private GeoLocation mGeoLocation;
-    private Venue mVenue;
-    private List<Venue> mVenueList;
+    private RestaurantVenue mRestaurantVenue;
+    private List<RestaurantVenue> mRestaurantVenueList;
     private List<String> mKeyList;
     private int mRadius;
 
@@ -138,8 +138,8 @@ public class FoodsDrinksVenuesActivity extends FragmentActivity implements
     private void initViewsAndVariables() {
         Log.d(TAG, "initViewsAndVariables: called");
         mKeyList = new ArrayList<>();
-        mVenueList = new ArrayList<>();
-        mNoVenueTV = findViewById(R.id.no_venue_TV);
+        mRestaurantVenueList = new ArrayList<>();
+        mNoRestaurantVenueTV = findViewById(R.id.no_venue_TV);
         mRestaurantsRV = findViewById(R.id.parties_RV);
         mRadiusET = findViewById(R.id.radius_ET);
         mRadius = Integer.parseInt(mRadiusET.getText().toString());
@@ -479,12 +479,13 @@ public class FoodsDrinksVenuesActivity extends FragmentActivity implements
 
     private void displayRestaurantsNearUserLocation(int radius) {
         mKeyList.clear();
-        mVenueList.clear();
+        mRestaurantVenueList.clear();
         Log.d(TAG, "displayRestaurantsNearUserLocation: radius = " + radius);
         mGeoLocation = new GeoLocation(mUserCurrentLocation.getLatitude(), mUserCurrentLocation.getLongitude());
         Log.d(TAG, "displayRestaurantsInTheRangeOf5km: mUserCurrentLocation.getLatitude = " + mUserCurrentLocation.getLatitude());
         Log.d(TAG, "displayRestaurantsInTheRangeOf5km: mUserCurrentLocation.getLongitude = " + mUserCurrentLocation.getLongitude());
         DatabaseReference mDbRestaurantsFirebase = mDbFirebase.getReference("Foods DrinksVenues");
+        Log.d(TAG, "displayRestaurantsNearUserLocation: db path : " + mDbRestaurantsFirebase.toString());
         mGeoFirebase = new GeoFire(mDbRestaurantsFirebase);
         mGeoFireQuery = mGeoFirebase.queryAtLocation(mGeoLocation, radius);
         mGeoFireQuery.removeAllListeners();
@@ -511,7 +512,7 @@ public class FoodsDrinksVenuesActivity extends FragmentActivity implements
     }
 
 
-    private void getDirection(Venue venue, Location userCurrentLocation, int itemPosition) {
+    private void getDirection(RestaurantVenue venue, Location userCurrentLocation, int itemPosition) {
         Log.d(TAG, "getDirection: called");
         Log.d(TAG, "getDirection: itemPosition = " + itemPosition);
         Log.d(TAG, "getDirection: markerTag = " + mMarker.getTag());
@@ -526,7 +527,7 @@ public class FoodsDrinksVenuesActivity extends FragmentActivity implements
 
     }
 
-    private void nowGetDirection(Venue venue) {
+    private void nowGetDirection(RestaurantVenue venue) {
         Log.d(TAG, "nowGetDirection: called");
         mUserLatLng = new LatLng(mUserCurrentLocation.getLatitude(), mUserCurrentLocation.getLongitude());
         mTargetLatLng = new LatLng(venue.getVenue_geopoint().getLatitude(), venue.getVenue_geopoint().getLongitude());
@@ -540,7 +541,7 @@ public class FoodsDrinksVenuesActivity extends FragmentActivity implements
     }
 
 
-    private void setTargetMarker(Venue venue, int itemPosition) {
+    private void setTargetMarker(RestaurantVenue venue, int itemPosition) {
 
         setUserMarkerWithoutUpdatingCamera();
         LatLng latLng = new LatLng(venue.getVenue_geopoint().getLatitude(), venue.getVenue_geopoint().getLongitude());
@@ -602,10 +603,11 @@ public class FoodsDrinksVenuesActivity extends FragmentActivity implements
 
         if (mKeyList.size() == 0) {
             mProgressBarPB.setVisibility(View.GONE);
-            mNoVenueTV.setVisibility(View.VISIBLE);
+            mNoRestaurantVenueTV.setVisibility(View.VISIBLE);
         }
 
         if (!mLoopStarted) {
+            Log.d(TAG, "onGeoQueryReady: if mLoopStarted");
             for (i = 0; i < mKeyList.size(); i++) {
                 mLoopStarted = true;
                 Log.d(TAG, "onGeoQueryReady: i = " + i);
@@ -620,23 +622,23 @@ public class FoodsDrinksVenuesActivity extends FragmentActivity implements
                     @Override
                     public void onSuccess(DocumentSnapshot documentSnapshot) {
 
-                        mVenue = documentSnapshot.toObject(Venue.class);
-                        mVenueList.add(mVenue);
+                        mRestaurantVenue = documentSnapshot.toObject(RestaurantVenue.class);
+                        mRestaurantVenueList.add(mRestaurantVenue);
 
-                        Log.d(TAG, "onSuccess: mVenue.getVenue_name() = " + mVenue.getVenue_name());
+                        Log.d(TAG, "onSuccess: mRestaurantVenue.getVenue_name() = " + mRestaurantVenue.getVenue_name());
 
                         if (mLoopFinished) {
                             Log.d(TAG, "onSuccess: isTrueNow " + mLoopFinished);
 
-                            Log.d(TAG, "onGeoQueryReady: mVenueList.size() = " + mVenueList.size());
+                            Log.d(TAG, "onGeoQueryReady: mRestaurantVenueList.size() = " + mRestaurantVenueList.size());
 
-                            VenuesAdapter venuesAdapter = new VenuesAdapter(FoodsDrinksVenuesActivity.this, mVenueList, mUserCurrentLocation, mMap, mProgressBarPB);
+                            RestaurantVenuesAdapter venuesAdapter = new RestaurantVenuesAdapter(FoodsDrinksVenuesActivity.this, mRestaurantVenueList, mUserCurrentLocation, mMap, mProgressBarPB);
                             Log.d(TAG, "onSuccess: adapter called");
                             mRestaurantsRV.setAdapter(venuesAdapter);
                             mProgressBarPB.setVisibility(View.GONE);
                             mRestaurantsRV.setLayoutManager(new LinearLayoutManager(FoodsDrinksVenuesActivity.this));
                             if (mRestaurantsRV.getAdapter().getItemCount() > 1) {
-                                mNoVenueTV.setVisibility(View.GONE);
+                                mNoRestaurantVenueTV.setVisibility(View.GONE);
                             }
                             hideSoftKeyboard(FoodsDrinksVenuesActivity.this, mRadiusET);
 
@@ -656,7 +658,7 @@ public class FoodsDrinksVenuesActivity extends FragmentActivity implements
     }
 
     @Override
-    public void onTap(Venue venue, int viewId, int tappedItemPosition) {
+    public void onTap(RestaurantVenue venue, int viewId, int tappedItemPosition) {
         Log.d(TAG, "onTap: viewId = " + viewId);
         switch (viewId) {
             case R.id.show_on_map_BTN:

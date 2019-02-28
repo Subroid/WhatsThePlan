@@ -10,6 +10,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 import platinum.whatstheplan.models.Event;
+import platinum.whatstheplan.models.Restaurant;
+import platinum.whatstheplan.models.RestaurantVenue;
+import platinum.whatstheplan.models.Venue;
 
 public class BookingDbHandler extends SQLiteOpenHelper {
 
@@ -20,6 +23,7 @@ public class BookingDbHandler extends SQLiteOpenHelper {
     private static final String TABLE_BOOKINGS_FOODSDRINKS = "BookingsFoodsDrinks";
     private static final String TABLE_BOOKINGS_SPORTS = "BookingsSports";
     private static final String TABLE_BOOKINGS_OPENEVENTS = "BookingsOpenEvents";
+    private static final String TABLE_BOOKINGS_RESTAURANTS = "BookingsRestaurants";
 
     private static final String COLUMN_EVENTNO = "EventNum";
     private static final String COLUMN_EVENTID = "EventId";
@@ -30,6 +34,13 @@ public class BookingDbHandler extends SQLiteOpenHelper {
     private static final String COLUMN_VENUENAME = "VenueName";
     private static final String COLUMN_VENUEADDRESS = "VenueAddress";
     private static final String COLUMN_VENUEIMAGE = "VenueImage";
+    
+    private static final String COLUMN_RESTAURANTNO = "RestaurantNum";
+    private static final String COLUMN_RESTAURANTID = "RestaurantId";
+    private static final String COLUMN_RESTAURANTNAME = "RestaurantName";
+    private static final String COLUMN_RESTAURANT_BOOKING_DATE = "RestaurantDate";
+    private static final String COLUMN_RESTAURANTADDRESS = "RestaurantAddress";
+    private static final String COLUMN_RESTAURANTIMAGE = "RestaurantImage";
 
 
 
@@ -97,6 +108,17 @@ public class BookingDbHandler extends SQLiteOpenHelper {
                 COLUMN_VENUEIMAGE + " TEXT" +")";
 
         sqLiteDatabase.execSQL(CREATE_TABLE_BOOKINGS_SPORTS);
+        
+        String CREATE_TABLE_BOOKINGS_RESTAURANTS = "CREATE TABLE " +
+                TABLE_BOOKINGS_RESTAURANTS +
+                "(" + COLUMN_RESTAURANTNO + " INTEGER PRIMARY KEY," +
+                COLUMN_RESTAURANTID + " TEXT," +
+                COLUMN_RESTAURANTNAME + " TEXT," +
+                COLUMN_RESTAURANT_BOOKING_DATE + " TEXT," +
+                COLUMN_RESTAURANTADDRESS + " TEXT," +
+                COLUMN_RESTAURANTIMAGE + " TEXT" +")";
+
+        sqLiteDatabase.execSQL(CREATE_TABLE_BOOKINGS_RESTAURANTS);
 
     }
 
@@ -106,6 +128,7 @@ public class BookingDbHandler extends SQLiteOpenHelper {
         sqLiteDatabase.execSQL("DROP TABLE IF EXISTS " + TABLE_BOOKINGS_FOODSDRINKS);
         sqLiteDatabase.execSQL("DROP TABLE IF EXISTS " + TABLE_BOOKINGS_SPORTS);
         sqLiteDatabase.execSQL("DROP TABLE IF EXISTS " + TABLE_BOOKINGS_OPENEVENTS);
+        sqLiteDatabase.execSQL("DROP TABLE IF EXISTS " + TABLE_BOOKINGS_RESTAURANTS);
     }
 
     public void addEvent(Event event) {
@@ -129,6 +152,33 @@ public class BookingDbHandler extends SQLiteOpenHelper {
 
     }
 
+
+    public void addRestaurantVenue(RestaurantVenue venue) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        db.insert(TABLE_BOOKINGS_RESTAURANTS, null, getRestaurantValues (venue));
+
+        //todo 280219
+
+       /*
+        switch (venue.getVenue_type()) {
+            case "Parties" :
+                db.insert(TABLE_BOOKINGS_PARTIES, null, getContentValues (venue));
+                break;
+            case "Foods Drinks" :
+                db.insert(TABLE_BOOKINGS_FOODSDRINKS, null, getContentValues (venue));
+                break;
+            case "Sports" :
+                db.insert(TABLE_BOOKINGS_SPORTS, null, getContentValues (venue));
+                break;
+            case "Opne Events" :
+                db.insert(TABLE_BOOKINGS_OPENEVENTS, null, getContentValues (venue));
+                break;
+        }*/
+
+        db.close();
+
+    }
+
         private ContentValues getContentValues(Event event) {
             ContentValues contentValues = new ContentValues();
             contentValues.put(COLUMN_EVENTID, event.getEvent_id());
@@ -139,6 +189,17 @@ public class BookingDbHandler extends SQLiteOpenHelper {
             contentValues.put(COLUMN_VENUENAME, event.getVenue_name());
             contentValues.put(COLUMN_VENUEADDRESS, event.getVenue_address());
             contentValues.put(COLUMN_VENUEIMAGE, event.getVenue_image());
+
+            return contentValues;
+        }
+        
+        private ContentValues getRestaurantValues(RestaurantVenue venue) {
+            ContentValues contentValues = new ContentValues();
+            contentValues.put(COLUMN_RESTAURANTID, venue.getVenue_id());
+            contentValues.put(COLUMN_RESTAURANTNAME, venue.getVenue_name());
+            contentValues.put(COLUMN_RESTAURANT_BOOKING_DATE, venue.getVenue_date());
+            contentValues.put(COLUMN_RESTAURANTADDRESS, venue.getVenue_address());
+            contentValues.put(COLUMN_RESTAURANTIMAGE, venue.getVenue_image());
 
             return contentValues;
         }
@@ -175,7 +236,39 @@ public class BookingDbHandler extends SQLiteOpenHelper {
 
     }
 
-        private List<Event> findEventsFromTable(String date, String tableName, List<Event> eventList) {
+    public List<RestaurantVenue> findRestaurantVenues(String date) {
+        List<RestaurantVenue> restaurantVenueList = new ArrayList<>();
+        findRestaurantsFromTable (date, TABLE_BOOKINGS_RESTAURANTS, restaurantVenueList);
+
+       return restaurantVenueList;
+
+    }
+
+
+
+    private List<RestaurantVenue> findRestaurantsFromTable(String date, String tableName, List<RestaurantVenue> restaurantVenueList) {
+        SQLiteDatabase db = this.getReadableDatabase();
+        String query = "SELECT * FROM " + tableName + " WHERE " + COLUMN_RESTAURANT_BOOKING_DATE + " = ?";
+        Cursor cursor = db.rawQuery(query, new String[]{date});
+
+        while (cursor.moveToNext()) {
+            String restaurantId = cursor.getString(cursor.getColumnIndex(COLUMN_RESTAURANTID));
+            String restaurantName = cursor.getString(cursor.getColumnIndex(COLUMN_RESTAURANTNAME));
+            String restaurantDate = cursor.getString(cursor.getColumnIndex(COLUMN_RESTAURANT_BOOKING_DATE));
+            String restaurantAdderess = cursor.getString(cursor.getColumnIndex(COLUMN_RESTAURANTADDRESS));
+            String restaurantImage = cursor.getString(cursor.getColumnIndex(COLUMN_RESTAURANTIMAGE));
+            RestaurantVenue venue = new RestaurantVenue(restaurantId, restaurantName, restaurantAdderess, null, null, null, restaurantImage, null, restaurantDate, null);
+            restaurantVenueList.add(venue);
+        }
+
+        cursor.close();
+        db.close();
+
+        return restaurantVenueList;
+
+    }
+
+    private List<Event> findEventsFromTable(String date, String tableName, List<Event> eventList) {
             SQLiteDatabase db = this.getReadableDatabase();
             String query = "SELECT * FROM " + tableName + " WHERE " + COLUMN_EVENTDATE + " = ?";
             Cursor cursor = db.rawQuery(query, new String[]{date});

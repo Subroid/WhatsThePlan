@@ -8,20 +8,15 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.widget.TextView;
-import android.widget.Toast;
 import android.widget.Toolbar;
 
 import com.firebase.ui.firestore.FirestoreRecyclerOptions;
 import com.google.firebase.firestore.CollectionReference;
-import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.firestore.Query;
 
 import platinum.whatstheplan.R;
 import platinum.whatstheplan.adapters.FoodsAdapter;
-import platinum.whatstheplan.adapters.RestaurantsAdapter;
 import platinum.whatstheplan.models.FoodItem;
-import platinum.whatstheplan.models.Restaurant;
 
 public class FoodListActivity extends AppCompatActivity {
 

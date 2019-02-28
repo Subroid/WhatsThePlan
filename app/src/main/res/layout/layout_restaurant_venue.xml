@@ -191,6 +191,7 @@
         app:layout_constraintVertical_bias="0.98"
         android:visibility="gone"/>
 
+    <!--gone-->
     <Button
         android:id="@+id/show_events_BTN"
         android:layout_width="wrap_content"
@@ -214,7 +215,33 @@
         app:layout_constraintHorizontal_bias="0.951"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.98"/>
+        app:layout_constraintVertical_bias="0.98"
+        android:visibility="gone"/>
+
+
+    <Button
+        android:id="@+id/booking_BTN"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:background="@drawable/round_shpae_persianpink"
+        android:fontFamily="sans-serif-condensed"
+        android:minWidth="0dp"
+        android:minHeight="0dp"
+        android:padding="@dimen/_2sdp"
+        android:paddingStart="@dimen/_5sdp"
+        android:paddingEnd="@dimen/_5sdp"
+        android:elevation="@dimen/_3sdp"
+        android:text="Booking"
+        android:textAllCaps="false"
+        android:textColor="@color/WhiteFFFFFF"
+        android:textSize="@dimen/_10ssp"
+        android:textStyle="bold"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.95"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.98" />
 
 
 
