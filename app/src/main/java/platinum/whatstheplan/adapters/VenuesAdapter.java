@@ -1,5 +1,6 @@
 package platinum.whatstheplan.adapters;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.location.Location;
@@ -33,6 +34,7 @@ import platinum.whatstheplan.models.Venue;
 public class VenuesAdapter extends RecyclerView.Adapter<VenuesAdapter.VenueViewHolder> {
 
     private static final String TAG = "VenuesAdapter";
+    Activity mActivity;
     private Context mContext;
     private List<Venue> mVenueList = new ArrayList<>();
     private Venue mVenue;
@@ -46,12 +48,13 @@ public class VenuesAdapter extends RecyclerView.Adapter<VenuesAdapter.VenueViewH
     public VenuesAdapter() {
     }
 
-    public VenuesAdapter(Context context, List<Venue> venueList, Location userCurrentLocation, GoogleMap map, ProgressBar progressBar) {
+    public VenuesAdapter(Context context, List<Venue> venueList, Location userCurrentLocation, GoogleMap map, ProgressBar progressBar, Activity activity) {
         mContext = context;
         mVenueList = venueList;
         mUserCurrentLocation = userCurrentLocation;
         mMap = map;
         mProgressBar = progressBar;
+        mActivity = activity;
     }
 
 
@@ -147,6 +150,8 @@ public class VenuesAdapter extends RecyclerView.Adapter<VenuesAdapter.VenueViewH
                 case R.id.show_events_BTN:
                     Log.d(TAG, "onClick: show_events_BTN");
                     String venueId = (String) show_events_BTN.getTag();
+                    mActivity.finish();
+                    //^had to finish the activity because of IndexOutOfBoundException
                     navigateToActivity (mContext, PartyEventsActivity.class);
                     break;
             }

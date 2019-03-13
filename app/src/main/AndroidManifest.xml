@@ -14,7 +14,10 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".activities.PaymentActivity"></activity>
+        <activity android:name=".activities.Bookings2SelectorActivity" />
+        <activity android:name=".activities.Bookings3RestaurantsActivity" />
+        <activity android:name=".activities.Bookings3EventsActivity" />
+        <activity android:name=".activities.PaymentActivity" />
         <activity android:name=".activities.PartyEventsActivity" />
         <activity android:name=".activities.PartyVenuesActivity" />
         <activity android:name=".activities.FoodsDrinksVenuesActivity" />
@@ -30,7 +33,7 @@
             </intent-filter>
         </activity>
         <activity android:name=".activities.HomeActivity" />
-        <activity android:name=".activities.BookingsActivity" />
+        <activity android:name=".activities.Bookings1Activity" />
         <activity android:name=".activities.AddEventActivity" />
         <activity android:name=".activities.ChatActivity" />
         <activity android:name=".activities.MapActivity" />

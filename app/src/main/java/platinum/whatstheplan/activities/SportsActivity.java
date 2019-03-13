@@ -12,6 +12,7 @@ import android.graphics.Canvas;
 import android.graphics.drawable.Drawable;
 import android.location.Location;
 import android.location.LocationManager;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.provider.Settings;
 import android.support.annotation.NonNull;
@@ -39,6 +40,7 @@ import com.google.android.gms.common.GoogleApiAvailability;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.location.places.PlaceFilter;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
@@ -55,6 +57,12 @@ import com.google.android.gms.maps.model.PolylineOptions;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
+import com.google.android.libraries.places.api.Places;
+import com.google.android.libraries.places.api.model.Place;
+import com.google.android.libraries.places.api.model.PlaceLikelihood;
+import com.google.android.libraries.places.api.model.TypeFilter;
+import com.google.android.libraries.places.api.net.FindAutocompletePredictionsRequest;
+import com.google.android.libraries.places.api.net.PlacesClient;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DatabaseError;
@@ -68,7 +76,18 @@ import com.google.firebase.firestore.GeoPoint;
 
 import org.imperiumlabs.geofirestore.GeoFirestore;
 import org.imperiumlabs.geofirestore.GeoQuery;
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+import org.json.JSONStringer;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -122,6 +141,7 @@ public class SportsActivity extends FragmentActivity implements
     private List<Event> mEventList;
     private List<String> mKeyList;
     private int mRadius;
+    private PlacesClient mPlacesClient;
 
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -147,6 +167,8 @@ public class SportsActivity extends FragmentActivity implements
         mDbFirebase = FirebaseDatabase.getInstance();
         mUser = FirebaseAuth.getInstance().getCurrentUser();
         mFusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(SportsActivity.this);
+        Places.initialize(getApplicationContext(), getString(R.string.google_maps_key));
+
     }
 
     private void performActions() {
@@ -417,9 +439,22 @@ public class SportsActivity extends FragmentActivity implements
 
     private void saveUserLocationIntoFirestoreThenDisplaySportsNearUserLocation() {
         saveUserLocationIntoFirestore();
+        displaySportsPlacesNearUserLocation();
         displaySportsNearUserLocation(mRadius);
 //        displaySportsWithin5km();
 //        displaySportsNearUserLocation();
+    }
+
+    double lat = 19.0255306;
+    double lng = 72.8642131;
+    private void displaySportsPlacesNearUserLocation() {
+        String placesSearchStr = "https://maps.googleapis.com/maps/api/place/nearbysearch/" +
+                "json?location="+lat+","+lng+
+                "&rankby=distance&sensor=true" +
+                "&types=stadium"+
+                "&key=AIzaSyAvXGr1Kt3gF7Zt1rWI3hUYJcVVtyLB-LE";
+        PlacesTask placesTask = new PlacesTask();
+        placesTask.execute(placesSearchStr);
     }
 
     private void requestLocationPermissions() {
@@ -687,5 +722,65 @@ public class SportsActivity extends FragmentActivity implements
         inputMethodManager.hideSoftInputFromWindow(view.getWindowToken(), 0);
 
     }
+
+
+    private class PlacesTask extends AsyncTask<String, Void, String> {
+
+        @Override
+        protected String doInBackground(String... placesUrl) {
+
+            StringBuilder placesBuilder = new StringBuilder();
+            for (String placeSearchUrl : placesUrl) {
+                try {
+                    URL requestUrl = new URL(placeSearchUrl);
+                    HttpURLConnection connection = (HttpURLConnection) requestUrl.openConnection();
+                    connection.setRequestMethod("GET");
+                    connection.connect();
+                    int responseCode = connection.getResponseCode();
+
+                    if (responseCode == HttpURLConnection.HTTP_OK) {
+                        BufferedReader bufferedReader = null;
+                        InputStream inputStream = connection.getInputStream();
+                        if (inputStream == null) {
+                            return "";
+                        }
+                        bufferedReader = new BufferedReader(new InputStreamReader(inputStream));
+                        String line;
+                        while ((line = bufferedReader.readLine()) != null) {
+                            placesBuilder.append(line + "\n");
+                        }
+                        if (placesBuilder.length() == 0) {
+                            return "";
+                        }
+                        Log.d(TAG, "doInBackground: placesBuilder = " + placesBuilder.toString());
+                    } else {
+                        Log.i(TAG, "doInBackground: Unsuccessful HTTP Response Code: " + responseCode);
+                    }
+                } catch (MalformedURLException e) {
+
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+            return placesBuilder.toString();
+
+        }
+
+        @Override
+        protected void onPostExecute(String placesResult) {
+            super.onPostExecute(placesResult);
+
+            try {
+                JSONObject placesResultJsonObj = new JSONObject(placesResult);
+                JSONArray placesResultJsonArr = placesResultJsonObj.getJSONArray("results");
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+
+
+
+        }
+    }
+
 
 }

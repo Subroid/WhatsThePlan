@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/polywall_blue"
+    tools:context=".activities.Bookings2SelectorActivity">
+
+    <android.support.v7.widget.Toolbar
+        android:id="@+id/toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/colorPrimaryDark"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <TextView
+            android:id="@+id/toolbar_title_TV"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:fontFamily="@font/nyala"
+            android:gravity="center"
+            android:text="Bookings Selector"            
+            android:textColor="@color/WhiteFFFFFF"
+            android:textSize="@dimen/_20ssp" />
+
+    </android.support.v7.widget.Toolbar>
+
+
+    <com.ittianyu.bottomnavigationviewex.BottomNavigationViewEx
+        android:id="@+id/ha_BottomNavigationView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@drawable/whitesolid_greytop"
+        app:itemIconTint="@color/Black000000"
+        app:itemTextColor="@color/Black000000"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="1.0"
+        app:menu="@menu/bottom_navigation_menu">
+
+    </com.ittianyu.bottomnavigationviewex.BottomNavigationViewEx>
+
+    <Button
+        android:id="@+id/booked_restaurants_BTN"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Booked Restaurants"
+        android:fontFamily="casual"
+        android:textColor="@color/WhiteFFFFFF"
+        android:textStyle="bold"
+        android:textAllCaps="false"
+        android:textSize="@dimen/_14ssp"
+        android:padding="@dimen/_15sdp"
+        android:background="@color/Black000000"
+        app:layout_constraintBottom_toTopOf="@+id/ha_BottomNavigationView"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.498"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/toolbar"
+        app:layout_constraintVertical_bias="0.269" />
+
+    <Button
+        android:id="@+id/booked_events_BTN"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Booked Events"
+        android:fontFamily="casual"
+        android:textColor="@color/WhiteFFFFFF"
+        android:textStyle="bold"
+        android:textAllCaps="false"
+        android:textSize="@dimen/_14ssp"
+        android:padding="@dimen/_15sdp"
+        android:background="@color/Black000000"
+        app:layout_constraintBottom_toTopOf="@+id/ha_BottomNavigationView"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/booked_restaurants_BTN" />
+
+
+</android.support.constraint.ConstraintLayout>

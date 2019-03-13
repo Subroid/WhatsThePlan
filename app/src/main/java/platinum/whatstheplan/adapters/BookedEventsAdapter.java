@@ -18,6 +18,8 @@ import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
+import com.firebase.ui.firestore.FirestoreRecyclerAdapter;
+import com.firebase.ui.firestore.FirestoreRecyclerOptions;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
@@ -37,123 +39,75 @@ import platinum.whatstheplan.R;
 import platinum.whatstheplan.interfaces.EventItemTapListener;
 import platinum.whatstheplan.models.Event;
 import platinum.whatstheplan.models.Guest;
-import platinum.whatstheplan.models.RestaurantVenue;
+import platinum.whatstheplan.models.Event;
+import platinum.whatstheplan.models.Venue;
 import platinum.whatstheplan.utils.BookingDbHandler;
 
-public class BookedEventsAdapter extends RecyclerView.Adapter<BookedEventsAdapter.EventViewHolder> {
+public class BookedEventsAdapter extends FirestoreRecyclerAdapter<Event, BookedEventsAdapter.EventViewHolder>  {
 
-    private static final String TAG = "PartiesQueryAdapterTag";
+    private static final String TAG = "BookedAdapterTag";
     private Context mContext;
-    private List<Event> mEventList = new ArrayList<>();
-    private List<RestaurantVenue> mRestaurantVenueList = new ArrayList<>();
-    private Event mEvent;
-    private RestaurantVenue mRestaurantVenue;
     private ProgressBar mProgressBar;
-    private boolean mUseSecondConstructor;
-
-    float[] distanceResults = new float[2];
-
-    public BookedEventsAdapter() {
-    }
-
-    public BookedEventsAdapter(Context context, List<Event> eventList, ProgressBar progressBar) {
-        mContext = context;
-        mEventList = eventList;
-        mProgressBar = progressBar;
-    }
-
-    public BookedEventsAdapter(Context context, List<RestaurantVenue> restaurantVenueList, ProgressBar progressBar, boolean useThisConstructor) {
-        mContext = context;
-        mRestaurantVenueList = restaurantVenueList;
-        mProgressBar = progressBar;
-        mUseSecondConstructor = useThisConstructor;
-    }
-
     EventViewHolder viewHolder;
     View itemView;
+
+    /**
+     * Create a new RecyclerView adapter that listens to a Firestore Query.  See {@link
+     * FirestoreRecyclerOptions} for configuration options.
+     *
+     * @param options
+     */
+    public BookedEventsAdapter(@NonNull FirestoreRecyclerOptions<Event> options, Context context, ProgressBar progressBar) {
+        super(options);
+        mContext = context;
+        mProgressBar = progressBar;
+
+    }
+
     @NonNull
     @Override
     public EventViewHolder onCreateViewHolder(@NonNull ViewGroup viewGroup, int i) {
 
-        if (mUseSecondConstructor) {
-            itemView = LayoutInflater.from(mContext).inflate(R.layout.layout_bookedrestaurant, viewGroup, false);
-        } else {
-            itemView = LayoutInflater.from(mContext).inflate(R.layout.layout_bookedevent, viewGroup, false);
-        }
+        itemView = LayoutInflater.from(mContext).inflate(R.layout.layout_bookedevent, viewGroup, false);
         viewHolder = new EventViewHolder(itemView);
         return viewHolder;
     }
 
+
     @Override
-    public void onBindViewHolder(@NonNull EventViewHolder eventViewHolder, int position) {
+    protected void onBindViewHolder(@NonNull EventViewHolder holder, int position, @NonNull Event event) {
+//        if (mUseSecondConstructor) {
+        Log.d(TAG, "onBindViewHolder: event name = " + event.getEvent_name());
+        Log.d(TAG, "onBindViewHolder: venue name = " + event.getVenue_name());
+        Log.d(TAG, "onBindViewHolder: venue address = " + event.getVenue_address());
+        holder.event_name_TV.setText(event.getEvent_name());
+        holder.venue_name_TV.setText(event.getVenue_name());
+        holder.event_address_TV.setText(event.getVenue_address());
 
-        if (mUseSecondConstructor) {
-            mRestaurantVenue = mRestaurantVenueList.get(position);
-
-            eventViewHolder.venue_name_TV.setText(mRestaurantVenue.getVenue_name());
-            eventViewHolder.venue_address_TV.setText(mRestaurantVenue.getVenue_address());
-
-            Glide.with(mContext).load(Uri.parse(mRestaurantVenue.getVenue_image())).apply(new RequestOptions().fitCenter()).into(eventViewHolder.event_image_IV);
-            Glide.with(mContext).load(Uri.parse(mRestaurantVenue.getVenue_image())).apply(new RequestOptions().fitCenter()).into(eventViewHolder.event_layout_bg_IV);
-            mProgressBar.setVisibility(View.INVISIBLE);
-
-        } else {
-            mEvent = mEventList.get(position);
-
-            eventViewHolder.event_name_TV.setText(mEvent.getEvent_name());
-            eventViewHolder.venue_name_TV.setText(mEvent.getVenue_name());
-            eventViewHolder.venue_address_TV.setText(mEvent.getVenue_address());
-            eventViewHolder.event_date_TV.setText(mEvent.getEvent_date());
-            eventViewHolder.event_time_TV.setText(mEvent.getEvent_time());
-
-            Glide.with(mContext).load(Uri.parse(mEvent.getEvent_image())).apply(new RequestOptions().fitCenter()).into(eventViewHolder.event_image_IV);
-            Glide.with(mContext).load(Uri.parse(mEvent.getEvent_image())).apply(new RequestOptions().fitCenter()).into(eventViewHolder.event_layout_bg_IV);
-            mProgressBar.setVisibility(View.INVISIBLE);
-
-        }
-
+        Glide.with(mContext).load(Uri.parse(event.getEvent_image())).apply(new RequestOptions().fitCenter()).into(holder.event_image_IV);
+        Glide.with(mContext).load(Uri.parse(event.getEvent_image())).apply(new RequestOptions().fitCenter()).into(holder.event_layout_bg_IV);
+        mProgressBar.setVisibility(View.INVISIBLE);
 
     }
 
-
-    @Override
-    public int getItemCount() {
-        if (mUseSecondConstructor) {
-            return mRestaurantVenueList.size();
-        } else {
-            return mEventList.size();
-        }
-    }
 
     class EventViewHolder extends RecyclerView.ViewHolder {
         private TextView event_name_TV;
         private TextView venue_name_TV;
-        private TextView venue_address_TV;
-        private TextView event_date_TV;
-        private TextView event_time_TV;
+        private TextView event_address_TV;
         private ImageView event_image_IV;
         private ImageView event_layout_bg_IV;
 
 
         public EventViewHolder(@NonNull View itemView) {
             super(itemView);
-            if (mUseSecondConstructor) {
-                venue_name_TV = itemView.findViewById(R.id.venue_name_TV);
-                venue_address_TV = itemView.findViewById(R.id.venue_address_TV);
-//                event_date_TV = itemView.findViewById(R.id.event_date_TV);
-//                event_time_TV = itemView.findViewById(R.id.event_time_TV);
-                event_image_IV = itemView.findViewById(R.id.venue_image_IV);
-                event_layout_bg_IV = itemView.findViewById(R.id.venue_layout_bg_IV);
-            } else {
-                event_name_TV = itemView.findViewById(R.id.event_name_TV);
-                venue_name_TV = itemView.findViewById(R.id.venue_name_TV);
-                venue_address_TV = itemView.findViewById(R.id.venue_address_TV);
-                event_date_TV = itemView.findViewById(R.id.event_date_TV);
-                event_time_TV = itemView.findViewById(R.id.event_time_TV);
-                event_image_IV = itemView.findViewById(R.id.event_image_IV);
-                event_layout_bg_IV = itemView.findViewById(R.id.event_layout_bg_IV);
+            event_name_TV = itemView.findViewById(R.id.event_name_TV);
+            venue_name_TV = itemView.findViewById(R.id.venue_name_TV);
+            event_address_TV = itemView.findViewById(R.id.venue_address_TV);
+            event_image_IV = itemView.findViewById(R.id.event_image_IV);
+            event_layout_bg_IV = itemView.findViewById(R.id.event_layout_bg_IV);
+
             }
 
         }
     }
-}

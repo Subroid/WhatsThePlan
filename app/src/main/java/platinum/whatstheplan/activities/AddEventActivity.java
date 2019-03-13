@@ -13,7 +13,7 @@ import platinum.whatstheplan.utils.BottomNavigationViewHelper;
 
 public class AddEventActivity extends AppCompatActivity {
 
-    private static final String TAG = "BookingsActivity";
+    private static final String TAG = "Bookings1Activity";
     private BottomNavigationViewEx bottomNavigationViewEx;
     private Context mContext;
 

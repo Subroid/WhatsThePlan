@@ -10,7 +10,7 @@ import android.view.MenuItem;
 import com.ittianyu.bottomnavigationviewex.BottomNavigationViewEx;
 
 import platinum.whatstheplan.R;
-import platinum.whatstheplan.activities.BookingsActivity;
+import platinum.whatstheplan.activities.Bookings1Activity;
 import platinum.whatstheplan.activities.HomeActivity;
 import platinum.whatstheplan.activities.MapActivity;
 
@@ -37,7 +37,7 @@ public class BottomNavigationViewHelper {
                                     context.startActivity(homeIntent);
                                     break;
                                  case R.id.ic_events :
-                                        Intent eventsIntent = new Intent(context, BookingsActivity.class);
+                                        Intent eventsIntent = new Intent(context, Bookings1Activity.class);
                                     context.startActivity(eventsIntent);
                                     break;
                                /* case R.id.ic_add :

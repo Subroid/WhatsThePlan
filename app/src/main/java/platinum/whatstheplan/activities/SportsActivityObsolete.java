@@ -12,14 +12,14 @@ import android.graphics.Canvas;
 import android.graphics.drawable.Drawable;
 import android.location.Location;
 import android.location.LocationManager;
+import android.os.AsyncTask;
+import android.os.Bundle;
 import android.provider.Settings;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.content.ContextCompat;
-import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
 import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -56,6 +56,8 @@ import com.google.android.gms.maps.model.PolylineOptions;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
+import com.google.android.libraries.places.api.Places;
+import com.google.android.libraries.places.api.net.PlacesClient;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DatabaseError;
@@ -69,16 +71,26 @@ import com.google.firebase.firestore.GeoPoint;
 
 import org.imperiumlabs.geofirestore.GeoFirestore;
 import org.imperiumlabs.geofirestore.GeoQuery;
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import platinum.whatstheplan.R;
-import platinum.whatstheplan.adapters.VenuesAdapter;
-import platinum.whatstheplan.interfaces.VenueItemTapListener;
-import platinum.whatstheplan.models.Venue;
+import platinum.whatstheplan.adapters.EventsAdapter;
+import platinum.whatstheplan.interfaces.EventItemTapListener;
+import platinum.whatstheplan.models.Event;
 import platinum.whatstheplan.models.UserInformation;
 import platinum.whatstheplan.models.UserLocation;
 
@@ -86,19 +98,18 @@ import static platinum.whatstheplan.utils.Constants.REQUEST_ERROR_DIALOG_CODE_61
 import static platinum.whatstheplan.utils.Constants.REQUEST_LOCATION_PERMISSIONS_CODE_52;
 import static platinum.whatstheplan.utils.Constants.REQUEST_LOCATION_SETTINGS_CODE_51;
 
-public class PartyVenuesActivity extends FragmentActivity implements
+public class SportsActivityObsolete extends FragmentActivity implements
         OnMapReadyCallback,
-        VenueItemTapListener,
-        GeoQueryEventListener, View.OnClickListener  {
+        EventItemTapListener,
+        GeoQueryEventListener, View.OnClickListener {
 
-
-    private static final String TAG = "PartyVenuesActivityTag";
+    private static final String TAG = "SportsActivityTag";
 
     private GoogleMap mMap;
     private ProgressBar mProgressBarPB;
     private EditText mRadiusET;
     private Button mFindBTN;
-    private TextView mNoVenueTV;
+    private TextView mNoEventTV;
     private LocationRequest mLocationRequest;
     private FusedLocationProviderClient mFusedLocationProviderClient;
     private Location mUserCurrentLocation;
@@ -107,7 +118,7 @@ public class PartyVenuesActivity extends FragmentActivity implements
     private boolean mLocationPermissionGranted = false;
     private FirebaseFirestore mDbFirestore;
     private FirebaseDatabase mDbFirebase;
-    private RecyclerView mVenuesRV;
+    private RecyclerView mSportsRV;
     private UserInformation mUserInformation;
     private FirebaseUser mUser;
     private Marker mMarker;
@@ -120,15 +131,15 @@ public class PartyVenuesActivity extends FragmentActivity implements
     private GeoQuery mGeoQuery;
     private com.firebase.geofire.GeoQuery mGeoFireQuery;
     private GeoLocation mGeoLocation;
-    private Venue mVenue;
-    private List<Venue> mVenueList;
+    private Event mEvent;
+    private List<Event> mEventList;
     private List<String> mKeyList;
     private int mRadius;
+    private PlacesClient mPlacesClient;
 
-    @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_party_venues);
+        setContentView(R.layout.activity_sports);
 
         Log.d(TAG, "onCreate: called");
         initViewsAndVariables();
@@ -139,16 +150,18 @@ public class PartyVenuesActivity extends FragmentActivity implements
     private void initViewsAndVariables() {
         Log.d(TAG, "initViewsAndVariables: called");
         mKeyList = new ArrayList<>();
-        mVenueList = new ArrayList<>();
-        mNoVenueTV = findViewById(R.id.no_venue_TV);
-        mVenuesRV = findViewById(R.id.parties_RV);
+        mEventList = new ArrayList<>();
+        mSportsRV = findViewById(R.id.sports_RV);
         mRadiusET = findViewById(R.id.radius_ET);
+        mNoEventTV = findViewById(R.id.no_event_TV);
         mRadius = Integer.parseInt(mRadiusET.getText().toString());
         mFindBTN = findViewById(R.id.find_BTN);
         mProgressBarPB = findViewById(R.id.progressBar);
         mDbFirestore = FirebaseFirestore.getInstance();
         mDbFirebase = FirebaseDatabase.getInstance();
         mUser = FirebaseAuth.getInstance().getCurrentUser();
+        mFusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(SportsActivityObsolete.this);
+        Places.initialize(getApplicationContext(), getString(R.string.google_maps_key));
 
     }
 
@@ -156,7 +169,7 @@ public class PartyVenuesActivity extends FragmentActivity implements
         Log.d(TAG, "performActions: called");
         setClickListeners();
         mMapActions();
-        mVenuesRvActions();
+        mSportsRvActions();
 
     }
 
@@ -168,16 +181,16 @@ public class PartyVenuesActivity extends FragmentActivity implements
         Log.d(TAG, "mMapActions: called");
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.mapFragment);
-        mapFragment.getMapAsync(PartyVenuesActivity.this);
+        mapFragment.getMapAsync(SportsActivityObsolete.this);
     }
 
-    private void mVenuesRvActions() {
-        Log.d(TAG, "mVenuesRvActions: called");
-        mVenuesRV.setHasFixedSize(true);
+    private void mSportsRvActions() {
+        Log.d(TAG, "mSportsRvActions: called");
+        mSportsRV.setHasFixedSize(true);
         DividerItemDecoration itemDecorator = new DividerItemDecoration
-                (PartyVenuesActivity.this, DividerItemDecoration.VERTICAL);
-        itemDecorator.setDrawable(ContextCompat.getDrawable(PartyVenuesActivity.this, R.drawable.divider));
-        mVenuesRV.addItemDecoration(itemDecorator);
+                (SportsActivityObsolete.this, DividerItemDecoration.VERTICAL);
+        itemDecorator.setDrawable(ContextCompat.getDrawable(SportsActivityObsolete.this, R.drawable.divider));
+        mSportsRV.addItemDecoration(itemDecorator);
 
     }
 
@@ -197,7 +210,6 @@ public class PartyVenuesActivity extends FragmentActivity implements
             Log.d(TAG, "onResume: else");
             requestLocationPermission();
         }
-
     }
 
     private boolean checkMapServices() {
@@ -213,7 +225,7 @@ public class PartyVenuesActivity extends FragmentActivity implements
     public boolean isPlayServicesOK() {
         Log.d(TAG, "isPlayServicesOK: checking google services version");
 
-        int available = GoogleApiAvailability.getInstance().isGooglePlayServicesAvailable(PartyVenuesActivity.this);
+        int available = GoogleApiAvailability.getInstance().isGooglePlayServicesAvailable(SportsActivityObsolete.this);
 
         if (available == ConnectionResult.SUCCESS) {
             //everything is fine and the user can make map requests
@@ -222,7 +234,7 @@ public class PartyVenuesActivity extends FragmentActivity implements
         } else if (GoogleApiAvailability.getInstance().isUserResolvableError(available)) {
             //an error occured but we can resolve it
             Log.d(TAG, "isPlayServicesOK: an error occured but we can fix it");
-            Dialog dialog = GoogleApiAvailability.getInstance().getErrorDialog(PartyVenuesActivity.this, available, REQUEST_ERROR_DIALOG_CODE_61);
+            Dialog dialog = GoogleApiAvailability.getInstance().getErrorDialog(SportsActivityObsolete.this, available, REQUEST_ERROR_DIALOG_CODE_61);
             dialog.show();
         } else {
             Toast.makeText(this, "You can't make map requests", Toast.LENGTH_SHORT).show();
@@ -268,7 +280,6 @@ public class PartyVenuesActivity extends FragmentActivity implements
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         Log.d(TAG, "onActivityResult: called");
-        Log.d(TAG, "onActivityResult: resultCode : " + resultCode);
 
         switch (requestCode) {
             case REQUEST_LOCATION_SETTINGS_CODE_51:
@@ -285,17 +296,16 @@ public class PartyVenuesActivity extends FragmentActivity implements
 
         Log.d(TAG, "requestLocationPermission: called");
         if (ContextCompat.checkSelfPermission(this.getApplicationContext(),
-                android.Manifest.permission.ACCESS_FINE_LOCATION)
+                Manifest.permission.ACCESS_FINE_LOCATION)
                 == PackageManager.PERMISSION_GRANTED) {
             mLocationPermissionGranted = true;
-            mMapActions();
             //todo
         } else {
             ActivityCompat.requestPermissions(this,
-                    new String[]{android.Manifest.permission.ACCESS_FINE_LOCATION},
+                    new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
                     REQUEST_LOCATION_PERMISSIONS_CODE_52);
-            ActivityCompat.shouldShowRequestPermissionRationale(PartyVenuesActivity.this,
-                    android.Manifest.permission.ACCESS_FINE_LOCATION);
+            ActivityCompat.shouldShowRequestPermissionRationale(SportsActivityObsolete.this,
+                    Manifest.permission.ACCESS_FINE_LOCATION);
 
         }
     }
@@ -303,9 +313,7 @@ public class PartyVenuesActivity extends FragmentActivity implements
     @Override
     public void onRequestPermissionsResult(int requestCode,
                                            @NonNull String permissions[],
-                                           @NonNull int[] grantResults)
-
-    {
+                                           @NonNull int[] grantResults) {
         Log.d(TAG, "onRequestPermissionsResult: " + requestCode + " " + permissions.length + " " + grantResults.length);
         Log.d(TAG, "onRequestPermissionsResult: mLocationPermissionGranted = " + mLocationPermissionGranted);
 
@@ -316,7 +324,6 @@ public class PartyVenuesActivity extends FragmentActivity implements
                 if (grantResults.length > 0
                         && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                     mLocationPermissionGranted = true;
-                    mMapActions();
                 }
             }
         }
@@ -327,18 +334,19 @@ public class PartyVenuesActivity extends FragmentActivity implements
         mMap = googleMap;
         Log.d(TAG, "onMapReady: called");
         initMap();
+        getUserCurrentLocationAndSaveIntoRemoteDatabase();
 
     }
 
     private void initMap() {
-        Log.d(TAG, "initMap: called");
-        mMap.setMapStyle(MapStyleOptions.loadRawResourceStyle(PartyVenuesActivity.this, R.raw.style_json));
+        mMap.setMapStyle(MapStyleOptions.loadRawResourceStyle(SportsActivityObsolete.this, R.raw.style_json));
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             Log.d(TAG, "getUserCurrentLocationAndSaveIntoRemoteDatabase: if called");
-            requestLocationPermission();
+            requestLocationPermissions();
         } else {
             Log.d(TAG, "getUserCurrentLocationAndSaveIntoRemoteDatabase: else called");
-            getUserCurrentLocationAndSaveIntoRemoteDatabase();
+            mMap.setMyLocationEnabled(true);
+            mMap.getUiSettings().setMapToolbarEnabled(false);
         }
 
     }
@@ -348,16 +356,12 @@ public class PartyVenuesActivity extends FragmentActivity implements
         final Location[] userCurrentLocationResults = {new Location(LocationManager.GPS_PROVIDER)};
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             Log.d(TAG, "getUserCurrentLocationAndSaveIntoRemoteDatabase: if called");
-            requestLocationPermission();
+            requestLocationPermissions();
         } else {
             Log.d(TAG, "getUserCurrentLocationAndSaveIntoRemoteDatabase: else called");
-            mMap.setMyLocationEnabled(true);
-            mMap.getUiSettings().setMapToolbarEnabled(false);
-            mMap.getUiSettings().setMyLocationButtonEnabled(true);
-            mFusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(PartyVenuesActivity.this);
+
 
             Task<Location> taskLastLocation = mFusedLocationProviderClient.getLastLocation();
-            Log.d(TAG, "getUserCurrentLocationAndSaveIntoRemoteDatabase: taskLastLocation : " + taskLastLocation.toString());
             taskLastLocation.addOnCompleteListener(new OnCompleteListener<Location>() {
                 @Override
                 public void onComplete(@NonNull Task<Location> task) {
@@ -367,7 +371,7 @@ public class PartyVenuesActivity extends FragmentActivity implements
                         mUserCurrentLocation = userCurrentLocationResults[0];
                         moveCameraToUserCurrentLocation(mUserCurrentLocation);
                         setUserMarker();
-                        saveUserLocationIntoFirestoreThenDisplayVenuesNearUserLocation();
+                        saveUserLocationIntoFirestoreThenDisplaySportsNearUserLocation();
                         Log.d(TAG, "onComplete: userCurrentLocationResults[0] = " + userCurrentLocationResults[0].getLatitude());
                     } else {
                         Log.d(TAG, "onComplete: else else");
@@ -379,46 +383,13 @@ public class PartyVenuesActivity extends FragmentActivity implements
 
     }
 
-
-    private void addOnMyLocationButtonClickListener() {
-        Log.d(TAG, "addOnMyLocationButtonClickListener: called");
-        //todo prompting user for clicking my location button on map
-
-        mMap.setOnMyLocationButtonClickListener(new GoogleMap.OnMyLocationButtonClickListener() {
-            @Override
-            public boolean onMyLocationButtonClick() {
-                Log.d(TAG, "onMyLocationButtonClick: called");
-                Log.d(TAG, "addOnMyLocationButtonClickListener: mMap.isMyLocationEnabled " + mMap.isMyLocationEnabled());
-//                if (ActivityCompat.checkSelfPermission(PartyVenuesActivity.this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-//                    requestLocationPermission();
-//                    Log.d(TAG, "onMyLocationButtonClick: if");
-//                    return false;
-//                }
-//                mMap.setMyLocationEnabled(true);
-                Log.d(TAG, "onMyLocationButtonClick: before task = mFusedLocationProviderClient.getLastLocation();");
-                Task<Location> task = mFusedLocationProviderClient.getLastLocation();
-                task.addOnCompleteListener(new OnCompleteListener<Location>() {
-                    @Override
-                    public void onComplete(@NonNull Task<Location> task) {
-                        if (task.isSuccessful() && task.getResult() != null) {
-                            mUserCurrentLocation = task.getResult();
-                            moveCameraToUserCurrentLocation(mUserCurrentLocation);
-                            saveUserLocationIntoFirestoreThenDisplayVenuesNearUserLocation();
-                        }
-                    }
-                });
-                return true;
-            }
-        });
-    }
-
     private void setUserMarker() {
         LatLng latLng = new LatLng(mUserCurrentLocation.getLatitude(), mUserCurrentLocation.getLongitude());
         mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng, 15.0f));
         mUserMarker = mMap.addMarker(new MarkerOptions()
                 .position(latLng)
                 .title("You are here")
-                .snippet("Find Venues around you"));
+                .snippet("Find Sports around you"));
         mUserMarker.showInfoWindow();
     }
 
@@ -431,17 +402,58 @@ public class PartyVenuesActivity extends FragmentActivity implements
 
     }
 
+    private void addOnMyLocationButtonClickListener() {
+        Log.d(TAG, "addOnMyLocationButtonClickListener: called");
+        //todo prompting user for clicking my location button on map
+        mMap.setOnMyLocationButtonClickListener(new GoogleMap.OnMyLocationButtonClickListener() {
+            @Override
+            public boolean onMyLocationButtonClick() {
+                Log.d(TAG, "onMyLocationButtonClick: called");
+                if (ActivityCompat.checkSelfPermission(SportsActivityObsolete.this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+                    requestLocationPermissions();
+                    Log.d(TAG, "onMyLocationButtonClick: if");
+                    return false;
+                }
+                mMap.setMyLocationEnabled(true);
+                Task<Location> task = mFusedLocationProviderClient.getLastLocation();
+                task.addOnCompleteListener(new OnCompleteListener<Location>() {
+                    @Override
+                    public void onComplete(@NonNull Task<Location> task) {
+                        if (task.isSuccessful() && task.getResult() != null) {
+                            mUserCurrentLocation = task.getResult();
+                            moveCameraToUserCurrentLocation(mUserCurrentLocation);
+                            saveUserLocationIntoFirestoreThenDisplaySportsNearUserLocation();
+                        }
+                    }
+                });
+                return true;
+            }
+        });
+    }
 
-    private void saveUserLocationIntoFirestoreThenDisplayVenuesNearUserLocation() {
+    private void saveUserLocationIntoFirestoreThenDisplaySportsNearUserLocation() {
         saveUserLocationIntoFirestore();
-        displayVenuesNearUserLocation(mRadius);
-//        displayVenuesWithin5km();
-//        displayVenuesNearUserLocation();
+        displaySportsPlacesNearUserLocation();
+        displaySportsNearUserLocation(mRadius);
+//        displaySportsWithin5km();
+//        displaySportsNearUserLocation();
+    }
+
+    double lat = 19.0255306;
+    double lng = 72.8642131;
+    private void displaySportsPlacesNearUserLocation() {
+        String placesSearchStr = "https://maps.googleapis.com/maps/api/place/nearbysearch/" +
+                "json?location="+lat+","+lng+
+                "&rankby=distance&sensor=true" +
+                "&types=stadium"+
+                "&key=AIzaSyAvXGr1Kt3gF7Zt1rWI3hUYJcVVtyLB-LE";
+        PlacesTask placesTask = new PlacesTask();
+        placesTask.execute(placesSearchStr);
     }
 
     private void requestLocationPermissions() {
         Log.d(TAG, "requestLocationPermissions: called");
-        ActivityCompat.requestPermissions(PartyVenuesActivity.this, new String[]
+        ActivityCompat.requestPermissions(SportsActivityObsolete.this, new String[]
                         {Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION},
                 REQUEST_LOCATION_PERMISSIONS_CODE_52);
     }
@@ -487,16 +499,15 @@ public class PartyVenuesActivity extends FragmentActivity implements
                         }*/
 
 
-    private void displayVenuesNearUserLocation(int radius) {
+    private void displaySportsNearUserLocation(int radius) {
         mKeyList.clear();
-        mVenueList.clear();
-        Log.d(TAG, "displayVenuesNearUserLocation: radius = " + radius);
+        mEventList.clear();
+        Log.d(TAG, "displaySportsNearUserLocation: radius = " + radius);
         mGeoLocation = new GeoLocation(mUserCurrentLocation.getLatitude(), mUserCurrentLocation.getLongitude());
-        Log.d(TAG, "displayVenuesNearUserLocation: mUserCurrentLocation.getLatitude = " + mUserCurrentLocation.getLatitude());
-        Log.d(TAG, "displayVenuesNearUserLocation: mUserCurrentLocation.getLongitude = " + mUserCurrentLocation.getLongitude());
-        DatabaseReference mDbVenuesFirebase = mDbFirebase.getReference("PartiesVenues");
-        Log.d(TAG, "displayVenuesNearUserLocation: path = " + mDbVenuesFirebase.getPath().toString());
-        mGeoFirebase = new GeoFire(mDbVenuesFirebase);
+        Log.d(TAG, "displaySportsInTheRangeOf5km: mUserCurrentLocation.getLatitude = " + mUserCurrentLocation.getLatitude());
+        Log.d(TAG, "displaySportsInTheRangeOf5km: mUserCurrentLocation.getLongitude = " + mUserCurrentLocation.getLongitude());
+        DatabaseReference mDbSportsFirebase = mDbFirebase.getReference("SportsLocations");
+        mGeoFirebase = new GeoFire(mDbSportsFirebase);
         mGeoFireQuery = mGeoFirebase.queryAtLocation(mGeoLocation, radius);
         mGeoFireQuery.removeAllListeners();
         mGeoFireQuery.addGeoQueryEventListener(this);
@@ -508,7 +519,7 @@ public class PartyVenuesActivity extends FragmentActivity implements
         mUserMarker = mMap.addMarker(new MarkerOptions()
                 .position(latLng)
                 .title("You are here")
-                .snippet("Find Venues around you"));
+                .snippet("Find Sports around you"));
         mUserMarker.showInfoWindow();
     }
 
@@ -522,25 +533,25 @@ public class PartyVenuesActivity extends FragmentActivity implements
     }
 
 
-    private void getDirection(Venue venue, Location userCurrentLocation, int itemPosition) {
+    private void getDirection(Event event, Location userCurrentLocation, int itemPosition) {
         Log.d(TAG, "getDirection: called");
         Log.d(TAG, "getDirection: itemPosition = " + itemPosition);
         Log.d(TAG, "getDirection: markerTag = " + mMarker.getTag());
         if (mMarker != null) {
             if (itemPosition == (int) mMarker.getTag()) {
-                nowGetDirection(venue);
+                nowGetDirection(event);
             } else {
-                setTargetMarker(venue, itemPosition);
-                nowGetDirection(venue);
+                setTargetMarker(event, itemPosition);
+                nowGetDirection(event);
             }
         }
 
     }
 
-    private void nowGetDirection(Venue venue) {
+    private void nowGetDirection(Event event) {
         Log.d(TAG, "nowGetDirection: called");
         mUserLatLng = new LatLng(mUserCurrentLocation.getLatitude(), mUserCurrentLocation.getLongitude());
-        mTargetLatLng = new LatLng(venue.getVenue_geopoint().getLatitude(), venue.getVenue_geopoint().getLongitude());
+        mTargetLatLng = new LatLng(event.getEvent_geopoint().getLatitude(), event.getEvent_geopoint().getLongitude());
         mMap.addPolyline(new PolylineOptions().add(mUserLatLng, mTargetLatLng).clickable(true));
         Log.d(TAG, "nowGetDirection: done");
         if (mUserLatLng.latitude > mTargetLatLng.latitude) {
@@ -551,15 +562,20 @@ public class PartyVenuesActivity extends FragmentActivity implements
     }
 
 
-    private void setTargetMarker(Venue venue, int itemPosition) {
-
+    private void setTargetMarker(Event event, int itemPosition) {
+        if (mMarker != null) {
+            Log.d(TAG, "onTap: marker not null");
+            mMarker.remove(); // todo : this method is not working maybe because map is getting instantiated twice (onCreate & onResume)
+            mMarker = null;
+            mMap.clear();
+        }
         setUserMarkerWithoutUpdatingCamera();
-        LatLng latLng = new LatLng(venue.getVenue_geopoint().getLatitude(), venue.getVenue_geopoint().getLongitude());
+        LatLng latLng = new LatLng(event.getEvent_geopoint().getLatitude(), event.getEvent_geopoint().getLongitude());
         mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng, 15.0f));
         mMarker = mMap.addMarker(new MarkerOptions()
                 .position(latLng)
-                .title(venue.getVenue_name())
-                .snippet(venue.getVenue_address()));
+                .title(event.getEvent_name())
+                .snippet(event.getVenue_address()));
         mMarker.setTag(itemPosition);
         mMarker.showInfoWindow();
         Log.d(TAG, "setTargetMarker: done");
@@ -613,7 +629,7 @@ public class PartyVenuesActivity extends FragmentActivity implements
 
         if (mKeyList.size() == 0) {
             mProgressBarPB.setVisibility(View.GONE);
-            mNoVenueTV.setVisibility(View.VISIBLE);
+            mNoEventTV.setVisibility(View.VISIBLE);
         }
 
         if (!mLoopStarted) {
@@ -627,30 +643,27 @@ public class PartyVenuesActivity extends FragmentActivity implements
                 }
                 Log.d(TAG, "onGeoQueryReady: loopFinished " + mLoopFinished);
 
-                mDbFirestore.collection("PartiesVenues").document(key).get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
+                mDbFirestore.collection("Sports").document(key).get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
                     @Override
                     public void onSuccess(DocumentSnapshot documentSnapshot) {
 
-                        mVenue = documentSnapshot.toObject(Venue.class);
-                        mVenueList.add(mVenue);
+                        mEvent = documentSnapshot.toObject(Event.class);
+                        mEventList.add(mEvent);
 
-                        Log.d(TAG, "onSuccess: mVenue.getVenue_name() = " + mVenue.getVenue_name());
+                        Log.d(TAG, "onSuccess: mEvent.getEvent_name() = " + mEvent.getEvent_name());
 
                         if (mLoopFinished) {
                             Log.d(TAG, "onSuccess: isTrueNow " + mLoopFinished);
 
-                            Log.d(TAG, "onGeoQueryReady: mVenueList.size() = " + mVenueList.size());
+                            Log.d(TAG, "onGeoQueryReady: mEventList.size() = " + mEventList.size());
 
-                            VenuesAdapter venuesAdapter = new VenuesAdapter(PartyVenuesActivity.this, mVenueList, mUserCurrentLocation, mMap, mProgressBarPB, PartyVenuesActivity.this);
+                            EventsAdapter eventsAdapter = new EventsAdapter(SportsActivityObsolete.this, mEventList, mUserCurrentLocation, mMap, mProgressBarPB);
                             Log.d(TAG, "onSuccess: adapter called");
-                            mVenuesRV.setAdapter(venuesAdapter);
+                            mSportsRV.setAdapter(eventsAdapter);
                             mProgressBarPB.setVisibility(View.GONE);
-                            mVenuesRV.setLayoutManager(new LinearLayoutManager(PartyVenuesActivity.this));
-                            if (mVenuesRV.getAdapter().getItemCount() > 1) {
-                                mNoVenueTV.setVisibility(View.GONE);
-                            }
+                            mSportsRV.setLayoutManager(new LinearLayoutManager(SportsActivityObsolete.this));
 
-                            hideSoftKeyboard(PartyVenuesActivity.this, mRadiusET);
+                            hideSoftKeyboard(SportsActivityObsolete.this, mRadiusET);
 
                         }
 
@@ -668,16 +681,16 @@ public class PartyVenuesActivity extends FragmentActivity implements
     }
 
     @Override
-    public void onTap(Venue venue, int viewId, int tappedItemPosition) {
+    public void onTap(Event event, int viewId, int tappedItemPosition) {
         Log.d(TAG, "onTap: viewId = " + viewId);
         switch (viewId) {
             case R.id.show_on_map_BTN:
-                Log.d(TAG, "onTap: getVenue_name() = " + venue.getVenue_name());
-                setTargetMarker(venue, tappedItemPosition);
+                Log.d(TAG, "onTap: getEvent_name() = " + event.getEvent_name());
+                setTargetMarker(event, tappedItemPosition);
                 break;
             case R.id.get_direction_BTN:
-                Log.d(TAG, "onTap: mMarker.getVenue_id() = " + mMarker.getId());
-                getDirection(venue, mUserCurrentLocation, tappedItemPosition);
+                Log.d(TAG, "onTap: mMarker.getEvent_id() = " + mMarker.getId());
+                getDirection(event, mUserCurrentLocation, tappedItemPosition);
 
         }
     }
@@ -686,14 +699,14 @@ public class PartyVenuesActivity extends FragmentActivity implements
     public void onClick(View view) {
         switch (view.getId()) {
             case R.id.find_BTN:
-                hideSoftKeyboard(PartyVenuesActivity.this, mRadiusET);
+                hideSoftKeyboard(SportsActivityObsolete.this, mRadiusET);
                 mProgressBarPB.setVisibility(View.VISIBLE);
                 mRadius = Integer.parseInt(mRadiusET.getText().toString());
 
                 mLoopStarted = false;
                 i = 0;
                 mLoopFinished = false;
-                displayVenuesNearUserLocation(mRadius);
+                displaySportsNearUserLocation(mRadius);
         }
     }
 
@@ -703,5 +716,67 @@ public class PartyVenuesActivity extends FragmentActivity implements
         inputMethodManager.hideSoftInputFromWindow(view.getWindowToken(), 0);
 
     }
+
+
+    private class PlacesTask extends AsyncTask<String, Void, String> {
+
+        @Override
+        protected String doInBackground(String... placesUrl) {
+
+            StringBuilder placesBuilder = new StringBuilder();
+            for (String placeSearchUrl : placesUrl) {
+                try {
+                    URL requestUrl = new URL(placeSearchUrl);
+                    HttpURLConnection connection = (HttpURLConnection) requestUrl.openConnection();
+                    connection.setRequestMethod("GET");
+                    connection.connect();
+                    int responseCode = connection.getResponseCode();
+
+                    if (responseCode == HttpURLConnection.HTTP_OK) {
+                        BufferedReader bufferedReader = null;
+                        InputStream inputStream = connection.getInputStream();
+                        if (inputStream == null) {
+                            return "";
+                        }
+                        bufferedReader = new BufferedReader(new InputStreamReader(inputStream));
+                        String line;
+                        while ((line = bufferedReader.readLine()) != null) {
+                            placesBuilder.append(line + "\n");
+                        }
+                        if (placesBuilder.length() == 0) {
+                            return "";
+                        }
+                        Log.d(TAG, "doInBackground: placesBuilder = " + placesBuilder.toString());
+                    } else {
+                        Log.i(TAG, "doInBackground: Unsuccessful HTTP Response Code: " + responseCode);
+                    }
+                } catch (MalformedURLException e) {
+
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+            return placesBuilder.toString();
+
+        }
+
+        @Override
+        protected void onPostExecute(String placesResult) {
+            super.onPostExecute(placesResult);
+
+            try {
+                JSONObject placesResultJsonObj = new JSONObject(placesResult);
+                JSONArray placesResultJsonArr = placesResultJsonObj.getJSONArray("results");
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+
+            new PlacesClient().fetchPhoto()
+
+
+
+        }
+    }
+
 
 }

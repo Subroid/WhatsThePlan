@@ -6,7 +6,10 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
+import com.prolificinteractive.materialcalendarview.CalendarDay;
+
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.List;
 
 import platinum.whatstheplan.models.Event;
@@ -224,7 +227,7 @@ public class BookingDbHandler extends SQLiteOpenHelper {
         db.close();
     }
 
-    public List<Event> findEvents(String date) {
+    public List<Event> findEvents(CalendarDay date) {
         List<Event> eventList = new ArrayList<>();
 
         findEventsFromTable (date, TABLE_BOOKINGS_PARTIES, eventList);
@@ -236,7 +239,7 @@ public class BookingDbHandler extends SQLiteOpenHelper {
 
     }
 
-    public List<RestaurantVenue> findRestaurantVenues(String date) {
+    public List<RestaurantVenue> findRestaurantVenues(CalendarDay date) {
         List<RestaurantVenue> restaurantVenueList = new ArrayList<>();
         findRestaurantsFromTable (date, TABLE_BOOKINGS_RESTAURANTS, restaurantVenueList);
 
@@ -245,11 +248,35 @@ public class BookingDbHandler extends SQLiteOpenHelper {
     }
 
 
-
-    private List<RestaurantVenue> findRestaurantsFromTable(String date, String tableName, List<RestaurantVenue> restaurantVenueList) {
+    public List<RestaurantVenue> findAllRestaurantVenues() {
+        List<RestaurantVenue> restaurantVenueList = new ArrayList<>();
         SQLiteDatabase db = this.getReadableDatabase();
+        String query = "SELECT * FROM " + TABLE_BOOKINGS_RESTAURANTS;
+        Cursor cursor = db.rawQuery(query, null);
+
+        while (cursor.moveToNext()) {
+            String restaurantId = cursor.getString(cursor.getColumnIndex(COLUMN_RESTAURANTID));
+            String restaurantName = cursor.getString(cursor.getColumnIndex(COLUMN_RESTAURANTNAME));
+            String restaurantDate = cursor.getString(cursor.getColumnIndex(COLUMN_RESTAURANT_BOOKING_DATE));
+            String restaurantAdderess = cursor.getString(cursor.getColumnIndex(COLUMN_RESTAURANTADDRESS));
+            String restaurantImage = cursor.getString(cursor.getColumnIndex(COLUMN_RESTAURANTIMAGE));
+            RestaurantVenue venue = new RestaurantVenue(restaurantId, restaurantName, restaurantAdderess, null, null, null, restaurantImage, null, restaurantDate, null);
+            restaurantVenueList.add(venue);
+        }
+
+        cursor.close();
+        db.close();
+        return restaurantVenueList;
+
+    }
+
+
+
+    private List<RestaurantVenue> findRestaurantsFromTable(CalendarDay date, String tableName, List<RestaurantVenue> restaurantVenueList) {
+        SQLiteDatabase db = this.getReadableDatabase();
+        String date_ = date.toString();
         String query = "SELECT * FROM " + tableName + " WHERE " + COLUMN_RESTAURANT_BOOKING_DATE + " = ?";
-        Cursor cursor = db.rawQuery(query, new String[]{date});
+        Cursor cursor = db.rawQuery(query, new String[]{date_});
 
         while (cursor.moveToNext()) {
             String restaurantId = cursor.getString(cursor.getColumnIndex(COLUMN_RESTAURANTID));
@@ -268,10 +295,13 @@ public class BookingDbHandler extends SQLiteOpenHelper {
 
     }
 
-    private List<Event> findEventsFromTable(String date, String tableName, List<Event> eventList) {
+
+
+    private List<Event> findEventsFromTable(CalendarDay date, String tableName, List<Event> eventList) {
             SQLiteDatabase db = this.getReadableDatabase();
+            String date_ = date.toString();
             String query = "SELECT * FROM " + tableName + " WHERE " + COLUMN_EVENTDATE + " = ?";
-            Cursor cursor = db.rawQuery(query, new String[]{date});
+            Cursor cursor = db.rawQuery(query, new String[]{date_});
 
             while (cursor.moveToNext()) {
                 String eventId = cursor.getString(cursor.getColumnIndex(COLUMN_EVENTID));

@@ -181,8 +181,6 @@ public class RestaurantVenuesAdapter extends RecyclerView.Adapter<RestaurantVenu
                     mRestaurantVenue = (RestaurantVenue) view.getTag(R.id.TAG_FOR_EVENT);
                     Log.d(TAG, "onClick: venueid : " + mRestaurantVenue.getVenue_id());
                     showDatePickerDialog ();
-//                    showTimePickerDialog ();
-//                    showConfrimationDialog (mVenue);
                     break;
             }
         }
@@ -201,7 +199,7 @@ public class RestaurantVenuesAdapter extends RecyclerView.Adapter<RestaurantVenu
             public void onDateSet(DatePicker datePicker, int i, int i1, int i2) {
                 i1 = i1+1;
 //                mEventDateET.setText(i2 + "/" + i1 + "/" + i);
-                mBookingDate = i2 + "/" + i1 + "/" + i;
+                mBookingDate = i2 + "-" + i1 + "-" + i;
                 mRestaurantVenue.setVenue_date(mBookingDate);
                 showConfrimationDialog (mRestaurantVenue);
             }
@@ -218,8 +216,6 @@ public class RestaurantVenuesAdapter extends RecyclerView.Adapter<RestaurantVenu
                             Intent intent = new Intent(mContext, PaymentActivity.class);
                             intent.putExtra("venue", venue);
                             mContext.startActivity(intent);
-//                            saveVenueBookingLocally (venue);
-//                            saveVenueBookingRemotely (venue);
                         }
                     })
                     .setNegativeButton("No", new DialogInterface.OnClickListener() {
@@ -235,76 +231,6 @@ public class RestaurantVenuesAdapter extends RecyclerView.Adapter<RestaurantVenu
         private void navigateToActivity(Context mContext, Class classname) {
             Intent intent = new Intent(mContext, classname);
             mContext.startActivity(intent);
-        }
-
-
-        private void saveVenueBookingLocally(RestaurantVenue venue) {
-
-            BookingDbHandler bookingDbHandler = new BookingDbHandler(mContext);
-            bookingDbHandler.addRestaurantVenue(venue);
-        }
-
-        private void saveVenueBookingRemotely(final RestaurantVenue venue) {
-            final FirebaseFirestore dbFirestore = FirebaseFirestore.getInstance();
-
-            final CollectionReference dbRefVenueType = dbFirestore.collection("Foods DrinksVenues");
-            Log.d(TAG, "saveVenueBookingRemotely: path : " + dbRefVenueType.getPath());
-            Log.d(TAG, "saveVenueBookingRemotely: venueid : " + venue.getVenue_id());
-            Log.d(TAG, "saveVenueBookingRemotely: adminid : " + venue.getAdmin_id());
-            Log.d(TAG, "saveVenueBookingRemotely: dbRefVenue Path : " + dbRefVenueType.document(venue.getVenue_id()).toString());
-            final DocumentReference dbRefVenue = dbRefVenueType.document(venue.getVenue_id());
-            dbRefVenue.get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
-                @Override
-                public void onSuccess(DocumentSnapshot documentSnapshot) {
-//                    final RestaurantVenue gotVenue =  documentSnapshot.toObject(RestaurantVenue.class);
-//                    final String adminId = gotVenue.getAdmin_id();
-//                    final int gotVenue_venueTickets = gotVenue.getVenue_tickets();
-//                    dbRefVenue.update("venue_tickets", gotVenue_venueTickets-1).addOnSuccessListener(new OnSuccessListener<Void>() {
-//                        @Override
-//                        public void onSuccess(Void aVoid) {
-                            final DocumentReference dbRefAdmin = dbFirestore.collection("Admins")
-                                    .document(venue.getAdmin_id());
-                           /* DocumentReference dbRefVenue = dbRefAdmin.collection("Venues")
-                                    .document(venue.getVenue_id());*/
-//                            dbRefVenue.update("venue_tickets", gotVenue_venueTickets-1).addOnSuccessListener(new OnSuccessListener<Void>() {
-//                                @Override
-//                                public void onSuccess(Void aVoid) {
-                                    CollectionReference dbRefBookingsAdminSide = dbRefAdmin.collection("Bookings");
-                                    CollectionReference dbRefGuests = dbRefBookingsAdminSide.document(venue.getVenue_id()).collection("Guests");
-                                    dbRefGuests.document(FirebaseAuth.getInstance().getCurrentUser().getUid())
-                                            .set(getGuestInstance())
-                                            .addOnSuccessListener(new OnSuccessListener<Void>() {
-                                                @Override
-                                                public void onSuccess(Void aVoid) {
-                                                    CollectionReference dbRefBookingsClientSide = dbFirestore.collection("Users")
-                                                            .document(FirebaseAuth.getInstance().getCurrentUser().getUid())
-                                                            .collection("Bookings");
-                                                    dbRefBookingsClientSide.document(venue.getVenue_id()).set(venue).addOnSuccessListener(new OnSuccessListener<Void>() {
-                                                        @Override
-                                                        public void onSuccess(Void aVoid) {
-                                                            mProgressBar.setVisibility(View.INVISIBLE);
-                                                            FancyToast.makeText(mContext, "Restaurant booked successfully", FancyToast.LENGTH_LONG, FancyToast.SUCCESS, false).show();
-                                                        }
-
-                                                    });
-                                                }
-                                            });
-//                                }
-//                            });
-
-//                        }
-//                    });
-
-
-                }
-
-                private Guest getGuestInstance() {
-                    FirebaseUser currentUser = FirebaseAuth.getInstance().getCurrentUser();
-                    Guest guest =  new Guest(currentUser.getDisplayName(), currentUser.getEmail(), currentUser.getUid());
-                    return guest;
-                }
-
-            });
         }
 
 

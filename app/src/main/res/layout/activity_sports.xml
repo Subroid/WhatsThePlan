@@ -18,13 +18,13 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:fontFamily="cursive"
+            android:fontFamily="@font/nyala"
             android:gravity="center"
-            android:text="Sports within "
+            android:text="Sport Venues around you "
             android:textColor="@color/WhiteFFFFFF"
             android:textSize="@dimen/_20ssp" />
 
-        <EditText
+      <!--  <EditText
             android:id="@+id/radius_ET"
             android:layout_width="@dimen/_50sdp"
             android:layout_height="wrap_content"
@@ -32,9 +32,9 @@
             android:gravity="center"
             android:padding="@dimen/_3sdp"
             android:text="5"
-            android:textSize="@dimen/_14ssp" />
+            android:textSize="@dimen/_14ssp" />-->
 
-        <TextView
+    <!--    <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginLeft="@dimen/_20sdp"
@@ -42,9 +42,9 @@
             android:gravity="center"
             android:text="km"
             android:textColor="@color/WhiteFFFFFF"
-            android:textSize="@dimen/_20ssp" />
+            android:textSize="@dimen/_20ssp" />-->
 
-        <Button
+       <!-- <Button
             android:id="@+id/find_BTN"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -61,7 +61,7 @@
             android:textAllCaps="false"
             android:textColor="@color/WhiteFFFFFF"
             android:textSize="@dimen/_10ssp"
-            android:textStyle="bold" />
+            android:textStyle="bold" />-->
 
     </android.support.v7.widget.Toolbar>
 
@@ -83,15 +83,14 @@
     <android.support.v7.widget.RecyclerView
         android:id="@+id/sports_RV"
         android:layout_width="match_parent"
-        android:layout_height="0dp"
+        android:layout_height="match_parent"
         app:layout_constraintBottom_toTopOf="@id/mapFragment"
         app:layout_constraintEnd_toStartOf="parent"
         app:layout_constraintHeight_default="percent"
-        app:layout_constraintHeight_percent="0.6"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/toolbar"
         app:layout_constraintVertical_bias="0.0"
-        tools:listitem="@layout/layout_event" />
+        tools:listitem="@layout/layout_other_venue" />
 
 
     <TextView
@@ -107,12 +106,13 @@
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_bias="0.4" />
 
+    <!--invisible-->
     <fragment xmlns:map="http://schemas.android.com/apk/res-auto"
         xmlns:tools="http://schemas.android.com/tools"
         android:id="@+id/mapFragment"
         android:name="com.google.android.gms.maps.SupportMapFragment"
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
+        android:layout_width="1dp"
+        android:layout_height="1dp"
         map:layout_constraintBottom_toBottomOf="parent"
         map:layout_constraintEnd_toEndOf="parent"
         map:layout_constraintHeight_default="percent"

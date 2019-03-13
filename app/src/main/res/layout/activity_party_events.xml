@@ -88,7 +88,7 @@
     <android.support.v7.widget.RecyclerView
         android:id="@+id/parties_RV"
         android:layout_width="match_parent"
-        android:layout_height="0dp"
+        android:layout_height="match_parent"
         app:layout_constraintBottom_toTopOf="@id/mapFragment"
         app:layout_constraintEnd_toStartOf="parent"
         app:layout_constraintHeight_default="percent"
@@ -98,12 +98,13 @@
         app:layout_constraintVertical_bias="0.0"
         tools:listitem="@layout/layout_event" />
 
+
     <fragment xmlns:map="http://schemas.android.com/apk/res-auto"
         xmlns:tools="http://schemas.android.com/tools"
         android:id="@+id/mapFragment"
         android:name="com.google.android.gms.maps.SupportMapFragment"
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
+        android:layout_width="1dp"
+        android:layout_height="1dp"
         map:layout_constraintBottom_toBottomOf="parent"
         map:layout_constraintEnd_toEndOf="parent"
         map:layout_constraintHeight_default="percent"

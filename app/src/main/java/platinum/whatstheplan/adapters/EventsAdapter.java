@@ -3,6 +3,7 @@ package platinum.whatstheplan.adapters;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.location.Location;
 import android.net.Uri;
 import android.support.annotation.NonNull;
@@ -35,6 +36,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import platinum.whatstheplan.R;
+import platinum.whatstheplan.activities.PaymentActivity;
 import platinum.whatstheplan.interfaces.EventItemTapListener;
 import platinum.whatstheplan.models.Event;
 import platinum.whatstheplan.models.Guest;
@@ -154,6 +156,8 @@ public class EventsAdapter extends RecyclerView.Adapter<EventsAdapter.EventViewH
                     break;
                 case R.id.booking_BTN:
                     mEvent = (Event) view.getTag(R.id.TAG_FOR_EVENT);
+                    Log.d(TAG, "onClick: event date = " + mEvent.getEvent_date().replaceAll("/", "-"));
+                    mEvent.setEvent_date(mEvent.getEvent_date().replaceAll("/", "-"));
                     showConfrimationDialog (mEvent);
                     break;
             }
@@ -167,8 +171,11 @@ public class EventsAdapter extends RecyclerView.Adapter<EventsAdapter.EventViewH
                         @Override
                         public void onClick(DialogInterface dialogInterface, int i) {
                             mProgressBar.setVisibility(View.VISIBLE);
-                            saveEventBookingLocally (event);
-                            saveEventBookingRemotely (event);
+                            Intent intent = new Intent(mContext, PaymentActivity.class);
+                            intent.putExtra("event", event);
+                            mContext.startActivity(intent);
+//                            saveEventBookingLocally (event);
+//                            saveEventBookingRemotely (event);
                         }
                     })
                     .setNegativeButton("No", new DialogInterface.OnClickListener() {

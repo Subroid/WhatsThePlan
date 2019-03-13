@@ -28,6 +28,7 @@ import com.google.android.gms.wallet.Wallet;
 import com.google.android.gms.wallet.WalletConstants;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
@@ -37,9 +38,12 @@ import com.shashank.sony.fancytoastlib.FancyToast;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Optional;
 
 import platinum.whatstheplan.R;
+import platinum.whatstheplan.models.Event;
 import platinum.whatstheplan.models.Guest;
 import platinum.whatstheplan.models.RestaurantVenue;
 import platinum.whatstheplan.models.Venue;
@@ -50,9 +54,10 @@ public class PaymentActivity extends AppCompatActivity {
 
     private static final String TAG = "PaymentActivityTag";
     private PaymentsClient mPaymentsClient;
-    private Button mGooglePayButton;
+    private Button mBhimPaymentButton;
     private TextView mGooglePayStatusText;
     private RestaurantVenue mVenue;
+    private Event mEvent;
     private static final int LOAD_PAYMENT_DATA_REQUEST_CODE = 991;
     private static final int BHIM_PAYMENT_REQUEST_CODE = 992;
 
@@ -71,9 +76,11 @@ public class PaymentActivity extends AppCompatActivity {
         possiblyShowGooglePayButton();
 
         mVenue = getIntent().getParcelableExtra("venue");
-        mGooglePayButton = findViewById(R.id.google_pay_button);
+        mEvent = getIntent().getParcelableExtra("event");
+        mBhimPaymentButton = findViewById(R.id.google_pay_button);
         mGooglePayStatusText = findViewById(R.id.google_pay_status_TV);
-        mGooglePayButton.setOnClickListener(
+
+        mBhimPaymentButton.setOnClickListener(
                 new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {
@@ -130,7 +137,7 @@ public class PaymentActivity extends AppCompatActivity {
             private void setGooglePayAvailable(boolean available) {
                 if (available) {
                     mGooglePayStatusText.setVisibility(View.GONE);
-                    mGooglePayButton.setVisibility(View.VISIBLE);
+                    mBhimPaymentButton.setVisibility(View.VISIBLE);
                 } else {
                     mGooglePayStatusText.setText(R.string.googlepay_status_unavailable);
                 }
@@ -139,7 +146,7 @@ public class PaymentActivity extends AppCompatActivity {
         // This method is called when the Pay with Google button is clicked.
         public void requestPayment(View view) {
             // Disables the button to prevent multiple clicks.
-            mGooglePayButton.setClickable(false);
+            mBhimPaymentButton.setClickable(false);
 
             // The price provided to the API should include taxes and shipping.
             // This price is not displayed to the user.
@@ -162,6 +169,12 @@ public class PaymentActivity extends AppCompatActivity {
             }
         }
 
+    private void requestPaymentUsingBhim() {
+        Uri uri = Uri.parse("upi://pay?pa=swatisurjuse137@okicici&pn=Whats%20The%20Plan&tn=Payment%20for%20Booking&am=1&cu=INR&url=https://mystar.co"); // missing 'http://' will cause crashed
+        Log.d(TAG, "onClick: uri: "+uri);
+        Intent intent = new Intent(Intent.ACTION_VIEW, uri);
+        startActivityForResult(intent,BHIM_PAYMENT_REQUEST_CODE);
+    }
 
     /**
      * Handle a resolved activity from the Google Pay payment sheet.
@@ -174,12 +187,18 @@ public class PaymentActivity extends AppCompatActivity {
      */
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        Log.d(TAG, "onActivityResult: isResultCodeOK = " + (resultCode == RESULT_OK));
+        Log.d(TAG, "onActivityResult: data.getExtras().toString() = " + data.getExtras().toString());
         switch (requestCode) {
 
             case BHIM_PAYMENT_REQUEST_CODE :
-                if (resultCode == RESULT_OK) {
-                    saveVenueBookingLocally (mVenue);
-                    saveVenueBookingRemotely (mVenue);
+                if (resultCode == RESULT_OK && data.getExtras().toString().equals("Bundle[mParcelledData.dataSize=212]")) {
+//                    saveVenueBookingLocally (mVenue);
+                    if (mVenue != null){
+                        saveVenueBookingRemotely(mVenue);
+                    } else if (mEvent != null) {
+                        saveEventBookingRemotely (mEvent);
+                    }
                 } else {
                     FancyToast.makeText(this, "Payment Failed", FancyToast.LENGTH_LONG, FancyToast.ERROR, false).show();
                 }
@@ -204,10 +223,79 @@ public class PaymentActivity extends AppCompatActivity {
                 }
 
                 // Re-enables the Google Pay payment button.
-                mGooglePayButton.setClickable(true);
+                mBhimPaymentButton.setClickable(true);
                 break;
 
         }
+    }
+
+    private void saveEventBookingRemotely(final Event event) {
+        final FirebaseFirestore dbFirestore = FirebaseFirestore.getInstance();
+
+        final CollectionReference dbRefEventType = dbFirestore.collection("Parties");
+        Log.d(TAG, "saveEventBookingRemotely: path : " + dbRefEventType.getPath());
+        Log.d(TAG, "saveEventBookingRemotely: eventid : " + event.getEvent_id());
+        Log.d(TAG, "saveEventBookingRemotely: adminid : " + event.getAdmin_id());
+        Log.d(TAG, "saveEventBookingRemotely: dbRefEvent Path : " + dbRefEventType.document(event.getEvent_id()).toString());
+        final DocumentReference dbRefEvent = dbRefEventType.document(event.getEvent_id());
+        dbRefEvent.get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
+            @Override
+            public void onSuccess(DocumentSnapshot documentSnapshot) {
+                final DocumentReference dbRefAdmin = dbFirestore.collection("Admins")
+                        .document(event.getAdmin_id());
+                CollectionReference dbRefBookingsAdminSide = dbRefAdmin.collection("Bookings");
+                CollectionReference dbRefGuests = dbRefBookingsAdminSide.document(event.getEvent_id()).collection("Guests");
+                dbRefGuests.document(FirebaseAuth.getInstance().getCurrentUser().getUid())
+                        .set(getGuestInstance())
+                        .addOnSuccessListener(new OnSuccessListener<Void>() {
+                            @Override
+                            public void onSuccess(Void aVoid) {
+                                final CollectionReference dbRefBookingsClientSide = dbFirestore.collection("Users")
+                                        .document(FirebaseAuth.getInstance().getCurrentUser().getUid())
+                                        .collection("Bookings");
+                                dbRefBookingsClientSide.document(event.getEvent_id()).set(event).addOnSuccessListener(new OnSuccessListener<Void>() {
+                                    @Override
+                                    public void onSuccess(Void aVoid) {
+//                                        mProgressBar.setVisibility(View.INVISIBLE);
+                                        final CollectionReference dbRefBookingsByDateClientSide = dbFirestore.collection("Users")
+                                                .document(FirebaseAuth.getInstance().getCurrentUser().getUid())
+                                                .collection("Bookings By Date");
+                                        final Map<String, Object> data = new HashMap<>();
+                                        data.put("bookings", true);
+                                        dbRefBookingsClientSide.document(event.getEvent_date()).set(data).addOnSuccessListener(new OnSuccessListener<Void>() {
+                                            @Override
+                                            public void onSuccess(Void aVoid) {
+                                                dbRefBookingsByDateClientSide.document(event.getEvent_date()).collection("Parties Bookings on " + event.getEvent_date()).document(event.getEvent_id()).set(event).addOnSuccessListener(new OnSuccessListener<Void>() {
+                                                    @Override
+                                                    public void onSuccess(Void aVoid) {
+                                                        FirebaseDatabase.getInstance().getReference("Users").child(FirebaseAuth.getInstance().getUid()).child("Bookings by Date").child(event.getEvent_date()).child("Parties Bookings on " + event.getEvent_date()).child(event.getEvent_id()).setValue(event).addOnSuccessListener(new OnSuccessListener<Void>() {
+                                                            @Override
+                                                            public void onSuccess(Void aVoid) {
+                                                                FancyToast.makeText(PaymentActivity.this, "Event booked successfully", FancyToast.LENGTH_LONG, FancyToast.SUCCESS, false).show();
+                                                            }
+                                                        });
+
+                                                    }
+                                                });
+
+                                            }
+                                        });
+
+                                    }
+
+                                });
+                            }
+                        });
+
+            }
+
+            private Guest getGuestInstance() {
+                FirebaseUser currentUser = FirebaseAuth.getInstance().getCurrentUser();
+                Guest guest =  new Guest(currentUser.getDisplayName(), currentUser.getEmail(), currentUser.getUid());
+                return guest;
+            }
+
+        });
     }
 
     private void saveVenueBookingLocally(RestaurantVenue venue) {
@@ -228,19 +316,8 @@ public class PaymentActivity extends AppCompatActivity {
         dbRefVenue.get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
             @Override
             public void onSuccess(DocumentSnapshot documentSnapshot) {
-//                    final RestaurantVenue gotVenue =  documentSnapshot.toObject(RestaurantVenue.class);
-//                    final String adminId = gotVenue.getAdmin_id();
-//                    final int gotVenue_venueTickets = gotVenue.getVenue_tickets();
-//                    dbRefVenue.update("venue_tickets", gotVenue_venueTickets-1).addOnSuccessListener(new OnSuccessListener<Void>() {
-//                        @Override
-//                        public void onSuccess(Void aVoid) {
                 final DocumentReference dbRefAdmin = dbFirestore.collection("Admins")
                         .document(venue.getAdmin_id());
-                           /* DocumentReference dbRefVenue = dbRefAdmin.collection("Venues")
-                                    .document(venue.getVenue_id());*/
-//                            dbRefVenue.update("venue_tickets", gotVenue_venueTickets-1).addOnSuccessListener(new OnSuccessListener<Void>() {
-//                                @Override
-//                                public void onSuccess(Void aVoid) {
                 CollectionReference dbRefBookingsAdminSide = dbRefAdmin.collection("Bookings");
                 CollectionReference dbRefGuests = dbRefBookingsAdminSide.document(venue.getVenue_id()).collection("Guests");
                 dbRefGuests.document(FirebaseAuth.getInstance().getCurrentUser().getUid())
@@ -248,25 +325,42 @@ public class PaymentActivity extends AppCompatActivity {
                         .addOnSuccessListener(new OnSuccessListener<Void>() {
                             @Override
                             public void onSuccess(Void aVoid) {
-                                CollectionReference dbRefBookingsClientSide = dbFirestore.collection("Users")
+                                final CollectionReference dbRefBookingsClientSide = dbFirestore.collection("Users")
                                         .document(FirebaseAuth.getInstance().getCurrentUser().getUid())
                                         .collection("Bookings");
                                 dbRefBookingsClientSide.document(venue.getVenue_id()).set(venue).addOnSuccessListener(new OnSuccessListener<Void>() {
                                     @Override
                                     public void onSuccess(Void aVoid) {
 //                                        mProgressBar.setVisibility(View.INVISIBLE);
-                                        FancyToast.makeText(PaymentActivity.this, "Restaurant booked successfully", FancyToast.LENGTH_LONG, FancyToast.SUCCESS, false).show();
+                                        final CollectionReference dbRefBookingsByDateClientSide = dbFirestore.collection("Users")
+                                                .document(FirebaseAuth.getInstance().getCurrentUser().getUid())
+                                                .collection("Bookings By Date");
+                                        final Map<String, Object> data = new HashMap<>();
+                                        data.put("bookings", true);
+                                        dbRefBookingsClientSide.document(venue.getVenue_date()).set(data).addOnSuccessListener(new OnSuccessListener<Void>() {
+                                            @Override
+                                            public void onSuccess(Void aVoid) {
+                                                dbRefBookingsByDateClientSide.document(venue.getVenue_date()).collection("Restaurants Bookings on " + venue.getVenue_date()).document(venue.getVenue_id()).set(venue).addOnSuccessListener(new OnSuccessListener<Void>() {
+                                                    @Override
+                                                    public void onSuccess(Void aVoid) {
+                                                        FirebaseDatabase.getInstance().getReference("Users").child(FirebaseAuth.getInstance().getUid()).child("Bookings by Date").child(venue.getVenue_date()).child("Restaurants Bookings on " + venue.getVenue_date()).child(venue.getVenue_id()).setValue(venue).addOnSuccessListener(new OnSuccessListener<Void>() {
+                                                            @Override
+                                                            public void onSuccess(Void aVoid) {
+                                                                FancyToast.makeText(PaymentActivity.this, "Restaurant booked successfully", FancyToast.LENGTH_LONG, FancyToast.SUCCESS, false).show();
+                                                            }
+                                                        });
+
+                                                    }
+                                                });
+
+                                            }
+                                        });
+
                                     }
 
                                 });
                             }
                         });
-//                                }
-//                            });
-
-//                        }
-//                    });
-
 
             }
 
@@ -349,11 +443,6 @@ public class PaymentActivity extends AppCompatActivity {
         Log.w("loadPaymentData failed", String.format("Error code: %d", statusCode));
     }
 
-    private void requestPaymentUsingBhim() {
-        Uri uri = Uri.parse("upi://pay?pa=9732772512@upi&pn=Whats%20The%20Plan&tn=Payment%20for%20Booking&am=1&cu=INR&url=https://mystar.co"); // missing 'http://' will cause crashed
-        Log.d(TAG, "onClick: uri: "+uri);
-        Intent intent = new Intent(Intent.ACTION_VIEW, uri);
-        startActivityForResult(intent,BHIM_PAYMENT_REQUEST_CODE);
-    }
+
 
 }

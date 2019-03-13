@@ -8,6 +8,8 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.res.ColorStateList;
+import android.location.Address;
+import android.location.Geocoder;
 import android.location.Location;
 import android.location.LocationManager;
 import android.provider.Settings;
@@ -38,6 +40,10 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.ittianyu.bottomnavigationviewex.BottomNavigationViewEx;
 
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+
 import platinum.whatstheplan.R;
 import platinum.whatstheplan.utils.BottomNavigationViewHelper;
 
@@ -45,7 +51,7 @@ import static platinum.whatstheplan.utils.Constants.REQUEST_ERROR_DIALOG_CODE_61
 import static platinum.whatstheplan.utils.Constants.REQUEST_LOCATION_PERMISSIONS_CODE_52;
 import static platinum.whatstheplan.utils.Constants.REQUEST_LOCATION_SETTINGS_CODE_51;
 
-public class MapActivity extends AppCompatActivity implements OnMapReadyCallback {
+public class MapActivity extends AppCompatActivity implements OnMapReadyCallback, GoogleMap.OnCameraIdleListener, GoogleMap.OnMapClickListener, GoogleMap.OnMarkerDragListener {
 
     private static final String TAG = "MapActivityTag";
     private BottomNavigationViewEx bottomNavigationViewEx;
@@ -56,7 +62,6 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
     private Location mUserCurrentLocation;
     private Marker mUserMarker;
     private boolean mLocationPermissionGranted = false;
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -195,8 +200,6 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         }
     }
 
-
-
             private void performBottomNavigationViewExActions() {
                 bottomNavigationViewEx.enableAnimation(false);
                 bottomNavigationViewEx.setLabelVisibilityMode(LabelVisibilityMode.LABEL_VISIBILITY_LABELED);
@@ -307,9 +310,11 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng, 15.0f));
         mUserMarker = mMap.addMarker(new MarkerOptions()
                 .position(latLng)
+                .draggable(true)
                 .title("You are here")
-                .snippet("Find Parties around you"));
+                .snippet("Find Location Information around you"));
         mUserMarker.showInfoWindow();
+        mMap.setOnCameraIdleListener(MapActivity.this);
     }
 
     private void addOnMyLocationButtonClickListener() {
@@ -340,4 +345,84 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         });
     }
 
+    @Override
+    public void onMarkerDragStart(Marker marker) {
+        Log.d(TAG, "onMarkerDragStart: called");
+
+    }
+
+    @Override
+    public void onMarkerDrag(Marker marker) {
+        Log.d(TAG, "onMarkerDrag: called");
+        mUserMarker = marker;
+        mUserMarker.setTitle("Loading...");
+        mUserMarker.setSnippet("Address would be updated when dragging completes");
+        mUserMarker.showInfoWindow();
+
+    }
+
+    @Override
+    public void onMarkerDragEnd(Marker marker) {
+        Log.d(TAG, "onMarkerDragEnd: called");
+        mUserMarker = marker;
+        LatLng markerPosition = mUserMarker.getPosition();
+        Geocoder geocoder = new Geocoder(MapActivity.this);
+        List<Address> addressList = new ArrayList<>();
+        try {
+            addressList = geocoder.getFromLocation(markerPosition.latitude, markerPosition.longitude, 1);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        Address address = addressList.get(0);
+        mUserMarker.setTitle(address.getFeatureName());
+        mUserMarker.setSnippet(address.getAddressLine(0) + "\n" + address.getAddressLine(1));
+        mUserMarker.showInfoWindow();
+
+    }
+
+    @Override
+    public void onMapClick(LatLng latLng) {
+        Log.d(TAG, "onMapClick: called");
+        Geocoder geocoder = new Geocoder(MapActivity.this);
+        List<Address> addressList = new ArrayList<>();
+        try {
+            addressList = geocoder.getFromLocation(latLng.latitude, latLng.longitude, 1);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        Address address = addressList.get(0);
+        Marker marker = mMap.addMarker(new MarkerOptions().position(latLng).draggable(true));
+        marker.setTitle(address.getFeatureName());
+        marker.setSnippet(address.getAddressLine(0) + "\n" + address.getAddressLine(1));
+        marker.showInfoWindow();
+
+    }
+
+    @Override
+    public void onCameraIdle() {
+        Log.d(TAG, "onCameraIdle: called");
+      LatLng latLng =  mMap.getCameraPosition().target;
+        Geocoder geocoder = new Geocoder(MapActivity.this);
+        List<Address> addressList = new ArrayList<>();
+        try {
+            addressList = geocoder.getFromLocation(latLng.latitude, latLng.longitude, 1);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        Address address = addressList.get(0);
+        if (mUserMarker != null) {
+            mUserMarker.remove();
+            mUserMarker = mMap.addMarker(new MarkerOptions().position(latLng));
+            mUserMarker.setTitle(address.getFeatureName());
+            mUserMarker.setSnippet(address.getAddressLine(0) + "\n" + address.getAddressLine(1));
+            mUserMarker.showInfoWindow();
+        } else {
+            mUserMarker = mMap.addMarker(new MarkerOptions().position(latLng));
+            mUserMarker.setTitle(address.getFeatureName());
+            mUserMarker.setSnippet(address.getAddressLine(0) + "\n" + address.getAddressLine(1));
+            mUserMarker.showInfoWindow();
+        }
+
+    }
 }
