@@ -85,7 +85,7 @@ import static platinum.whatstheplan.utils.Constants.REQUEST_ERROR_DIALOG_CODE_61
 import static platinum.whatstheplan.utils.Constants.REQUEST_LOCATION_PERMISSIONS_CODE_52;
 import static platinum.whatstheplan.utils.Constants.REQUEST_LOCATION_SETTINGS_CODE_51;
 
-public class FoodsDrinksActivity extends FragmentActivity implements
+public class ArchivedFoodsDrinksActivity extends FragmentActivity implements
         OnMapReadyCallback,
         EventItemTapListener,
         GeoQueryEventListener, View.OnClickListener {
@@ -165,15 +165,15 @@ public class FoodsDrinksActivity extends FragmentActivity implements
         Log.d(TAG, "mMapActions: called");
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.mapFragment);
-        mapFragment.getMapAsync(FoodsDrinksActivity.this);
+        mapFragment.getMapAsync(ArchivedFoodsDrinksActivity.this);
     }
 
     private void mFoodsDrinksRvActions() {
         Log.d(TAG, "mFoodsDrinksRvActions: called");
         mFoodsDrinksRV.setHasFixedSize(true);
         DividerItemDecoration itemDecorator = new DividerItemDecoration
-                (FoodsDrinksActivity.this, DividerItemDecoration.VERTICAL);
-        itemDecorator.setDrawable(ContextCompat.getDrawable(FoodsDrinksActivity.this, R.drawable.divider));
+                (ArchivedFoodsDrinksActivity.this, DividerItemDecoration.VERTICAL);
+        itemDecorator.setDrawable(ContextCompat.getDrawable(ArchivedFoodsDrinksActivity.this, R.drawable.divider));
         mFoodsDrinksRV.addItemDecoration(itemDecorator);
 
     }
@@ -209,7 +209,7 @@ public class FoodsDrinksActivity extends FragmentActivity implements
     public boolean isPlayServicesOK() {
         Log.d(TAG, "isPlayServicesOK: checking google services version");
 
-        int available = GoogleApiAvailability.getInstance().isGooglePlayServicesAvailable(FoodsDrinksActivity.this);
+        int available = GoogleApiAvailability.getInstance().isGooglePlayServicesAvailable(ArchivedFoodsDrinksActivity.this);
 
         if (available == ConnectionResult.SUCCESS) {
             //everything is fine and the user can make map requests
@@ -218,7 +218,7 @@ public class FoodsDrinksActivity extends FragmentActivity implements
         } else if (GoogleApiAvailability.getInstance().isUserResolvableError(available)) {
             //an error occured but we can resolve it
             Log.d(TAG, "isPlayServicesOK: an error occured but we can fix it");
-            Dialog dialog = GoogleApiAvailability.getInstance().getErrorDialog(FoodsDrinksActivity.this, available, REQUEST_ERROR_DIALOG_CODE_61);
+            Dialog dialog = GoogleApiAvailability.getInstance().getErrorDialog(ArchivedFoodsDrinksActivity.this, available, REQUEST_ERROR_DIALOG_CODE_61);
             dialog.show();
         } else {
             Toast.makeText(this, "You can't make map requests", Toast.LENGTH_SHORT).show();
@@ -288,7 +288,7 @@ public class FoodsDrinksActivity extends FragmentActivity implements
             ActivityCompat.requestPermissions(this,
                     new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
                     REQUEST_LOCATION_PERMISSIONS_CODE_52);
-            ActivityCompat.shouldShowRequestPermissionRationale(FoodsDrinksActivity.this,
+            ActivityCompat.shouldShowRequestPermissionRationale(ArchivedFoodsDrinksActivity.this,
                     Manifest.permission.ACCESS_FINE_LOCATION);
 
         }
@@ -323,7 +323,7 @@ public class FoodsDrinksActivity extends FragmentActivity implements
     }
 
     private void initMap() {
-        mMap.setMapStyle(MapStyleOptions.loadRawResourceStyle(FoodsDrinksActivity.this, R.raw.style_json));
+        mMap.setMapStyle(MapStyleOptions.loadRawResourceStyle(ArchivedFoodsDrinksActivity.this, R.raw.style_json));
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             Log.d(TAG, "getUserCurrentLocationAndSaveIntoRemoteDatabase: if called");
             requestLocationPermissions();
@@ -345,7 +345,7 @@ public class FoodsDrinksActivity extends FragmentActivity implements
             mMap.setMyLocationEnabled(true);
             mMap.getUiSettings().setMapToolbarEnabled(false);
             mMap.getUiSettings().setMyLocationButtonEnabled(true);
-            mFusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(FoodsDrinksActivity.this);
+            mFusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(ArchivedFoodsDrinksActivity.this);
 
             Task<Location> taskLastLocation = mFusedLocationProviderClient.getLastLocation();
             taskLastLocation.addOnCompleteListener(new OnCompleteListener<Location>() {
@@ -395,7 +395,7 @@ public class FoodsDrinksActivity extends FragmentActivity implements
             @Override
             public boolean onMyLocationButtonClick() {
                 Log.d(TAG, "onMyLocationButtonClick: called");
-                if (ActivityCompat.checkSelfPermission(FoodsDrinksActivity.this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+                if (ActivityCompat.checkSelfPermission(ArchivedFoodsDrinksActivity.this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
                     requestLocationPermissions();
                     Log.d(TAG, "onMyLocationButtonClick: if");
                     return false;
@@ -426,7 +426,7 @@ public class FoodsDrinksActivity extends FragmentActivity implements
 
     private void requestLocationPermissions() {
         Log.d(TAG, "requestLocationPermissions: called");
-        ActivityCompat.requestPermissions(FoodsDrinksActivity.this, new String[]
+        ActivityCompat.requestPermissions(ArchivedFoodsDrinksActivity.this, new String[]
                         {Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION},
                 REQUEST_LOCATION_PERMISSIONS_CODE_52);
     }
@@ -630,16 +630,16 @@ public class FoodsDrinksActivity extends FragmentActivity implements
 
                             Log.d(TAG, "onGeoQueryReady: mEventList.size() = " + mEventList.size());
 
-                            EventsAdapter eventsAdapter = new EventsAdapter(FoodsDrinksActivity.this, mEventList, mUserCurrentLocation, mMap, mProgressBarPB);
+                            EventsAdapter eventsAdapter = new EventsAdapter(ArchivedFoodsDrinksActivity.this, mEventList, mUserCurrentLocation, mMap, mProgressBarPB);
                             Log.d(TAG, "onSuccess: adapter called");
                             mFoodsDrinksRV.setAdapter(eventsAdapter);
                             mProgressBarPB.setVisibility(View.GONE);
-                            mFoodsDrinksRV.setLayoutManager(new LinearLayoutManager(FoodsDrinksActivity.this));
+                            mFoodsDrinksRV.setLayoutManager(new LinearLayoutManager(ArchivedFoodsDrinksActivity.this));
                             if (mFoodsDrinksRV.getAdapter().getItemCount() > 1) {
                                 mNoEventTV.setVisibility(View.GONE);
                             }
 
-                            hideSoftKeyboard(FoodsDrinksActivity.this, mRadiusET);
+                            hideSoftKeyboard(ArchivedFoodsDrinksActivity.this, mRadiusET);
 
                         }
 
@@ -675,7 +675,7 @@ public class FoodsDrinksActivity extends FragmentActivity implements
     public void onClick(View view) {
         switch (view.getId()) {
             case R.id.find_BTN:
-                hideSoftKeyboard(FoodsDrinksActivity.this, mRadiusET);
+                hideSoftKeyboard(ArchivedFoodsDrinksActivity.this, mRadiusET);
                 mProgressBarPB.setVisibility(View.VISIBLE);
                 mRadius = Integer.parseInt(mRadiusET.getText().toString());
 

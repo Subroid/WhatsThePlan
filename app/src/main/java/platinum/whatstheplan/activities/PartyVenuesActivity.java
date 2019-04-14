@@ -12,6 +12,7 @@ import android.graphics.Canvas;
 import android.graphics.drawable.Drawable;
 import android.location.Location;
 import android.location.LocationManager;
+import android.os.Parcelable;
 import android.provider.Settings;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -28,6 +29,7 @@ import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -66,6 +68,7 @@ import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.GeoPoint;
+import com.shashank.sony.fancytoastlib.FancyToast;
 
 import org.imperiumlabs.geofirestore.GeoFirestore;
 import org.imperiumlabs.geofirestore.GeoQuery;
@@ -77,6 +80,7 @@ import java.util.Map;
 
 import platinum.whatstheplan.R;
 import platinum.whatstheplan.adapters.VenuesAdapter;
+import platinum.whatstheplan.interfaces.PageLoadingListener;
 import platinum.whatstheplan.interfaces.VenueItemTapListener;
 import platinum.whatstheplan.models.Venue;
 import platinum.whatstheplan.models.UserInformation;
@@ -89,7 +93,9 @@ import static platinum.whatstheplan.utils.Constants.REQUEST_LOCATION_SETTINGS_CO
 public class PartyVenuesActivity extends FragmentActivity implements
         OnMapReadyCallback,
         VenueItemTapListener,
-        GeoQueryEventListener, View.OnClickListener  {
+        GeoQueryEventListener,
+        View.OnClickListener,
+        PageLoadingListener {
 
 
     private static final String TAG = "PartyVenuesActivityTag";
@@ -124,6 +130,8 @@ public class PartyVenuesActivity extends FragmentActivity implements
     private List<Venue> mVenueList;
     private List<String> mKeyList;
     private int mRadius;
+    private ImageView mSearchIV;
+    private boolean mPageLoaded;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -141,6 +149,7 @@ public class PartyVenuesActivity extends FragmentActivity implements
         mKeyList = new ArrayList<>();
         mVenueList = new ArrayList<>();
         mNoVenueTV = findViewById(R.id.no_venue_TV);
+        mSearchIV = findViewById(R.id.search_IV);
         mVenuesRV = findViewById(R.id.parties_RV);
         mRadiusET = findViewById(R.id.radius_ET);
         mRadius = Integer.parseInt(mRadiusET.getText().toString());
@@ -162,6 +171,7 @@ public class PartyVenuesActivity extends FragmentActivity implements
 
     private void setClickListeners() {
         mFindBTN.setOnClickListener(this);
+        mSearchIV.setOnClickListener(this);
     }
 
     private void mMapActions() {
@@ -694,6 +704,20 @@ public class PartyVenuesActivity extends FragmentActivity implements
                 i = 0;
                 mLoopFinished = false;
                 displayVenuesNearUserLocation(mRadius);
+                break;
+            case R.id.search_IV:
+                if (mPageLoaded) {
+                    Intent searchIntent = new Intent(this, SearchActivity.class);
+                    searchIntent.putExtra("previous_activity", "Parties");
+                    searchIntent.putParcelableArrayListExtra("party_venues_list", (ArrayList<? extends Parcelable>) mVenueList);
+                    searchIntent.putExtra("user_location", mUserCurrentLocation);
+                    startActivity(searchIntent);
+                    finish();
+                } else  {
+                    FancyToast.makeText(this, "Please, search after page has finished loading", FancyToast.LENGTH_LONG, FancyToast.WARNING, false)
+                            .show();
+                }
+                break;
         }
     }
 
@@ -704,4 +728,8 @@ public class PartyVenuesActivity extends FragmentActivity implements
 
     }
 
+    @Override
+    public void onPageLoad(boolean pageLoaded) {
+        mPageLoaded = true;
+    }
 }

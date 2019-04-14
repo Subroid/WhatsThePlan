@@ -100,6 +100,9 @@ dependencies {
     // places library by android
     implementation 'com.google.android.libraries.places:places:1.0.0'
 
+    // material search bar
+    implementation 'com.github.mancj:MaterialSearchBar:0.8.2'
+
 
     implementation fileTree(dir: 'libs', include: ['*.jar'])
     testImplementation 'junit:junit:4.12'

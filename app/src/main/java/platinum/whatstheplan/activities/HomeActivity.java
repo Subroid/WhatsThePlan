@@ -21,7 +21,6 @@ import com.shashank.sony.fancytoastlib.FancyToast;
 
 import platinum.whatstheplan.R;
 import platinum.whatstheplan.activities.authentications.PhoneAuthActivity;
-import platinum.whatstheplan.activities.authentications.SignInActivity;
 import platinum.whatstheplan.utils.BottomNavigationViewHelper;
 
 public class HomeActivity extends AppCompatActivity {

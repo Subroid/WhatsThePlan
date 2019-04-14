@@ -12,15 +12,18 @@ import android.location.Address;
 import android.location.Geocoder;
 import android.location.Location;
 import android.location.LocationManager;
+import android.net.Uri;
 import android.provider.Settings;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.bottomnavigation.LabelVisibilityMode;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.View;
 import android.widget.Toast;
 
 import com.google.android.gms.common.ConnectionResult;
@@ -39,6 +42,7 @@ import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.ittianyu.bottomnavigationviewex.BottomNavigationViewEx;
+import com.shashank.sony.fancytoastlib.FancyToast;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -51,7 +55,7 @@ import static platinum.whatstheplan.utils.Constants.REQUEST_ERROR_DIALOG_CODE_61
 import static platinum.whatstheplan.utils.Constants.REQUEST_LOCATION_PERMISSIONS_CODE_52;
 import static platinum.whatstheplan.utils.Constants.REQUEST_LOCATION_SETTINGS_CODE_51;
 
-public class MapActivity extends AppCompatActivity implements OnMapReadyCallback, GoogleMap.OnCameraIdleListener, GoogleMap.OnMapClickListener, GoogleMap.OnMarkerDragListener {
+public class MapActivity extends AppCompatActivity implements View.OnClickListener, OnMapReadyCallback, GoogleMap.OnCameraIdleListener, GoogleMap.OnMapClickListener, GoogleMap.OnMarkerDragListener {
 
     private static final String TAG = "MapActivityTag";
     private BottomNavigationViewEx bottomNavigationViewEx;
@@ -62,6 +66,9 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
     private Location mUserCurrentLocation;
     private Marker mUserMarker;
     private boolean mLocationPermissionGranted = false;
+    private FloatingActionButton mDirectionsFAB;
+    private String mTargetDirectionLatStr = "";
+    private String mTargetDirectionLngStr = "";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -110,6 +117,7 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         private void initViewsAndVariables() {
             mContext = MapActivity.this;
             bottomNavigationViewEx = findViewById(R.id.ha_BottomNavigationView);
+            mDirectionsFAB = findViewById(R.id.directions_FAB);
             mFusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(MapActivity.this);
 
         }
@@ -117,6 +125,7 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         private void performActions() {
             performBottomNavigationViewExActions ();
             mMapActions ();
+            mDirectionsFAB.setOnClickListener(this);
 
     }
 
@@ -417,12 +426,33 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
             mUserMarker.setTitle(address.getFeatureName());
             mUserMarker.setSnippet(address.getAddressLine(0) + "\n" + address.getAddressLine(1));
             mUserMarker.showInfoWindow();
+            mTargetDirectionLatStr = Double.toString(address.getLatitude());
+            mTargetDirectionLngStr = Double.toString(address.getLongitude());
         } else {
             mUserMarker = mMap.addMarker(new MarkerOptions().position(latLng));
             mUserMarker.setTitle(address.getFeatureName());
             mUserMarker.setSnippet(address.getAddressLine(0) + "\n" + address.getAddressLine(1));
             mUserMarker.showInfoWindow();
+            mTargetDirectionLatStr = Double.toString(address.getLatitude());
+            mTargetDirectionLngStr = Double.toString(address.getLongitude());
         }
 
+    }
+
+    @Override
+    public void onClick(View view) {
+        switch (view.getId()) {
+            case R.id.directions_FAB :
+                if (mTargetDirectionLatStr.isEmpty()) {
+                    FancyToast.makeText(this, "Please drag the map to different location than your current location", FancyToast.LENGTH_LONG, FancyToast.WARNING, false)
+                            .show();
+                } else {
+                    Intent directionIntent = new Intent(android.content.Intent.ACTION_VIEW,
+//                            Uri.parse("http://maps.google.com/maps?saddr=20.344,34.34&daddr=20.5666,45.345"));
+                            Uri.parse("http://maps.google.com/maps?daddr=" + mTargetDirectionLatStr + "," + mTargetDirectionLngStr));
+                    startActivity(directionIntent);
+                }
+                break;
+        }
     }
 }

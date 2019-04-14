@@ -18,25 +18,29 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:fontFamily="cursive"
+            android:fontFamily="@font/nyala"
             android:gravity="center"
-            android:text="OpenEvents within "
+            android:text="Open Event Venues"
             android:textColor="@color/WhiteFFFFFF"
             android:textSize="@dimen/_20ssp" />
 
+        <!--invisible-->
         <EditText
             android:id="@+id/radius_ET"
             android:layout_width="@dimen/_50sdp"
             android:layout_height="wrap_content"
+            android:visibility="invisible"
             android:background="@color/WhiteFFFFFF"
             android:gravity="center"
             android:padding="@dimen/_3sdp"
-            android:text="5"
+            android:text="2000"
             android:textSize="@dimen/_14ssp" />
 
+        <!--invisible-->
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:visibility="invisible"
             android:layout_marginLeft="@dimen/_20sdp"
             android:fontFamily="cursive"
             android:gravity="center"
@@ -44,10 +48,12 @@
             android:textColor="@color/WhiteFFFFFF"
             android:textSize="@dimen/_20ssp" />
 
+        <!--invisible-->
         <Button
             android:id="@+id/find_BTN"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:visibility="invisible"
             android:layout_marginLeft="@dimen/_10sdp"
             android:background="@drawable/round_shpae_persianpink"
             android:elevation="@dimen/_3sdp"
@@ -85,34 +91,33 @@
         android:id="@+id/no_event_TV"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="No event has been booked on the selected date"
+        android:text="No Venue Found"
         android:visibility="invisible"
-        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintBottom_toTopOf="@+id/mapFragment"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/calendar_CV"
-        app:layout_constraintVertical_bias="0.5" />
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.55" />
 
     <android.support.v7.widget.RecyclerView
         android:id="@+id/openevents_RV"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        app:layout_constraintBottom_toTopOf="@id/mapFragment"
+        app:layout_constraintBottom_toTopOf="parent"
         app:layout_constraintEnd_toStartOf="parent"
         app:layout_constraintHeight_default="percent"
-        app:layout_constraintHeight_percent="0.6"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/toolbar"
         app:layout_constraintVertical_bias="0.0"
-        tools:listitem="@layout/layout_event" />
+        tools:listitem="@layout/layout_venue" />
 
     <fragment xmlns:map="http://schemas.android.com/apk/res-auto"
         xmlns:tools="http://schemas.android.com/tools"
         android:id="@+id/mapFragment"
         android:name="com.google.android.gms.maps.SupportMapFragment"
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
+        android:layout_width="1dp"
+        android:layout_height="1dp"
         map:layout_constraintBottom_toBottomOf="parent"
         map:layout_constraintEnd_toEndOf="parent"
         map:layout_constraintHeight_default="percent"

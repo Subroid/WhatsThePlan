@@ -70,7 +70,7 @@ public class EventsVenuesSelecterActivity extends AppCompatActivity implements V
                     break;
                 case 2 :
                     mVenuesClassName = FoodsDrinksVenuesActivity.class;
-                    mEventsClassName = FoodsDrinksActivity.class;
+                    mEventsClassName = ArchivedFoodsDrinksActivity.class;
                     break;
             }
         }

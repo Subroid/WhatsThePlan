@@ -11,6 +11,7 @@ import android.telecom.CallAudioState;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -58,6 +59,7 @@ public class PaymentActivity extends AppCompatActivity {
     private TextView mGooglePayStatusText;
     private RestaurantVenue mVenue;
     private Event mEvent;
+    private EditText mPaymentET;
     private static final int LOAD_PAYMENT_DATA_REQUEST_CODE = 991;
     private static final int BHIM_PAYMENT_REQUEST_CODE = 992;
 
@@ -79,12 +81,24 @@ public class PaymentActivity extends AppCompatActivity {
         mEvent = getIntent().getParcelableExtra("event");
         mBhimPaymentButton = findViewById(R.id.google_pay_button);
         mGooglePayStatusText = findViewById(R.id.google_pay_status_TV);
+        mPaymentET = findViewById(R.id.payment_ET);
+
 
         mBhimPaymentButton.setOnClickListener(
                 new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {
-                        requestPaymentUsingBhim();
+                        String payableAmount = mPaymentET.getText().toString();
+                        if (payableAmount.isEmpty()) {
+                            FancyToast.makeText(getApplicationContext(),
+                                    "Amount cannot be blank",
+                                    FancyToast.LENGTH_LONG,
+                                    FancyToast.ERROR,
+                                    false)
+                                    .show();
+                        } else {
+                            requestPaymentUsingBhim(payableAmount);
+                        }
 //                        requestPayment(view);
                     }
                 }
@@ -169,8 +183,8 @@ public class PaymentActivity extends AppCompatActivity {
             }
         }
 
-    private void requestPaymentUsingBhim() {
-        Uri uri = Uri.parse("upi://pay?pa=swatisurjuse137@okicici&pn=Whats%20The%20Plan&tn=Payment%20for%20Booking&am=1&cu=INR&url=https://mystar.co"); // missing 'http://' will cause crashed
+    private void requestPaymentUsingBhim(String amount) {
+        Uri uri = Uri.parse("upi://pay?pa=swatisurjuse137@okicici&pn=Whats%20The%20Plan&tn=Payment%20for%20Booking&am=" + amount + "&cu=INR&url=https://mystar.co"); // missing 'http://' will cause crashed
         Log.d(TAG, "onClick: uri: "+uri);
         Intent intent = new Intent(Intent.ACTION_VIEW, uri);
         startActivityForResult(intent,BHIM_PAYMENT_REQUEST_CODE);

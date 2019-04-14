@@ -19,6 +19,7 @@ import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.UserProfileChangeRequest;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.shashank.sony.fancytoastlib.FancyToast;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -58,15 +59,23 @@ public class NameSubmitActivity extends AppCompatActivity implements View.OnClic
         public void onClick(View view) {
             switch (view.getId()) {
                 case R.id.submitBTN :
-                    progressBar.setVisibility(View.VISIBLE);
-                        mFirstNameString = firstnameTIET.getText().toString();
-                        mLastNameString = lastnameTIET.getText().toString();
+                    mFirstNameString = firstnameTIET.getText().toString();
+                    mLastNameString = lastnameTIET.getText().toString();
+                    if (mFirstNameString.isEmpty() || mLastNameString.isEmpty()) {
+                        FancyToast.makeText(getApplicationContext(),
+                                "Please type First/Last name",
+                                FancyToast.LENGTH_LONG,
+                                FancyToast.ERROR,
+                                false)
+                                .show();
+                    } else {
+                        progressBar.setVisibility(View.VISIBLE);
                         FirebaseUser current_user = FirebaseAuth.getInstance().getCurrentUser();
                         UserProfileChangeRequest userProfileChangeRequest = new UserProfileChangeRequest.Builder()
                                 .setDisplayName(mFirstNameString + " "  + mLastNameString)
                                 .build();
-                    current_user.updateProfile(userProfileChangeRequest);
-                    Log.d(TAG, "onClick: current_user.getUid() = " + current_user.getUid());
+                        current_user.updateProfile(userProfileChangeRequest);
+                        Log.d(TAG, "onClick: current_user.getUid() = " + current_user.getUid());
 
                     /*FirebaseFirestore.getInstance().collection("Users")
                             .document(current_user.getUid()).get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
@@ -90,19 +99,27 @@ public class NameSubmitActivity extends AppCompatActivity implements View.OnClic
                         }
                     });*/
 
-                    FirebaseFirestore.getInstance().collection("Users")
-                            .document(current_user.getUid()).update(
-                            "userProfile.name",
-                            mFirstNameString + " " + mLastNameString).addOnSuccessListener(new OnSuccessListener<Void>() {
-                        @Override
-                        public void onSuccess(Void aVoid) {
-                            progressBar.setVisibility(View.INVISIBLE);
+                        FirebaseFirestore.getInstance().collection("Users")
+                                .document(current_user.getUid()).update(
+                                "userProfile.name",
+                                mFirstNameString + " " + mLastNameString).addOnSuccessListener(new OnSuccessListener<Void>() {
+                            @Override
+                            public void onSuccess(Void aVoid) {
+                                progressBar.setVisibility(View.INVISIBLE);
                                 Intent homeIntent = new Intent(NameSubmitActivity.this, HomeActivity.class);
-                            startActivity(homeIntent);
-                            finish();
-                        }
-                    });
+                                startActivity(homeIntent);
+                                finish();
+                            }
+                        });
+                    }
                     break;
             }
         }
+
+
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        finish();
+    }
 }

@@ -76,10 +76,15 @@ import java.util.Map;
 
 import platinum.whatstheplan.R;
 import platinum.whatstheplan.adapters.EventsAdapter;
+import platinum.whatstheplan.adapters.OtherVenuesAdapter;
+import platinum.whatstheplan.adapters.VenuesAdapter;
 import platinum.whatstheplan.interfaces.EventItemTapListener;
+import platinum.whatstheplan.interfaces.PageLoadingListener;
 import platinum.whatstheplan.models.Event;
+import platinum.whatstheplan.models.OtherVenue;
 import platinum.whatstheplan.models.UserInformation;
 import platinum.whatstheplan.models.UserLocation;
+import platinum.whatstheplan.models.Venue;
 
 import static platinum.whatstheplan.utils.Constants.REQUEST_ERROR_DIALOG_CODE_61;
 import static platinum.whatstheplan.utils.Constants.REQUEST_LOCATION_PERMISSIONS_CODE_52;
@@ -88,7 +93,8 @@ import static platinum.whatstheplan.utils.Constants.REQUEST_LOCATION_SETTINGS_CO
 public class OpenEventsActivity extends FragmentActivity implements
         OnMapReadyCallback,
         EventItemTapListener,
-        GeoQueryEventListener, View.OnClickListener {
+        GeoQueryEventListener, View.OnClickListener,
+        PageLoadingListener {
 
     private static final String TAG = "OpenEventsActivityTag";
 
@@ -120,6 +126,8 @@ public class OpenEventsActivity extends FragmentActivity implements
     private GeoLocation mGeoLocation;
     private Event mEvent;
     private List<Event> mEventList;
+    private Venue mVenue;
+    private List<Venue> mVenueList;
     private List<String> mKeyList;
     private int mRadius;
 
@@ -137,6 +145,7 @@ public class OpenEventsActivity extends FragmentActivity implements
         Log.d(TAG, "initViewsAndVariables: called");
         mKeyList = new ArrayList<>();
         mEventList = new ArrayList<>();
+        mVenueList = new ArrayList<>();
         mNoEventTV = findViewById(R.id.no_event_TV);
         mOpenEventsRV = findViewById(R.id.openevents_RV);
         mRadiusET = findViewById(R.id.radius_ET);
@@ -477,7 +486,7 @@ public class OpenEventsActivity extends FragmentActivity implements
         mGeoLocation = new GeoLocation(mUserCurrentLocation.getLatitude(), mUserCurrentLocation.getLongitude());
         Log.d(TAG, "displayOpenEventsInTheRangeOf5km: mUserCurrentLocation.getLatitude = " + mUserCurrentLocation.getLatitude());
         Log.d(TAG, "displayOpenEventsInTheRangeOf5km: mUserCurrentLocation.getLongitude = " + mUserCurrentLocation.getLongitude());
-        DatabaseReference mDbOpenEventsFirebase = mDbFirebase.getReference("OpenEventsLocations");
+        DatabaseReference mDbOpenEventsFirebase = mDbFirebase.getReference("Open EventsVenues");
         mGeoFirebase = new GeoFire(mDbOpenEventsFirebase);
         mGeoFireQuery = mGeoFirebase.queryAtLocation(mGeoLocation, radius);
         mGeoFireQuery.removeAllListeners();
@@ -614,23 +623,26 @@ public class OpenEventsActivity extends FragmentActivity implements
                 }
                 Log.d(TAG, "onGeoQueryReady: loopFinished " + mLoopFinished);
 
-                mDbFirestore.collection("OpenEvents").document(key).get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
+                mDbFirestore.collection("Open EventsVenues").document(key).get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
                     @Override
                     public void onSuccess(DocumentSnapshot documentSnapshot) {
 
-                        mEvent = documentSnapshot.toObject(Event.class);
-                        mEventList.add(mEvent);
+                       /* mEvent = documentSnapshot.toObject(Event.class);
+                        mEventList.add(mEvent);*/
+                       mVenue = documentSnapshot.toObject(Venue.class);
+                       mVenueList.add(mVenue);
 
-                        Log.d(TAG, "onSuccess: mEvent.getEvent_name() = " + mEvent.getEvent_name());
+//                        Log.d(TAG, "onSuccess: mEvent.getEvent_name() = " + mEvent.getEvent_name());
 
                         if (mLoopFinished) {
                             Log.d(TAG, "onSuccess: isTrueNow " + mLoopFinished);
 
-                            Log.d(TAG, "onGeoQueryReady: mEventList.size() = " + mEventList.size());
+//                            Log.d(TAG, "onGeoQueryReady: mEventList.size() = " + mEventList.size());
 
-                            EventsAdapter eventsAdapter = new EventsAdapter(OpenEventsActivity.this, mEventList, mUserCurrentLocation, mMap, mProgressBarPB);
+//                            EventsAdapter eventsAdapter = new EventsAdapter(OpenEventsActivity.this, mEventList, mUserCurrentLocation, mMap, mProgressBarPB);
+                            VenuesAdapter venuesAdapter = new VenuesAdapter(OpenEventsActivity.this, mVenueList,mUserCurrentLocation, mMap, mProgressBarPB, OpenEventsActivity.this);
                             Log.d(TAG, "onSuccess: adapter called");
-                            mOpenEventsRV.setAdapter(eventsAdapter);
+                            mOpenEventsRV.setAdapter(venuesAdapter);
                             mProgressBarPB.setVisibility(View.GONE);
                             mOpenEventsRV.setLayoutManager(new LinearLayoutManager(OpenEventsActivity.this));
 
@@ -688,4 +700,8 @@ public class OpenEventsActivity extends FragmentActivity implements
 
     }
 
+    @Override
+    public void onPageLoad(boolean pageLoaded) {
+        // does nothing
+    }
 }

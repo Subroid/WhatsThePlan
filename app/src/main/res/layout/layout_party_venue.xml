@@ -191,13 +191,11 @@
         app:layout_constraintVertical_bias="0.98"
         android:visibility="gone"/>
 
-    <!--invisible-->
     <Button
         android:id="@+id/show_events_BTN"
         android:layout_width="wrap_content"
         android:layout_height="20dp"
         android:background="@drawable/round_shpae_blue10e7dc"
-        android:visibility="invisible"
         android:elevation="@dimen/_3sdp"
         android:fontFamily="sans-serif-condensed"
         android:minWidth="0dp"

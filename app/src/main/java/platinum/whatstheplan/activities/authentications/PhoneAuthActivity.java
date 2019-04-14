@@ -77,6 +77,4 @@ public class PhoneAuthActivity extends AppCompatActivity implements View.OnClick
         finish();
     }
 
-
-
 }

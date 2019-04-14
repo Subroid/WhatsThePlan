@@ -15,10 +15,10 @@ import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.FirebaseFirestore;
 
 import platinum.whatstheplan.R;
-import platinum.whatstheplan.adapters.FoodsAdapter;
+import platinum.whatstheplan.adapters.ArchivedFoodsAdapter;
 import platinum.whatstheplan.models.FoodItem;
 
-public class FoodListActivity extends AppCompatActivity {
+public class ArchivedFoodListActivity extends AppCompatActivity {
 
     private static final String TAG = "FoodListActivityTag";
 
@@ -47,8 +47,8 @@ public class FoodListActivity extends AppCompatActivity {
     private void mFoodsRVActions() {
         mFoodsRV.setHasFixedSize(true);
         DividerItemDecoration itemDecorator = new DividerItemDecoration
-                (FoodListActivity.this, DividerItemDecoration.VERTICAL);
-        itemDecorator.setDrawable(ContextCompat.getDrawable(FoodListActivity.this, R.drawable.divider));
+                (ArchivedFoodListActivity.this, DividerItemDecoration.VERTICAL);
+        itemDecorator.setDrawable(ContextCompat.getDrawable(ArchivedFoodListActivity.this, R.drawable.divider));
         mFoodsRV.addItemDecoration(itemDecorator);
 
     }
@@ -63,10 +63,10 @@ public class FoodListActivity extends AppCompatActivity {
                         .setQuery(mDbFoodsRef, FoodItem.class)
                         .build();
 
-        FoodsAdapter adapter = new FoodsAdapter(frOptions, FoodListActivity.this);
+        ArchivedFoodsAdapter adapter = new ArchivedFoodsAdapter(frOptions, ArchivedFoodListActivity.this);
         mFoodsRV.setAdapter(adapter);
         adapter.startListening();
-        mFoodsRV.setLayoutManager(new LinearLayoutManager(FoodListActivity.this));
+        mFoodsRV.setLayoutManager(new LinearLayoutManager(ArchivedFoodListActivity.this));
 ;
     }
 

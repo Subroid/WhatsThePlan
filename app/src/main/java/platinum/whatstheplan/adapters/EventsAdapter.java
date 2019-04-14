@@ -37,6 +37,7 @@ import java.util.List;
 
 import platinum.whatstheplan.R;
 import platinum.whatstheplan.activities.PaymentActivity;
+import platinum.whatstheplan.activities.authentications.PhoneAuthActivity;
 import platinum.whatstheplan.interfaces.EventItemTapListener;
 import platinum.whatstheplan.models.Event;
 import platinum.whatstheplan.models.Guest;
@@ -51,6 +52,7 @@ public class EventsAdapter extends RecyclerView.Adapter<EventsAdapter.EventViewH
     private Location mUserCurrentLocation;
     private GoogleMap mMap;
     private ProgressBar mProgressBar;
+    private com.google.firebase.auth.FirebaseUser mCurrentUser;
 
     float[] distanceResults = new float[2];
 
@@ -155,11 +157,20 @@ public class EventsAdapter extends RecyclerView.Adapter<EventsAdapter.EventViewH
                     setTapListener(view);
                     break;
                 case R.id.booking_BTN:
+//                    getCurrentUser();
                     mEvent = (Event) view.getTag(R.id.TAG_FOR_EVENT);
                     Log.d(TAG, "onClick: event date = " + mEvent.getEvent_date().replaceAll("/", "-"));
                     mEvent.setEvent_date(mEvent.getEvent_date().replaceAll("/", "-"));
                     showConfrimationDialog (mEvent);
                     break;
+            }
+        }
+
+        private void getCurrentUser() {
+            mCurrentUser = com.google.firebase.auth.FirebaseAuth.getInstance().getCurrentUser();
+            if (mCurrentUser == null) {
+                android.content.Intent signInIntent = new android.content.Intent(mContext, PhoneAuthActivity.class);
+                mContext.startActivity(signInIntent);
             }
         }
 

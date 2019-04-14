@@ -1,14 +1,17 @@
 package platinum.whatstheplan.models;
 
+import android.graphics.Bitmap;
+
 public class OtherVenue {
 
     private String venue_name;
     private String venue_address;
-    private String venue_image;
+    private Bitmap venue_image;
 
-    public OtherVenue(String venue_name, String venue_address) {
+    public OtherVenue(String venue_name, String venue_address, Bitmap venue_image) {
         this.venue_name = venue_name;
         this.venue_address = venue_address;
+        this.venue_image = venue_image;
     }
 
     public OtherVenue() {
@@ -30,11 +33,11 @@ public class OtherVenue {
         this.venue_address = venue_address;
     }
 
-    public String getVenue_image() {
+    public Bitmap getVenue_image() {
         return venue_image;
     }
 
-    public void setVenue_image(String venue_image) {
+    public void setVenue_image(Bitmap venue_image) {
         this.venue_image = venue_image;
     }
 }

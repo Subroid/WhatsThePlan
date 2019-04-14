@@ -24,7 +24,8 @@
             android:textColor="@color/WhiteFFFFFF"
             android:textSize="@dimen/_20ssp" />
 
-<!--visibility gone-->
+
+        <!--visibility gone-->
         <EditText
             android:id="@+id/radius_ET"
             android:layout_width="@dimen/_50sdp"
@@ -34,9 +35,9 @@
             android:padding="@dimen/_3sdp"
             android:text="2000"
             android:textSize="@dimen/_14ssp"
-            android:visibility="gone"/>
+            android:visibility="gone" />
 
-<!--visibility gone-->
+        <!--visibility gone-->
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -46,9 +47,9 @@
             android:text="km"
             android:textColor="@color/WhiteFFFFFF"
             android:textSize="@dimen/_20ssp"
-            android:visibility="gone"/>
+            android:visibility="gone" />
 
-<!--visibility gone-->
+        <!--visibility gone-->
         <Button
             android:id="@+id/find_BTN"
             android:layout_width="wrap_content"
@@ -67,7 +68,15 @@
             android:textColor="@color/WhiteFFFFFF"
             android:textSize="@dimen/_10ssp"
             android:textStyle="bold"
-            android:visibility="gone"/>
+            android:visibility="gone" />
+
+        <ImageView
+            android:id="@+id/search_IV"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:elevation="@dimen/_2sdp"
+            android:layout_marginStart="@dimen/_50sdp"
+            android:background="@drawable/ic_search_white_24dp" />
 
     </android.support.v7.widget.Toolbar>
 
@@ -79,6 +88,18 @@
         android:elevation="@dimen/_5sdp"
         android:indeterminateTint="@color/WhiteFFFFFF"
         android:indeterminateTintMode="src_in"
+        app:layout_constraintBottom_toTopOf="@+id/mapFragment"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.55" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:elevation="@dimen/_5sdp"
+        android:text="Loading.."
         app:layout_constraintBottom_toTopOf="@+id/mapFragment"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.5"
@@ -114,7 +135,7 @@
         map:layout_constraintStart_toStartOf="parent"
         map:layout_constraintTop_toBottomOf="@id/parties_RV"
         map:layout_constraintVertical_bias="1.0"
-        tools:context=".activities.PartyEventsActivity"/>
+        tools:context=".activities.PartyEventsActivity" />
 
 
     <TextView
@@ -130,5 +151,22 @@
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_bias="0.4" />
 
+
 </android.support.constraint.ConstraintLayout>
 
+
+
+
+<!--
+<ImageView
+android:id="@+id/search_IV"
+android:layout_width="wrap_content"
+android:layout_height="wrap_content"
+android:elevation="@dimen/_2sdp"
+app:layout_constraintBottom_toBottomOf="parent"
+app:layout_constraintEnd_toEndOf="parent"
+app:layout_constraintHorizontal_bias="0.98"
+app:layout_constraintStart_toStartOf="parent"
+app:layout_constraintTop_toTopOf="parent"
+app:layout_constraintVertical_bias="0.02"
+app:srcCompat="@drawable/ic_search_white_24dp" />-->

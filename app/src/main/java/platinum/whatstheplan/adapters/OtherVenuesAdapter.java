@@ -43,11 +43,9 @@ public class OtherVenuesAdapter extends RecyclerView.Adapter<OtherVenuesAdapter.
     public OtherVenuesAdapter() {
     }
 
-    public OtherVenuesAdapter(Context context, List<OtherVenue> venueList, Location userCurrentLocation, GoogleMap map, ProgressBar progressBar) {
+    public OtherVenuesAdapter(Context context, List<OtherVenue> venueList,ProgressBar progressBar) {
         mContext = context;
         mVenueList = venueList;
-        mUserCurrentLocation = userCurrentLocation;
-        mMap = map;
         mProgressBar = progressBar;
     }
 
@@ -72,8 +70,8 @@ public class OtherVenuesAdapter extends RecyclerView.Adapter<OtherVenuesAdapter.
         venueViewHolder.venue_name_TV.setText("Venue : " + mVenue.getVenue_name());
         venueViewHolder.venue_address_TV.setText("Address : " + mVenue.getVenue_address());
 
-        Glide.with(mContext).load(Uri.parse(mVenue.getVenue_image())).apply(new RequestOptions().fitCenter()).into(venueViewHolder.venue_image_IV);
-        Glide.with(mContext).load(Uri.parse(mVenue.getVenue_image())).apply(new RequestOptions().fitCenter()).into(venueViewHolder.venue_layout_bg_IV);
+        Glide.with(mContext).load(mVenue.getVenue_image()).apply(new RequestOptions().fitCenter()).into(venueViewHolder.venue_image_IV);
+        Glide.with(mContext).load(mVenue.getVenue_image()).apply(new RequestOptions().fitCenter()).into(venueViewHolder.venue_layout_bg_IV);
         mProgressBar.setVisibility(View.GONE);
     }
 

@@ -39,8 +39,12 @@ import java.util.Calendar;
 import java.util.List;
 
 import platinum.whatstheplan.R;
+import platinum.whatstheplan.activities.HomeActivity;
 import platinum.whatstheplan.activities.PartyEventsActivity;
 import platinum.whatstheplan.activities.PaymentActivity;
+import platinum.whatstheplan.activities.SearchActivity;
+import platinum.whatstheplan.activities.authentications.PhoneAuthActivity;
+import platinum.whatstheplan.interfaces.PageLoadingListener;
 import platinum.whatstheplan.interfaces.RestaurantVenueItemTapListener;
 import platinum.whatstheplan.models.Guest;
 import platinum.whatstheplan.models.RestaurantVenue;
@@ -56,6 +60,7 @@ public class RestaurantVenuesAdapter extends RecyclerView.Adapter<RestaurantVenu
     private Location mUserCurrentLocation;
     private GoogleMap mMap;
     private ProgressBar mProgressBar;
+    private com.google.firebase.auth.FirebaseUser mCurrentUser;
 
     float[] distanceResults = new float[2];
 
@@ -87,6 +92,7 @@ public class RestaurantVenuesAdapter extends RecyclerView.Adapter<RestaurantVenu
 
         venueViewHolder.venue_name_TV.setText(mVenue.getVenue_name());
         Log.d(TAG, "onBindViewHolder: venue name " + mVenue.getVenue_name());
+
         float distance = getDistancBetweenTwoPoints(
                 mUserCurrentLocation.getLatitude(),
                 mUserCurrentLocation.getLongitude(),
@@ -106,13 +112,21 @@ public class RestaurantVenuesAdapter extends RecyclerView.Adapter<RestaurantVenu
         Glide.with(mContext).load(Uri.parse(mVenue.getVenue_image())).apply(new RequestOptions().fitCenter()).into(venueViewHolder.venue_image_IV);
         Glide.with(mContext).load(Uri.parse(mVenue.getVenue_image())).apply(new RequestOptions().fitCenter()).into(venueViewHolder.venue_layout_bg_IV);
         LatLng venueLatLng = new LatLng(mVenue.getVenue_geopoint().getLatitude(), mVenue.getVenue_geopoint().getLongitude());
-        mMap.addMarker(new MarkerOptions().position(venueLatLng));
+        if (mMap != null) {
+            mMap.addMarker(new MarkerOptions().position(venueLatLng));
+        }
         Log.d(TAG, "onBindViewHolder: venueid : " + mVenue.getVenue_id());
         venueViewHolder.show_on_map_BTN.setTag(R.id.TAG_FOR_EVENT, mVenue);
         venueViewHolder.show_on_map_BTN.setTag(R.id.TAG_FOR_POSITION, position);
         venueViewHolder.booking_BTN.setTag(R.id.TAG_FOR_EVENT, mVenue);
         venueViewHolder.booking_BTN.setTag(R.id.TAG_FOR_POSITION, position);
-        mProgressBar.setVisibility(View.GONE);
+        if (mProgressBar != null) {
+            mProgressBar.setVisibility(View.GONE);
+        }
+        if (position == 0) {
+                PageLoadingListener pageLoadingListener = (PageLoadingListener) mContext;
+                pageLoadingListener.onPageLoad(true);
+        }
     }
 
 
@@ -178,10 +192,19 @@ public class RestaurantVenuesAdapter extends RecyclerView.Adapter<RestaurantVenu
                     // date picker then time picker
                     // book event locally with retrieved date and time
                     // book event remotely with retrieved date and time
+//                    getCurrentUser();
                     mRestaurantVenue = (RestaurantVenue) view.getTag(R.id.TAG_FOR_EVENT);
                     Log.d(TAG, "onClick: venueid : " + mRestaurantVenue.getVenue_id());
                     showDatePickerDialog ();
                     break;
+            }
+        }
+
+        private void getCurrentUser() {
+            mCurrentUser = com.google.firebase.auth.FirebaseAuth.getInstance().getCurrentUser();
+            if (mCurrentUser == null) {
+                android.content.Intent signInIntent = new android.content.Intent(mContext, PhoneAuthActivity.class);
+               mContext.startActivity(signInIntent);
             }
         }
 

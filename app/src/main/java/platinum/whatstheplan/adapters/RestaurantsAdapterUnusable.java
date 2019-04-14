@@ -25,7 +25,7 @@ import com.google.android.gms.maps.model.MarkerOptions;
 import java.text.DecimalFormat;
 
 import platinum.whatstheplan.R;
-import platinum.whatstheplan.activities.FoodListActivity;
+import platinum.whatstheplan.activities.ArchivedFoodListActivity;
 import platinum.whatstheplan.interfaces.RestaurantItemTapListener;
 import platinum.whatstheplan.models.Restaurant;
 import platinum.whatstheplan.models.UserInformation;
@@ -148,7 +148,7 @@ public class RestaurantsAdapterUnusable extends FirestoreRecyclerAdapter<Restaur
                     Log.d(TAG, "onClick: visit_btn");
                     Restaurant restaurant = (Restaurant) view.getTag(R.id.TAG_FOR_RESTAURANT);
                     Log.d(TAG, "onClick: restaurant id = " + restaurant.getId());
-                    Intent intent = new Intent(mContext, FoodListActivity.class);
+                    Intent intent = new Intent(mContext, ArchivedFoodListActivity.class);
                     intent.putExtra("restaurant_name", restaurant_name_TV.getText());
                     intent.putExtra("restaurant_id", restaurant.getId());
                     mContext.startActivity(intent);

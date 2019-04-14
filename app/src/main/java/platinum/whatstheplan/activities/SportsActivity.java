@@ -40,7 +40,6 @@ import com.google.android.gms.common.GoogleApiAvailability;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
-import com.google.android.gms.location.places.PlaceFilter;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
@@ -58,10 +57,6 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.libraries.places.api.Places;
-import com.google.android.libraries.places.api.model.Place;
-import com.google.android.libraries.places.api.model.PlaceLikelihood;
-import com.google.android.libraries.places.api.model.TypeFilter;
-import com.google.android.libraries.places.api.net.FindAutocompletePredictionsRequest;
 import com.google.android.libraries.places.api.net.PlacesClient;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -79,7 +74,6 @@ import org.imperiumlabs.geofirestore.GeoQuery;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.json.JSONStringer;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -95,10 +89,13 @@ import java.util.Map;
 
 import platinum.whatstheplan.R;
 import platinum.whatstheplan.adapters.EventsAdapter;
+import platinum.whatstheplan.adapters.VenuesAdapter;
 import platinum.whatstheplan.interfaces.EventItemTapListener;
+import platinum.whatstheplan.interfaces.PageLoadingListener;
 import platinum.whatstheplan.models.Event;
 import platinum.whatstheplan.models.UserInformation;
 import platinum.whatstheplan.models.UserLocation;
+import platinum.whatstheplan.models.Venue;
 
 import static platinum.whatstheplan.utils.Constants.REQUEST_ERROR_DIALOG_CODE_61;
 import static platinum.whatstheplan.utils.Constants.REQUEST_LOCATION_PERMISSIONS_CODE_52;
@@ -107,7 +104,8 @@ import static platinum.whatstheplan.utils.Constants.REQUEST_LOCATION_SETTINGS_CO
 public class SportsActivity extends FragmentActivity implements
         OnMapReadyCallback,
         EventItemTapListener,
-        GeoQueryEventListener, View.OnClickListener {
+        GeoQueryEventListener, View.OnClickListener,
+        PageLoadingListener {
 
     private static final String TAG = "SportsActivityTag";
 
@@ -137,8 +135,8 @@ public class SportsActivity extends FragmentActivity implements
     private GeoQuery mGeoQuery;
     private com.firebase.geofire.GeoQuery mGeoFireQuery;
     private GeoLocation mGeoLocation;
-    private Event mEvent;
-    private List<Event> mEventList;
+    private Venue mVenue;
+    private List<Venue> mVenueList;
     private List<String> mKeyList;
     private int mRadius;
     private PlacesClient mPlacesClient;
@@ -156,7 +154,7 @@ public class SportsActivity extends FragmentActivity implements
     private void initViewsAndVariables() {
         Log.d(TAG, "initViewsAndVariables: called");
         mKeyList = new ArrayList<>();
-        mEventList = new ArrayList<>();
+        mVenueList = new ArrayList<>();
         mSportsRV = findViewById(R.id.sports_RV);
         mRadiusET = findViewById(R.id.radius_ET);
         mNoEventTV = findViewById(R.id.no_event_TV);
@@ -439,23 +437,12 @@ public class SportsActivity extends FragmentActivity implements
 
     private void saveUserLocationIntoFirestoreThenDisplaySportsNearUserLocation() {
         saveUserLocationIntoFirestore();
-        displaySportsPlacesNearUserLocation();
         displaySportsNearUserLocation(mRadius);
 //        displaySportsWithin5km();
 //        displaySportsNearUserLocation();
     }
 
-    double lat = 19.0255306;
-    double lng = 72.8642131;
-    private void displaySportsPlacesNearUserLocation() {
-        String placesSearchStr = "https://maps.googleapis.com/maps/api/place/nearbysearch/" +
-                "json?location="+lat+","+lng+
-                "&rankby=distance&sensor=true" +
-                "&types=stadium"+
-                "&key=AIzaSyAvXGr1Kt3gF7Zt1rWI3hUYJcVVtyLB-LE";
-        PlacesTask placesTask = new PlacesTask();
-        placesTask.execute(placesSearchStr);
-    }
+
 
     private void requestLocationPermissions() {
         Log.d(TAG, "requestLocationPermissions: called");
@@ -507,12 +494,12 @@ public class SportsActivity extends FragmentActivity implements
 
     private void displaySportsNearUserLocation(int radius) {
         mKeyList.clear();
-        mEventList.clear();
+        mVenueList.clear();
         Log.d(TAG, "displaySportsNearUserLocation: radius = " + radius);
         mGeoLocation = new GeoLocation(mUserCurrentLocation.getLatitude(), mUserCurrentLocation.getLongitude());
         Log.d(TAG, "displaySportsInTheRangeOf5km: mUserCurrentLocation.getLatitude = " + mUserCurrentLocation.getLatitude());
         Log.d(TAG, "displaySportsInTheRangeOf5km: mUserCurrentLocation.getLongitude = " + mUserCurrentLocation.getLongitude());
-        DatabaseReference mDbSportsFirebase = mDbFirebase.getReference("SportsLocations");
+        DatabaseReference mDbSportsFirebase = mDbFirebase.getReference("SportsVenues");
         mGeoFirebase = new GeoFire(mDbSportsFirebase);
         mGeoFireQuery = mGeoFirebase.queryAtLocation(mGeoLocation, radius);
         mGeoFireQuery.removeAllListeners();
@@ -649,23 +636,22 @@ public class SportsActivity extends FragmentActivity implements
                 }
                 Log.d(TAG, "onGeoQueryReady: loopFinished " + mLoopFinished);
 
-                mDbFirestore.collection("Sports").document(key).get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
+                mDbFirestore.collection("SportsVenues").document(key).get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
                     @Override
                     public void onSuccess(DocumentSnapshot documentSnapshot) {
 
-                        mEvent = documentSnapshot.toObject(Event.class);
-                        mEventList.add(mEvent);
+                        mVenue = documentSnapshot.toObject(Venue.class);
+                        mVenueList.add(mVenue);
 
-                        Log.d(TAG, "onSuccess: mEvent.getEvent_name() = " + mEvent.getEvent_name());
 
                         if (mLoopFinished) {
                             Log.d(TAG, "onSuccess: isTrueNow " + mLoopFinished);
 
-                            Log.d(TAG, "onGeoQueryReady: mEventList.size() = " + mEventList.size());
+                            Log.d(TAG, "onGeoQueryReady: mVenueList.size() = " + mVenueList.size());
 
-                            EventsAdapter eventsAdapter = new EventsAdapter(SportsActivity.this, mEventList, mUserCurrentLocation, mMap, mProgressBarPB);
+                            VenuesAdapter venuesAdapter = new VenuesAdapter(SportsActivity.this, mVenueList, mUserCurrentLocation, mMap, mProgressBarPB, SportsActivity.this);
                             Log.d(TAG, "onSuccess: adapter called");
-                            mSportsRV.setAdapter(eventsAdapter);
+                            mSportsRV.setAdapter(venuesAdapter);
                             mProgressBarPB.setVisibility(View.GONE);
                             mSportsRV.setLayoutManager(new LinearLayoutManager(SportsActivity.this));
 
@@ -724,63 +710,8 @@ public class SportsActivity extends FragmentActivity implements
     }
 
 
-    private class PlacesTask extends AsyncTask<String, Void, String> {
-
-        @Override
-        protected String doInBackground(String... placesUrl) {
-
-            StringBuilder placesBuilder = new StringBuilder();
-            for (String placeSearchUrl : placesUrl) {
-                try {
-                    URL requestUrl = new URL(placeSearchUrl);
-                    HttpURLConnection connection = (HttpURLConnection) requestUrl.openConnection();
-                    connection.setRequestMethod("GET");
-                    connection.connect();
-                    int responseCode = connection.getResponseCode();
-
-                    if (responseCode == HttpURLConnection.HTTP_OK) {
-                        BufferedReader bufferedReader = null;
-                        InputStream inputStream = connection.getInputStream();
-                        if (inputStream == null) {
-                            return "";
-                        }
-                        bufferedReader = new BufferedReader(new InputStreamReader(inputStream));
-                        String line;
-                        while ((line = bufferedReader.readLine()) != null) {
-                            placesBuilder.append(line + "\n");
-                        }
-                        if (placesBuilder.length() == 0) {
-                            return "";
-                        }
-                        Log.d(TAG, "doInBackground: placesBuilder = " + placesBuilder.toString());
-                    } else {
-                        Log.i(TAG, "doInBackground: Unsuccessful HTTP Response Code: " + responseCode);
-                    }
-                } catch (MalformedURLException e) {
-
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            }
-            return placesBuilder.toString();
-
-        }
-
-        @Override
-        protected void onPostExecute(String placesResult) {
-            super.onPostExecute(placesResult);
-
-            try {
-                JSONObject placesResultJsonObj = new JSONObject(placesResult);
-                JSONArray placesResultJsonArr = placesResultJsonObj.getJSONArray("results");
-            } catch (JSONException e) {
-                e.printStackTrace();
-            }
-
-
-
-        }
+    @Override
+    public void onPageLoad(boolean pageLoaded) {
+        // does nothing
     }
-
-
 }

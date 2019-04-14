@@ -48,11 +48,15 @@
     </android.support.v7.widget.CardView>
 
 
-    <TextView
-        android:id="@+id/textView5"
-        android:layout_width="wrap_content"
+    <EditText
+        android:id="@+id/payment_ET"
+        android:layout_width="@dimen/_200sdp"
         android:layout_height="wrap_content"
-        android:text="₹1"
+        android:backgroundTint="@color/searchBarIconColorDark"
+        android:gravity="center"
+        android:hint="Amount to be paid"
+        android:inputType="number"
+        android:textColor="@color/Black000000"
         android:textSize="@dimen/_20ssp"
         app:layout_constraintBottom_toTopOf="@+id/cardview"
         app:layout_constraintEnd_toEndOf="parent"
@@ -66,7 +70,7 @@
         android:layout_height="wrap_content"
         android:text="Payable Amount"
         android:textSize="@dimen/_16ssp"
-        app:layout_constraintBottom_toTopOf="@+id/textView5"
+        app:layout_constraintBottom_toTopOf="@+id/payment_ET"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/toolbar"

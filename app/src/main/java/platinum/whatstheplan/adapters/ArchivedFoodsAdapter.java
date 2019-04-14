@@ -17,14 +17,14 @@ import com.firebase.ui.firestore.FirestoreRecyclerOptions;
 import platinum.whatstheplan.R;
 import platinum.whatstheplan.models.FoodItem;
 
-public class FoodsAdapter extends FirestoreRecyclerAdapter<FoodItem, FoodsAdapter.FoodViewHolder> {
+public class ArchivedFoodsAdapter extends FirestoreRecyclerAdapter<FoodItem, ArchivedFoodsAdapter.FoodViewHolder> {
 
     private static final String TAG = "FoodsAdapterTag";
 
     private Context mContext;
 
 
-    public FoodsAdapter(@NonNull FirestoreRecyclerOptions<FoodItem> options, Context context) {
+    public ArchivedFoodsAdapter(@NonNull FirestoreRecyclerOptions<FoodItem> options, Context context) {
         super(options);
         mContext = context;
     }

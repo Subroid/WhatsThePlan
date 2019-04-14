@@ -28,6 +28,8 @@ import java.util.List;
 
 import platinum.whatstheplan.R;
 import platinum.whatstheplan.activities.PartyEventsActivity;
+import platinum.whatstheplan.activities.PartyVenuesActivity;
+import platinum.whatstheplan.interfaces.PageLoadingListener;
 import platinum.whatstheplan.interfaces.VenueItemTapListener;
 import platinum.whatstheplan.models.Venue;
 
@@ -36,6 +38,7 @@ public class VenuesAdapter extends RecyclerView.Adapter<VenuesAdapter.VenueViewH
     private static final String TAG = "VenuesAdapter";
     Activity mActivity;
     private Context mContext;
+    private String mContextStr;
     private List<Venue> mVenueList = new ArrayList<>();
     private Venue mVenue;
     private Location mUserCurrentLocation;
@@ -50,6 +53,8 @@ public class VenuesAdapter extends RecyclerView.Adapter<VenuesAdapter.VenueViewH
 
     public VenuesAdapter(Context context, List<Venue> venueList, Location userCurrentLocation, GoogleMap map, ProgressBar progressBar, Activity activity) {
         mContext = context;
+        mContextStr = mContext.getClass().toString();
+        Log.d(TAG, "VenuesAdapter: mContextStr = " + mContextStr);
         mVenueList = venueList;
         mUserCurrentLocation = userCurrentLocation;
         mMap = map;
@@ -61,7 +66,12 @@ public class VenuesAdapter extends RecyclerView.Adapter<VenuesAdapter.VenueViewH
     @NonNull
     @Override
     public VenueViewHolder onCreateViewHolder(@NonNull ViewGroup viewGroup, int i) {
-        View itemView = LayoutInflater.from(mContext).inflate(R.layout.layout_venue, viewGroup, false);
+        View itemView;
+        if (mContextStr.equals("class platinum.whatstheplan.activities.PartyVenuesActivity")) {
+            itemView = LayoutInflater.from(mContext).inflate(R.layout.layout_party_venue, viewGroup, false);
+        } else {
+            itemView = LayoutInflater.from(mContext).inflate(R.layout.layout_venue, viewGroup, false);
+        }
         VenueViewHolder viewHolder = new VenueViewHolder(itemView);
         return viewHolder;
     }
@@ -92,10 +102,18 @@ public class VenuesAdapter extends RecyclerView.Adapter<VenuesAdapter.VenueViewH
         Glide.with(mContext).load(Uri.parse(mVenue.getVenue_image())).apply(new RequestOptions().fitCenter()).into(venueViewHolder.venue_image_IV);
         Glide.with(mContext).load(Uri.parse(mVenue.getVenue_image())).apply(new RequestOptions().fitCenter()).into(venueViewHolder.venue_layout_bg_IV);
         LatLng venueLatLng = new LatLng(mVenue.getVenue_geopoint().getLatitude(), mVenue.getVenue_geopoint().getLongitude());
-        mMap.addMarker(new MarkerOptions().position(venueLatLng));
+        if (mMap != null) {
+            mMap.addMarker(new MarkerOptions().position(venueLatLng));
+        }
         venueViewHolder.show_on_map_BTN.setTag(R.id.TAG_FOR_EVENT, mVenue);
         venueViewHolder.show_on_map_BTN.setTag(R.id.TAG_FOR_POSITION, position);
-        mProgressBar.setVisibility(View.GONE);
+        if (mProgressBar != null) {
+            mProgressBar.setVisibility(View.GONE);
+        }
+        if (position == 0) {
+            PageLoadingListener pageLoadingListener = (PageLoadingListener) mContext;
+            pageLoadingListener.onPageLoad(true);
+        }
     }
 
 

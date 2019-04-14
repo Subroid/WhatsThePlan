@@ -24,31 +24,37 @@
             android:textColor="@color/WhiteFFFFFF"
             android:textSize="@dimen/_20ssp" />
 
-      <!--  <EditText
+        <!--invisible-->
+        <EditText
             android:id="@+id/radius_ET"
             android:layout_width="@dimen/_50sdp"
             android:layout_height="wrap_content"
+            android:visibility="invisible"
             android:background="@color/WhiteFFFFFF"
             android:gravity="center"
             android:padding="@dimen/_3sdp"
-            android:text="5"
-            android:textSize="@dimen/_14ssp" />-->
+            android:text="2000"
+            android:textSize="@dimen/_14ssp" />
 
-    <!--    <TextView
+        <!--invisible-->
+        <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:visibility="invisible"
             android:layout_marginLeft="@dimen/_20sdp"
             android:fontFamily="cursive"
             android:gravity="center"
             android:text="km"
             android:textColor="@color/WhiteFFFFFF"
-            android:textSize="@dimen/_20ssp" />-->
+            android:textSize="@dimen/_20ssp" />
 
-       <!-- <Button
+        <!--invisible-->
+        <Button
             android:id="@+id/find_BTN"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginLeft="@dimen/_10sdp"
+            android:visibility="invisible"
             android:background="@drawable/round_shpae_persianpink"
             android:elevation="@dimen/_3sdp"
             android:fontFamily="sans-serif-condensed"
@@ -61,7 +67,7 @@
             android:textAllCaps="false"
             android:textColor="@color/WhiteFFFFFF"
             android:textSize="@dimen/_10ssp"
-            android:textStyle="bold" />-->
+            android:textStyle="bold" />
 
     </android.support.v7.widget.Toolbar>
 
@@ -121,7 +127,7 @@
         map:layout_constraintStart_toStartOf="parent"
         map:layout_constraintTop_toBottomOf="@id/sports_RV"
         map:layout_constraintVertical_bias="1.0"
-        tools:context=".activities.SportsActivity" />
+        tools:context=".activities.SportsActivityArchived" />
 
 </android.support.constraint.ConstraintLayout>
 

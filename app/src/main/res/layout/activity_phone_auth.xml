@@ -42,7 +42,7 @@
         android:paddingTop="@dimen/_4sdp"
         android:paddingBottom="@dimen/_4sdp"
         android:background="@drawable/round_shpae_blue10e7dc"
-        android:fontFamily="cursive"
+        android:fontFamily="@font/nyala"
         android:text="Send OTP"
         android:textAllCaps="false"
         android:textColor="@color/WhiteFFFFFF"

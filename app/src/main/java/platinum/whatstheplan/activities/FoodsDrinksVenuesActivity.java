@@ -13,6 +13,7 @@ import android.graphics.drawable.Drawable;
 import android.location.Location;
 import android.location.LocationManager;
 import android.os.Bundle;
+import android.os.Parcelable;
 import android.provider.Settings;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -27,6 +28,7 @@ import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -65,6 +67,7 @@ import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.GeoPoint;
+import com.shashank.sony.fancytoastlib.FancyToast;
 
 import org.imperiumlabs.geofirestore.GeoFirestore;
 import org.imperiumlabs.geofirestore.GeoQuery;
@@ -76,6 +79,7 @@ import java.util.Map;
 
 import platinum.whatstheplan.R;
 import platinum.whatstheplan.adapters.RestaurantVenuesAdapter;
+import platinum.whatstheplan.interfaces.PageLoadingListener;
 import platinum.whatstheplan.interfaces.RestaurantVenueItemTapListener;
 import platinum.whatstheplan.models.UserInformation;
 import platinum.whatstheplan.models.UserLocation;
@@ -88,7 +92,9 @@ import static platinum.whatstheplan.utils.Constants.REQUEST_LOCATION_SETTINGS_CO
 public class FoodsDrinksVenuesActivity extends FragmentActivity implements
         OnMapReadyCallback,
         RestaurantVenueItemTapListener,
-        GeoQueryEventListener, View.OnClickListener  {
+        GeoQueryEventListener,
+        View.OnClickListener,
+        PageLoadingListener {
 
 
     private static final String TAG = "FoodsDrinksVenuesTag";
@@ -123,6 +129,8 @@ public class FoodsDrinksVenuesActivity extends FragmentActivity implements
     private List<RestaurantVenue> mRestaurantVenueList;
     private List<String> mKeyList;
     private int mRadius;
+    private ImageView mSearchIV;
+    private boolean mPageLoaded;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -140,6 +148,7 @@ public class FoodsDrinksVenuesActivity extends FragmentActivity implements
         mKeyList = new ArrayList<>();
         mRestaurantVenueList = new ArrayList<>();
         mNoRestaurantVenueTV = findViewById(R.id.no_venue_TV);
+        mSearchIV = findViewById(R.id.search_IV);
         mRestaurantsRV = findViewById(R.id.parties_RV);
         mRadiusET = findViewById(R.id.radius_ET);
         mRadius = Integer.parseInt(mRadiusET.getText().toString());
@@ -162,6 +171,7 @@ public class FoodsDrinksVenuesActivity extends FragmentActivity implements
 
     private void setClickListeners() {
         mFindBTN.setOnClickListener(this);
+        mSearchIV.setOnClickListener(this);
     }
 
     private void mMapActions() {
@@ -684,6 +694,20 @@ public class FoodsDrinksVenuesActivity extends FragmentActivity implements
                 i = 0;
                 mLoopFinished = false;
                 displayRestaurantsNearUserLocation(mRadius);
+                break;
+            case R.id.search_IV:
+                if (mPageLoaded) {
+                    Intent searchIntent = new Intent(this, SearchActivity.class);
+                    searchIntent.putExtra("previous_activity", "Restaurants");
+                    searchIntent.putParcelableArrayListExtra("restaurants_list", (ArrayList<? extends Parcelable>) mRestaurantVenueList);
+                    searchIntent.putExtra("user_location", mUserCurrentLocation);
+                    startActivity(searchIntent);
+                    finish();
+                } else  {
+                    FancyToast.makeText(this, "Please, search after page has finished loading", FancyToast.LENGTH_LONG, FancyToast.WARNING, false)
+                            .show();
+                }
+                break;
         }
     }
 
@@ -694,4 +718,8 @@ public class FoodsDrinksVenuesActivity extends FragmentActivity implements
 
     }
 
+    @Override
+    public void onPageLoad(boolean pageLoaded) {
+        mPageLoaded = true;
+    }
 }
